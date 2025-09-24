@@ -1,6 +1,7 @@
-import { describe, expect, test } from 'bun:test'
-import { Authorization, Hex, Rlp, Secp256k1, Value } from 'ox'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { Authorization, Hex, Rlp, RpcTransport, Secp256k1, Value } from 'ox'
 import { TransactionEnvelopeFeeToken } from 'tempo/ox'
+import { Instance } from 'tempo/prool'
 
 const privateKey =
   '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
@@ -800,4 +801,84 @@ test('exports', () => {
       "validate",
     ]
   `)
+})
+
+describe.skipIf(!!process.env.CI)('e2e', () => {
+  const node = Instance.tempo({ port: 8546 })
+  beforeEach(() => node.start())
+  afterEach(() => node.stop())
+
+  test('behavior: network', async () => {
+    const address = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'
+    const privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+
+    const transport = RpcTransport.fromHttp('http://localhost:8546')
+
+    const nonce = await transport.request({
+      method: 'eth_getTransactionCount',
+      params: [address, 'pending'],
+    })
+
+    const transaction = TransactionEnvelopeFeeToken.from({
+      chainId: 1337,
+      feeToken: '0x20c0000000000000000000000000000000000000',
+      nonce: BigInt(nonce),
+      gas: 21000n,
+      to: '0x0000000000000000000000000000000000000000',
+      value: Value.fromEther('1'),
+      maxFeePerGas: Value.fromGwei('20'),
+      maxPriorityFeePerGas: Value.fromGwei('10'),
+    })
+
+    const signature = Secp256k1.sign({
+      payload: TransactionEnvelopeFeeToken.getSignPayload(transaction),
+      privateKey,
+    })
+
+    const serialized_signed = TransactionEnvelopeFeeToken.serialize(
+      transaction,
+      {
+        signature,
+      },
+    )
+
+    const hash = await transport.request({
+      method: 'eth_sendRawTransaction',
+      params: [serialized_signed],
+    })
+
+    expect(hash).toBeDefined()
+
+    const response = await transport.request({
+      method: 'eth_getTransactionByHash',
+      params: [hash],
+    })
+
+    expect(response).toMatchInlineSnapshot(`
+      {
+        "accessList": [],
+        "authorizationList": [],
+        "blockHash": null,
+        "blockNumber": null,
+        "chainId": "0x539",
+        "feeToken": "0x20c0000000000000000000000000000000000000",
+        "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "gas": "0x5208",
+        "gasPrice": "0x4a817c800",
+        "hash": "0x2ed63d3c3020c91cff79f8d7d18c09d53614a929231f5292c4b6ea278309b587",
+        "input": "0x",
+        "maxFeePerGas": "0x4a817c800",
+        "maxPriorityFeePerGas": "0x2540be400",
+        "nonce": "0x0",
+        "r": "0xcfd572392075019a98174d4d4b145c8940104f3ebdb9bfd9dc328b9d1980ce97",
+        "s": "0xe86b6a7e36acd75b2da6c344d1a6001a5ae49bdfbd6982de250339769137671",
+        "to": "0x0000000000000000000000000000000000000000",
+        "transactionIndex": null,
+        "type": "0x77",
+        "v": "0x1",
+        "value": "0xde0b6b3a7640000",
+        "yParity": "0x1",
+      }
+    `)
+  })
 })
