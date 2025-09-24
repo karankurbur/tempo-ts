@@ -2,7 +2,7 @@
 
 Tempo primitives for Ox.
 
-> [!INFO]
+> [!NOTE]
 > This is a temporary package.
 > It will be merged into [Ox](https://github.com/wevm/ox) soon.
 
