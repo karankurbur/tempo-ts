@@ -1,4 +1,3 @@
-import type * as ox_Signature from 'ox/Signature'
 import {
   type Chain,
   type ChainConfig,
@@ -29,7 +28,9 @@ export const config = {
       signature?: Signature | undefined,
     ) {
       if (transaction.type === 'feeToken' || transaction.feeToken)
-        return TxFeeToken.serialize(transaction, { signature: signature as never })
+        return TxFeeToken.serialize(transaction, {
+          signature: signature as never,
+        })
       return serializeTransaction(transaction, signature)
     },
   },
