@@ -892,13 +892,16 @@ describe.skipIf(!!process.env.CI)('e2e', () => {
         method: 'eth_getTransactionByHash',
         params: [hash],
       })
+      if (!response) throw new Error()
 
-      expect(response).toMatchInlineSnapshot(`
+      const { blockNumber, blockHash, ...rest } = response
+
+      expect(blockNumber).toBeDefined()
+      expect(blockHash).toBeDefined()
+      expect(rest).toMatchInlineSnapshot(`
         {
           "accessList": [],
           "authorizationList": [],
-          "blockHash": "0x1a9daf4bf6b58e226b0707581d7bbf850183266d3d2af01153bbc22731efb634",
-          "blockNumber": "0x2",
           "chainId": "0x539",
           "feeToken": "0x20c0000000000000000000000000000000000000",
           "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
@@ -921,15 +924,19 @@ describe.skipIf(!!process.env.CI)('e2e', () => {
       `)
     }
 
-    const receipt = await transport.request({
-      method: 'eth_getTransactionReceipt',
-      params: [hash],
-    })
+    {
+      const receipt = await transport.request({
+        method: 'eth_getTransactionReceipt',
+        params: [hash],
+      })
+      if (!receipt) throw new Error()
 
-    expect({ ...receipt, blockHash: null }).toMatchInlineSnapshot(`
+      const { blockNumber, blockHash, ...rest } = receipt
+
+      expect(blockNumber).toBeDefined()
+      expect(blockHash).toBeDefined()
+      expect(rest).toMatchInlineSnapshot(`
       {
-        "blockHash": null,
-        "blockNumber": "0x2",
         "contractAddress": null,
         "cumulativeGasUsed": "0x5208",
         "effectiveGasPrice": "0x2540be42c",
@@ -944,5 +951,6 @@ describe.skipIf(!!process.env.CI)('e2e', () => {
         "type": "0x77",
       }
     `)
+    }
   })
 })

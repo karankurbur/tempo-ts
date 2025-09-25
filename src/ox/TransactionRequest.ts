@@ -3,8 +3,8 @@ import type * as Authorization from 'ox/Authorization'
 import type * as Errors from 'ox/Errors'
 import type * as Hex from 'ox/Hex'
 import * as ox_TransactionRequest from 'ox/TransactionRequest'
-import * as Transaction from './Transaction.js'
 import type { Compute } from '../internal/types.js'
+import * as Transaction from './Transaction.js'
 
 /** A Transaction Request that is generic to all transaction types, as defined in the [Execution API specification](https://github.com/ethereum/execution-apis/blob/4aca1d7a3e5aab24c8f6437131289ad386944eaa/src/schemas/transaction.yaml#L358-L423). */
 export type TransactionRequest<
