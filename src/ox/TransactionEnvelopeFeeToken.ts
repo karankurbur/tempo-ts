@@ -59,7 +59,8 @@ export type Type = typeof type
  *
  * @example
  * ```ts twoslash
- * import { TransactionEnvelopeFeeToken, Value } from 'ox'
+ * import { Value } from 'ox'
+ * import { TransactionEnvelopeFeeToken } from 'ox/tempo'
  *
  * TransactionEnvelopeFeeToken.assert({
  *   feeToken: '0x20c0000000000000000000000000000000000000',
@@ -104,7 +105,7 @@ export declare namespace assert {
  *
  * @example
  * ```ts twoslash
- * import { TransactionEnvelopeFeeToken } from 'ox'
+ * import { TransactionEnvelopeFeeToken } from 'ox/tempo'
  *
  * const envelope = TransactionEnvelopeFeeToken.deserialize('0x77ef0182031184773594008477359400809470997970c51812dc3a010c7d01b50e0d17dc79c8880de0b6b3a764000080c0')
  * // @log: {
@@ -213,7 +214,8 @@ export declare namespace deserialize {
  *
  * @example
  * ```ts twoslash
- * import { TransactionEnvelopeFeeToken, Value } from 'ox'
+ * import { Value } from 'ox'
+ * import { TransactionEnvelopeFeeToken } from 'ox/tempo'
  *
  * const envelope = TransactionEnvelopeFeeToken.from({ // [!code focus]
  *   chainId: 1, // [!code focus]
@@ -232,7 +234,8 @@ export declare namespace deserialize {
  *
  * ```ts twoslash
  * // @noErrors
- * import { Secp256k1, TransactionEnvelopeFeeToken, Value } from 'ox'
+ * import { Secp256k1, Value } from 'ox'
+ * import { TransactionEnvelopeFeeToken } from 'ox/tempo'
  *
  * const envelope = TransactionEnvelopeFeeToken.from({
  *   chainId: 1,
@@ -271,7 +274,7 @@ export declare namespace deserialize {
  * It is possible to instantiate an Fee Token Transaction Envelope from a {@link ox#TransactionEnvelopeFeeToken.Serialized} value.
  *
  * ```ts twoslash
- * import { TransactionEnvelopeFeeToken } from 'ox'
+ * import { TransactionEnvelopeFeeToken } from 'ox/tempo'
  *
  * const envelope = TransactionEnvelopeFeeToken.from('0x77f858018203118502540be4008504a817c800809470997970c51812dc3a010c7d01b50e0d17dc79c8880de0b6b3a764000080c08477359400e1a001627c687261b0e7f8638af1112efa8a77e23656f6e7945275b19e9deed80261')
  * // @log: {
@@ -352,7 +355,8 @@ export declare namespace from {
  *
  * ```ts twoslash
  * // @noErrors
- * import { Secp256k1, TransactionEnvelopeFeeToken } from 'ox'
+ * import { Secp256k1 } from 'ox'
+ * import { TransactionEnvelopeFeeToken } from 'ox/tempo'
  *
  * const envelope = TransactionEnvelopeFeeToken.from({
  *   chainId: 1,
@@ -391,7 +395,8 @@ export declare namespace getSignPayload {
  * @example
  * ```ts twoslash
  * // @noErrors
- * import { Secp256k1, TransactionEnvelopeFeeToken } from 'ox'
+ * import { Secp256k1 } from 'ox'
+ * import { TransactionEnvelopeFeeToken } from 'ox/tempo'
  *
  * const envelope = TransactionEnvelopeFeeToken.from({
  *   chainId: 1,
@@ -456,7 +461,8 @@ export declare namespace hash {
  * @example
  * ```ts twoslash
  * // @noErrors
- * import { TransactionEnvelopeFeeToken, Value } from 'ox'
+ * import { Value } from 'ox'
+ * import { TransactionEnvelopeFeeToken } from 'ox/tempo'
  *
  * const envelope = TransactionEnvelopeFeeToken.from({
  *   chainId: 1,
@@ -476,7 +482,8 @@ export declare namespace hash {
  *
  * ```ts twoslash
  * // @noErrors
- * import { Secp256k1, TransactionEnvelopeFeeToken, Value } from 'ox'
+ * import { Secp256k1, Value } from 'ox'
+ * import { TransactionEnvelopeFeeToken } from 'ox/tempo'
  *
  * const envelope = TransactionEnvelopeFeeToken.from({
  *   chainId: 1,
@@ -566,7 +573,8 @@ export declare namespace serialize {
  *
  * @example
  * ```ts twoslash
- * import { TransactionEnvelopeFeeToken, Value } from 'ox'
+ * import { Value } from 'ox'
+ * import { TransactionEnvelopeFeeToken } from 'ox/tempo'
  *
  * const valid = TransactionEnvelopeFeeToken.validate({
  *   feeToken: '0x20c0000000000000000000000000000000000000',

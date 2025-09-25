@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { setTimeout } from 'node:timers/promises'
 import { Authorization, Hex, Rlp, RpcTransport, Secp256k1, Value } from 'ox'
 import { TransactionEnvelopeFeeToken } from 'tempo/ox'
 import { Instance } from 'tempo/prool'
@@ -810,7 +811,8 @@ describe.skipIf(!!process.env.CI)('e2e', () => {
 
   test('behavior: network', async () => {
     const address = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'
-    const privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+    const privateKey =
+      '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
     const transport = RpcTransport.fromHttp('http://localhost:8546')
 
@@ -848,13 +850,13 @@ describe.skipIf(!!process.env.CI)('e2e', () => {
     })
 
     expect(hash).toBeDefined()
+    {
+      const response = await transport.request({
+        method: 'eth_getTransactionByHash',
+        params: [hash],
+      })
 
-    const response = await transport.request({
-      method: 'eth_getTransactionByHash',
-      params: [hash],
-    })
-
-    expect(response).toMatchInlineSnapshot(`
+      expect(response).toMatchInlineSnapshot(`
       {
         "accessList": [],
         "authorizationList": [],
@@ -878,6 +880,68 @@ describe.skipIf(!!process.env.CI)('e2e', () => {
         "v": "0x1",
         "value": "0xde0b6b3a7640000",
         "yParity": "0x1",
+      }
+    `)
+    }
+
+    // Wait for inclusion.
+    await setTimeout(4)
+
+    {
+      const response = await transport.request({
+        method: 'eth_getTransactionByHash',
+        params: [hash],
+      })
+
+      expect(response).toMatchInlineSnapshot(`
+        {
+          "accessList": [],
+          "authorizationList": [],
+          "blockHash": "0x1a9daf4bf6b58e226b0707581d7bbf850183266d3d2af01153bbc22731efb634",
+          "blockNumber": "0x2",
+          "chainId": "0x539",
+          "feeToken": "0x20c0000000000000000000000000000000000000",
+          "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+          "gas": "0x5208",
+          "gasPrice": "0x2540be42c",
+          "hash": "0x2ed63d3c3020c91cff79f8d7d18c09d53614a929231f5292c4b6ea278309b587",
+          "input": "0x",
+          "maxFeePerGas": "0x4a817c800",
+          "maxPriorityFeePerGas": "0x2540be400",
+          "nonce": "0x0",
+          "r": "0xcfd572392075019a98174d4d4b145c8940104f3ebdb9bfd9dc328b9d1980ce97",
+          "s": "0xe86b6a7e36acd75b2da6c344d1a6001a5ae49bdfbd6982de250339769137671",
+          "to": "0x0000000000000000000000000000000000000000",
+          "transactionIndex": "0x0",
+          "type": "0x77",
+          "v": "0x1",
+          "value": "0xde0b6b3a7640000",
+          "yParity": "0x1",
+        }
+      `)
+    }
+
+    const receipt = await transport.request({
+      method: 'eth_getTransactionReceipt',
+      params: [hash],
+    })
+
+    expect({ ...receipt, blockHash: null }).toMatchInlineSnapshot(`
+      {
+        "blockHash": null,
+        "blockNumber": "0x2",
+        "contractAddress": null,
+        "cumulativeGasUsed": "0x5208",
+        "effectiveGasPrice": "0x2540be42c",
+        "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "gasUsed": "0x5208",
+        "logs": [],
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "status": "0x0",
+        "to": "0x0000000000000000000000000000000000000000",
+        "transactionHash": "0x2ed63d3c3020c91cff79f8d7d18c09d53614a929231f5292c4b6ea278309b587",
+        "transactionIndex": "0x0",
+        "type": "0x77",
       }
     `)
   })

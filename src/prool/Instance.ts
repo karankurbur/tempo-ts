@@ -25,7 +25,7 @@ export const tempo = defineInstance((parameters: tempo.Parameters = {}) => {
     ...args
   } = parameters
   const { deadline = 3, gaslimit = 3000000000, maxTasks = 8 } = builder ?? {}
-  const { blockTime = '1sec' } = dev ?? {}
+  const { blockTime = '2ms' } = dev ?? {}
   const {
     address = '0x20c0000000000000000000000000000000000000',
     amount = 1000000000000000,
@@ -46,7 +46,9 @@ export const tempo = defineInstance((parameters: tempo.Parameters = {}) => {
     name,
     port: args.port ?? 8545,
     async start({ port = args.port }, options) {
-      fs.rmdirSync('./tmp', { recursive: true })
+      try {
+        fs.rmdirSync('./tmp', { recursive: true })
+      } catch {}
       fs.mkdirSync('./tmp', { recursive: true })
       fs.writeFileSync('./tmp/chain.json', JSON.stringify(chainJson, null, 2))
       return await process.start(
