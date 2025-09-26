@@ -69,4 +69,12 @@ export function setUserToken(client, parameters) {
         args: [token],
     });
 }
+export function decorator(client) {
+    return {
+        createToken: (parameters) => createToken(client, parameters),
+        // @ts-expect-error
+        getUserToken: (parameters) => getUserToken(client, parameters),
+        setUserToken: (parameters) => setUserToken(client, parameters),
+    };
+}
 //# sourceMappingURL=actions.js.map

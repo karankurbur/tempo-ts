@@ -54,4 +54,40 @@ export declare namespace setUserToken {
     };
     type ReturnType = WriteContractReturnType;
 }
+export type Decorator<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = {
+    /**
+     * Creates a new TIP20 token.
+     *
+     * @example
+     * TODO
+     *
+     * @param client - Client.
+     * @param parameters - Parameters.
+     * @returns The transaction hash.
+     */
+    createToken: (parameters: createToken.Parameters<chain, account>) => Promise<createToken.ReturnType>;
+    /**
+     * Gets the user's default fee token.
+     *
+     * @example
+     * TODO
+     *
+     * @param client - Client.
+     * @param parameters - Parameters.
+     * @returns The transaction hash.
+     */
+    getUserToken: (...parameters: account extends Account ? [getUserToken.Parameters<account>] | [] : [getUserToken.Parameters<account>]) => Promise<getUserToken.ReturnType>;
+    /**
+     * Sets the user's default fee token.
+     *
+     * @example
+     * TODO
+     *
+     * @param client - Client.
+     * @param parameters - Parameters.
+     * @returns The transaction hash.
+     */
+    setUserToken: (parameters: setUserToken.Parameters<chain, account>) => Promise<setUserToken.ReturnType>;
+};
+export declare function decorator<transport extends Transport, chain extends Chain | undefined, account extends Account | undefined>(client: Client<transport, chain, account>): Decorator<chain, account>;
 //# sourceMappingURL=actions.d.ts.map
