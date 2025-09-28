@@ -1,3 +1,5 @@
+export * as TokenId from "./TokenId.js";
+export * as TokenRole from "./TokenRole.js";
 export * as Transaction from "./Transaction.js";
 export * as TransactionEnvelopeFeeToken from "./TransactionEnvelopeFeeToken.js";
 //# sourceMappingURL=index.js.map

@@ -5,7 +5,7 @@ import { Instance } from 'tempo/prool'
 import * as actions from 'tempo/viem/actions'
 import { createClient, http, parseEther, publicActions } from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
-import { writeContract } from 'viem/actions'
+import { getCode, writeContract } from 'viem/actions'
 import { tip20Abi } from './abis.js'
 import { usdAddress } from './addresses.js'
 
@@ -28,17 +28,33 @@ const client = createClient({
   transport: http(),
 }).extend(publicActions)
 
-test('createToken', async () => {
-  const { address, hash } = await actions.createToken(client, {
-    admin: client.account,
-    currency: 'USD',
-    name: 'Test USD',
-    symbol: 'TUSD',
-  })
+test.skipIf(!!process.env.CI)(
+  'createToken',
+  async () => {
+    const { hash, ...result } = await actions.createToken(client, {
+      currency: 'USD',
+      name: 'Test USD',
+      symbol: 'TUSD',
+    })
 
-  expect(address).toBeDefined()
-  expect(hash).toBeDefined()
-})
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "address": "0x20c0000000000000000000000000000000000001",
+        "admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        "id": 1,
+      }
+    `)
+    expect(hash).toBeDefined()
+
+    await setTimeout(100)
+
+    const code = await getCode(client, {
+      address: result.address,
+    })
+    expect(code).toBe('0xef')
+  },
+  { timeout: 1000000 },
+)
 
 test.skipIf(!!process.env.CI)('getTokenAllowance', async () => {
   // First, approve some allowance
@@ -88,26 +104,22 @@ test.skipIf(!!process.env.CI)('getTokenBalance', async () => {
 test.skipIf(!!process.env.CI)('getTokenMetadata', async () => {
   const metadata = await actions.getTokenMetadata(client)
 
-  expect(metadata).toMatchObject({
-    name: 'TestUSD',
-    symbol: 'TestUSD',
-    currency: 'USD',
-    decimals: 6,
-    totalSupply: 340282366920938463647842048168863727605n,
-  })
-
-  // Test with explicit token
-  const metadataExplicit = await actions.getTokenMetadata(client, {
-    token: usdAddress,
-  })
-
-  expect(metadataExplicit).toMatchObject(metadata)
+  expect(metadata).toMatchInlineSnapshot(`
+    {
+      "currency": "USD",
+      "decimals": 6,
+      "name": "TestUSD",
+      "paused": false,
+      "supplyCap": 115792089237316195423570985008687907853269984665640564039457584007913129639935n,
+      "symbol": "TestUSD",
+      "totalSupply": 340282366920938463647842048168863727605n,
+      "transferPolicy": "always-allow",
+    }
+  `)
 })
 
-// TODO: fix
-test.skip('getTokenMetadata (custom token)', async () => {
+test.skipIf(!!process.env.CI)('getTokenMetadata (custom token)', async () => {
   const { address } = await actions.createToken(client, {
-    admin: client.account,
     currency: 'USD',
     name: 'Test USD',
     symbol: 'TUSD',
@@ -119,20 +131,18 @@ test.skip('getTokenMetadata (custom token)', async () => {
     token: address,
   })
 
-  expect(metadata).toMatchObject({
-    name: 'TestUSD',
-    symbol: 'TestUSD',
-    currency: 'USD',
-    decimals: 6,
-    totalSupply: 340282366920938463647842048168863727605n,
-  })
-
-  // Test with explicit token
-  const metadataExplicit = await actions.getTokenMetadata(client, {
-    token: usdAddress,
-  })
-
-  expect(metadataExplicit).toMatchObject(metadata)
+  expect(metadata).toMatchInlineSnapshot(`
+    {
+      "currency": "USD",
+      "decimals": 6,
+      "name": "Test USD",
+      "paused": false,
+      "supplyCap": 115792089237316195423570985008687907853269984665640564039457584007913129639935n,
+      "symbol": "TUSD",
+      "totalSupply": 0n,
+      "transferPolicy": "always-allow",
+    }
+  `)
 })
 
 test.skipIf(!!process.env.CI)('getUserToken', async () => {

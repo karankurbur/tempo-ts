@@ -1,14 +1,17 @@
-import { keccak256, stringToHex, } from 'viem';
+// TODO:
+// - `Compute`
+// - JSDoc
+// - increase test cov
+import { hexToNumber, } from 'viem';
 import { parseAccount } from 'viem/accounts';
 import { multicall, readContract, simulateContract, writeContract, } from 'viem/actions';
+import * as TokenId from "../ox/TokenId.js";
+import * as TokenRole from "../ox/TokenRole.js";
 import { feeManagerAbi, tip20Abi, tip20FactoryAbi } from "./abis.js";
 import { feeManagerAddress, tip20FactoryAddress, usdAddress, } from "./addresses.js";
-const tokenRole = {
-    defaultAdmin: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    pause: keccak256(stringToHex('PAUSE_ROLE')),
-    unpause: keccak256(stringToHex('UNPAUSE_ROLE')),
-    issuer: keccak256(stringToHex('ISSUER_ROLE')),
-    burnBlocked: keccak256(stringToHex('BURN_BLOCKED_ROLE')),
+const transferPolicy = {
+    0: 'always-reject',
+    1: 'always-allow',
 };
 /**
  * Creates a new TIP20 token.
@@ -21,8 +24,10 @@ const tokenRole = {
  * @returns The transaction hash.
  */
 export async function createToken(client, parameters) {
-    const { account = client.account, chain = client.chain, name, symbol, currency, } = parameters;
-    const admin = parseAccount(parameters.admin);
+    const { account = client.account, admin: admin_ = client.account, chain = client.chain, name, symbol, currency, } = parameters;
+    const admin = admin_ ? parseAccount(admin_) : undefined;
+    if (!admin)
+        throw new Error('admin is required.');
     const { request, result } = await simulateContract(client, {
         ...parameters,
         account,
@@ -33,9 +38,13 @@ export async function createToken(client, parameters) {
         args: [name, symbol, currency, admin.address],
     });
     const hash = await writeContract(client, request);
+    const id = hexToNumber(result);
+    const address = TokenId.toAddress(id);
     return {
-        address: result,
+        address,
+        admin: admin.address,
         hash,
+        id,
     };
 }
 /**
@@ -48,7 +57,7 @@ export async function createToken(client, parameters) {
  * @param parameters - Parameters.
  * @returns The token allowance.
  */
-export function getTokenAllowance(client, parameters) {
+export async function getTokenAllowance(client, parameters) {
     const { account = client.account, token = usdAddress, spender } = parameters;
     const address = account ? parseAccount(account).address : undefined;
     if (!address)
@@ -71,7 +80,7 @@ export function getTokenAllowance(client, parameters) {
  * @param parameters - Parameters.
  * @returns The token balance.
  */
-export function getTokenBalance(client, ...parameters) {
+export async function getTokenBalance(client, ...parameters) {
     const { account = client.account, token = usdAddress } = parameters[0] ?? {};
     const address = account ? parseAccount(account).address : undefined;
     if (!address)
@@ -94,21 +103,11 @@ export function getTokenBalance(client, ...parameters) {
  * @param parameters - Parameters.
  * @returns The token metadata.
  */
-export function getTokenMetadata(client, parameters = {}) {
+export async function getTokenMetadata(client, parameters = {}) {
     const { token = usdAddress, ...rest } = parameters;
     return multicall(client, {
         ...rest,
         contracts: [
-            {
-                address: token,
-                abi: tip20Abi,
-                functionName: 'name',
-            },
-            {
-                address: token,
-                abi: tip20Abi,
-                functionName: 'symbol',
-            },
             {
                 address: token,
                 abi: tip20Abi,
@@ -122,17 +121,45 @@ export function getTokenMetadata(client, parameters = {}) {
             {
                 address: token,
                 abi: tip20Abi,
+                functionName: 'name',
+            },
+            {
+                address: token,
+                abi: tip20Abi,
+                functionName: 'paused',
+            },
+            {
+                address: token,
+                abi: tip20Abi,
+                functionName: 'supplyCap',
+            },
+            {
+                address: token,
+                abi: tip20Abi,
+                functionName: 'symbol',
+            },
+            {
+                address: token,
+                abi: tip20Abi,
                 functionName: 'totalSupply',
+            },
+            {
+                address: token,
+                abi: tip20Abi,
+                functionName: 'transferPolicyId',
             },
         ],
         allowFailure: false,
         deployless: true,
-    }).then(([name, symbol, currency, decimals, totalSupply]) => ({
+    }).then(([currency, decimals, name, paused, supplyCap, symbol, totalSupply, transferPolicyId,]) => ({
         name,
         symbol,
         currency,
         decimals,
         totalSupply,
+        paused,
+        supplyCap,
+        transferPolicy: transferPolicy[Number(transferPolicyId)],
     }));
 }
 /**
@@ -145,7 +172,7 @@ export function getTokenMetadata(client, parameters = {}) {
  * @param parameters - Parameters.
  * @returns The transaction hash.
  */
-export function getUserToken(client, ...parameters) {
+export async function getUserToken(client, ...parameters) {
     const { account: account_ = client.account } = parameters[0] ?? {};
     if (!account_)
         throw new Error('account is required.');
@@ -168,9 +195,9 @@ export function getUserToken(client, ...parameters) {
  * @param parameters - Parameters.
  * @returns The transaction hash.
  */
-export function grantTokenRole(client, parameters) {
+export async function grantTokenRole(client, parameters) {
     const { account = client.account, chain = client.chain, token, to, } = parameters;
-    const role = tokenRole[parameters.role];
+    const role = TokenRole.serialize(parameters.role);
     return writeContract(client, {
         ...parameters,
         account,
@@ -191,9 +218,9 @@ export function grantTokenRole(client, parameters) {
  * @param parameters - Parameters.
  * @returns The transaction hash.
  */
-export function renounceTokenRole(client, parameters) {
+export async function renounceTokenRole(client, parameters) {
     const { account = client.account, chain = client.chain, token } = parameters;
-    const role = tokenRole[parameters.role];
+    const role = TokenRole.serialize(parameters.role);
     return writeContract(client, {
         ...parameters,
         account,
@@ -214,9 +241,9 @@ export function renounceTokenRole(client, parameters) {
  * @param parameters - Parameters.
  * @returns The transaction hash.
  */
-export function revokeTokenRole(client, parameters) {
+export async function revokeTokenRole(client, parameters) {
     const { account = client.account, chain = client.chain, token, from, } = parameters;
-    const role = tokenRole[parameters.role];
+    const role = TokenRole.serialize(parameters.role);
     return writeContract(client, {
         ...parameters,
         account,
@@ -237,7 +264,7 @@ export function revokeTokenRole(client, parameters) {
  * @param parameters - Parameters.
  * @returns The transaction hash.
  */
-export function setUserToken(client, parameters) {
+export async function setUserToken(client, parameters) {
     const { account = client.account, chain = client.chain, token } = parameters;
     return writeContract(client, {
         ...parameters,

@@ -1,15 +1,13 @@
-import { type Account, type Address, type Chain, type Client, type Hex, type ReadContractParameters, type ReadContractReturnType, type Transport, type WriteContractParameters, type WriteContractReturnType } from 'viem';
+import { type Account, type Address, type Chain, type Client, type Hex, type ReadContractParameters, type ReadContractReturnType, type Transport, type ValueOf, type WriteContractParameters, type WriteContractReturnType } from 'viem';
 import type { UnionOmit } from "../internal/types.js";
+import * as TokenRole from "../ox/TokenRole.js";
 import { feeManagerAbi, tip20Abi } from "./abis.js";
 import type { GetAccountParameter } from "./types.js";
-declare const tokenRole: {
-    defaultAdmin: string;
-    pause: `0x${string}`;
-    unpause: `0x${string}`;
-    issuer: `0x${string}`;
-    burnBlocked: `0x${string}`;
+declare const transferPolicy: {
+    readonly 0: "always-reject";
+    readonly 1: "always-allow";
 };
-type TokenRole = keyof typeof tokenRole;
+type TransferPolicy = ValueOf<typeof transferPolicy>;
 /**
  * Creates a new TIP20 token.
  *
@@ -23,14 +21,19 @@ type TokenRole = keyof typeof tokenRole;
 export declare function createToken<chain extends Chain | undefined, account extends Account | undefined>(client: Client<Transport, chain, account>, parameters: createToken.Parameters<chain, account>): Promise<createToken.ReturnType>;
 export declare namespace createToken {
     type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & {
-        admin: Account | Address;
         currency: string;
         name: string;
         symbol: string;
-    };
+    } & (account extends Account ? {
+        admin?: Account | Address | undefined;
+    } : {
+        admin: Account | Address;
+    });
     type ReturnType = {
         address: Address;
+        admin: Address;
         hash: Hex;
+        id: number;
     };
 }
 /**
@@ -88,7 +91,10 @@ export declare namespace getTokenMetadata {
         symbol: string;
         currency: string;
         decimals: number;
+        paused: boolean;
+        supplyCap: bigint;
         totalSupply: bigint;
+        transferPolicy: TransferPolicy;
     };
 }
 /**
@@ -120,7 +126,7 @@ export declare function grantTokenRole<chain extends Chain | undefined, account 
 export declare namespace grantTokenRole {
     type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & {
         token: Address;
-        role: TokenRole;
+        role: TokenRole.TokenRole;
         to: Address;
     };
     type ReturnType = WriteContractReturnType;
@@ -139,7 +145,7 @@ export declare function renounceTokenRole<chain extends Chain | undefined, accou
 export declare namespace renounceTokenRole {
     type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & {
         token: Address;
-        role: TokenRole;
+        role: TokenRole.TokenRole;
     };
     type ReturnType = WriteContractReturnType;
 }
@@ -157,7 +163,7 @@ export declare function revokeTokenRole<chain extends Chain | undefined, account
 export declare namespace revokeTokenRole {
     type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & {
         from: Address;
-        role: TokenRole;
+        role: TokenRole.TokenRole;
         token: Address;
     };
     type ReturnType = WriteContractReturnType;

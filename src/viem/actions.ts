@@ -1,14 +1,19 @@
+// TODO:
+// - `Compute`
+// - JSDoc
+// - increase test cov
+
 import {
   type Account,
   type Address,
   type Chain,
   type Client,
   type Hex,
-  keccak256,
+  hexToNumber,
   type ReadContractParameters,
   type ReadContractReturnType,
-  stringToHex,
   type Transport,
+  type ValueOf,
   type WriteContractParameters,
   type WriteContractReturnType,
 } from 'viem'
@@ -20,6 +25,8 @@ import {
   writeContract,
 } from 'viem/actions'
 import type { UnionOmit } from '../internal/types.js'
+import * as TokenId from '../ox/TokenId.js'
+import * as TokenRole from '../ox/TokenRole.js'
 import { feeManagerAbi, tip20Abi, tip20FactoryAbi } from './abis.js'
 import {
   feeManagerAddress,
@@ -28,15 +35,11 @@ import {
 } from './addresses.js'
 import type { GetAccountParameter } from './types.js'
 
-const tokenRole = {
-  defaultAdmin:
-    '0x0000000000000000000000000000000000000000000000000000000000000000',
-  pause: keccak256(stringToHex('PAUSE_ROLE')),
-  unpause: keccak256(stringToHex('UNPAUSE_ROLE')),
-  issuer: keccak256(stringToHex('ISSUER_ROLE')),
-  burnBlocked: keccak256(stringToHex('BURN_BLOCKED_ROLE')),
-}
-type TokenRole = keyof typeof tokenRole
+const transferPolicy = {
+  0: 'always-reject',
+  1: 'always-allow',
+} as const
+type TransferPolicy = ValueOf<typeof transferPolicy>
 
 /**
  * Creates a new TIP20 token.
@@ -57,12 +60,14 @@ export async function createToken<
 ): Promise<createToken.ReturnType> {
   const {
     account = client.account,
+    admin: admin_ = client.account,
     chain = client.chain,
     name,
     symbol,
     currency,
   } = parameters
-  const admin = parseAccount(parameters.admin)
+  const admin = admin_ ? parseAccount(admin_) : undefined
+  if (!admin) throw new Error('admin is required.')
   const { request, result } = await simulateContract(client, {
     ...parameters,
     account,
@@ -73,9 +78,13 @@ export async function createToken<
     args: [name, symbol, currency, admin.address],
   } as never)
   const hash = await writeContract(client as never, request as never)
+  const id = hexToNumber(result as Hex)
+  const address = TokenId.toAddress(id)
   return {
-    address: result as Address,
+    address,
+    admin: admin.address,
     hash,
+    id,
   }
 }
 
@@ -87,15 +96,18 @@ export namespace createToken {
     WriteContractParameters<never, never, never, chain, account>,
     'abi' | 'address' | 'functionName' | 'args'
   > & {
-    admin: Account | Address
     currency: string
     name: string
     symbol: string
-  }
+  } & (account extends Account
+      ? { admin?: Account | Address | undefined }
+      : { admin: Account | Address })
 
   export type ReturnType = {
     address: Address
+    admin: Address
     hash: Hex
+    id: number
   }
 }
 
@@ -109,7 +121,7 @@ export namespace createToken {
  * @param parameters - Parameters.
  * @returns The token allowance.
  */
-export function getTokenAllowance<
+export async function getTokenAllowance<
   chain extends Chain | undefined,
   account extends Account | undefined,
 >(
@@ -157,7 +169,7 @@ export namespace getTokenAllowance {
  * @param parameters - Parameters.
  * @returns The token balance.
  */
-export function getTokenBalance<
+export async function getTokenBalance<
   chain extends Chain | undefined,
   account extends Account | undefined,
 >(
@@ -206,7 +218,7 @@ export namespace getTokenBalance {
  * @param parameters - Parameters.
  * @returns The token metadata.
  */
-export function getTokenMetadata<chain extends Chain | undefined>(
+export async function getTokenMetadata<chain extends Chain | undefined>(
   client: Client<Transport, chain>,
   parameters: getTokenMetadata.Parameters = {},
 ): Promise<getTokenMetadata.ReturnType> {
@@ -214,16 +226,6 @@ export function getTokenMetadata<chain extends Chain | undefined>(
   return multicall(client, {
     ...rest,
     contracts: [
-      {
-        address: token,
-        abi: tip20Abi,
-        functionName: 'name',
-      },
-      {
-        address: token,
-        abi: tip20Abi,
-        functionName: 'symbol',
-      },
       {
         address: token,
         abi: tip20Abi,
@@ -237,18 +239,58 @@ export function getTokenMetadata<chain extends Chain | undefined>(
       {
         address: token,
         abi: tip20Abi,
+        functionName: 'name',
+      },
+      {
+        address: token,
+        abi: tip20Abi,
+        functionName: 'paused',
+      },
+      {
+        address: token,
+        abi: tip20Abi,
+        functionName: 'supplyCap',
+      },
+      {
+        address: token,
+        abi: tip20Abi,
+        functionName: 'symbol',
+      },
+      {
+        address: token,
+        abi: tip20Abi,
         functionName: 'totalSupply',
+      },
+      {
+        address: token,
+        abi: tip20Abi,
+        functionName: 'transferPolicyId',
       },
     ] as const,
     allowFailure: false,
     deployless: true,
-  }).then(([name, symbol, currency, decimals, totalSupply]) => ({
-    name,
-    symbol,
-    currency,
-    decimals,
-    totalSupply,
-  }))
+  }).then(
+    ([
+      currency,
+      decimals,
+      name,
+      paused,
+      supplyCap,
+      symbol,
+      totalSupply,
+      transferPolicyId,
+    ]) => ({
+      name,
+      symbol,
+      currency,
+      decimals,
+      totalSupply,
+      paused,
+      supplyCap,
+      transferPolicy:
+        transferPolicy[Number(transferPolicyId) as keyof typeof transferPolicy],
+    }),
+  )
 }
 
 export namespace getTokenMetadata {
@@ -261,7 +303,10 @@ export namespace getTokenMetadata {
     symbol: string
     currency: string
     decimals: number
+    paused: boolean
+    supplyCap: bigint
     totalSupply: bigint
+    transferPolicy: TransferPolicy
   }
 }
 
@@ -275,7 +320,7 @@ export namespace getTokenMetadata {
  * @param parameters - Parameters.
  * @returns The transaction hash.
  */
-export function getUserToken<
+export async function getUserToken<
   chain extends Chain | undefined,
   account extends Account | undefined,
 >(
@@ -322,7 +367,7 @@ export namespace getUserToken {
  * @param parameters - Parameters.
  * @returns The transaction hash.
  */
-export function grantTokenRole<
+export async function grantTokenRole<
   chain extends Chain | undefined,
   account extends Account | undefined,
 >(
@@ -335,7 +380,7 @@ export function grantTokenRole<
     token,
     to,
   } = parameters
-  const role = tokenRole[parameters.role]
+  const role = TokenRole.serialize(parameters.role)
   return writeContract(client, {
     ...parameters,
     account,
@@ -356,7 +401,7 @@ export namespace grantTokenRole {
     'abi' | 'address' | 'functionName' | 'args'
   > & {
     token: Address
-    role: TokenRole
+    role: TokenRole.TokenRole
     to: Address
   }
 
@@ -373,7 +418,7 @@ export namespace grantTokenRole {
  * @param parameters - Parameters.
  * @returns The transaction hash.
  */
-export function renounceTokenRole<
+export async function renounceTokenRole<
   chain extends Chain | undefined,
   account extends Account | undefined,
 >(
@@ -381,7 +426,7 @@ export function renounceTokenRole<
   parameters: renounceTokenRole.Parameters<chain, account>,
 ): Promise<renounceTokenRole.ReturnType> {
   const { account = client.account, chain = client.chain, token } = parameters
-  const role = tokenRole[parameters.role]
+  const role = TokenRole.serialize(parameters.role)
   return writeContract(client, {
     ...parameters,
     account,
@@ -402,7 +447,7 @@ export namespace renounceTokenRole {
     'abi' | 'address' | 'functionName' | 'args'
   > & {
     token: Address
-    role: TokenRole
+    role: TokenRole.TokenRole
   }
 
   export type ReturnType = WriteContractReturnType
@@ -418,7 +463,7 @@ export namespace renounceTokenRole {
  * @param parameters - Parameters.
  * @returns The transaction hash.
  */
-export function revokeTokenRole<
+export async function revokeTokenRole<
   chain extends Chain | undefined,
   account extends Account | undefined,
 >(
@@ -431,7 +476,7 @@ export function revokeTokenRole<
     token,
     from,
   } = parameters
-  const role = tokenRole[parameters.role]
+  const role = TokenRole.serialize(parameters.role)
   return writeContract(client, {
     ...parameters,
     account,
@@ -452,7 +497,7 @@ export namespace revokeTokenRole {
     'abi' | 'address' | 'functionName' | 'args'
   > & {
     from: Address
-    role: TokenRole
+    role: TokenRole.TokenRole
     token: Address
   }
 
@@ -469,7 +514,7 @@ export namespace revokeTokenRole {
  * @param parameters - Parameters.
  * @returns The transaction hash.
  */
-export function setUserToken<
+export async function setUserToken<
   chain extends Chain | undefined,
   account extends Account | undefined,
 >(
