@@ -8,13 +8,13 @@ import * as Rlp from 'ox/Rlp'
 import * as Signature from 'ox/Signature'
 import * as TransactionEnvelope from 'ox/TransactionEnvelope'
 import * as TransactionEnvelopeEip1559 from 'ox/TransactionEnvelopeEip1559'
-import * as TokenId from './TokenId.js'
 import type {
   Assign,
   Compute,
   PartialBy,
   UnionPartialBy,
 } from '../internal/types.js'
+import * as TokenId from './TokenId.js'
 
 export type TransactionEnvelopeFeeToken<
   signed extends boolean = boolean,
