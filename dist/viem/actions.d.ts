@@ -28,7 +28,7 @@ export declare namespace approveTransferToken {
         amount: bigint;
         /** Address of the spender. */
         spender: Address;
-        /** Address or ID of the TIP20 token. */
+        /** Address or ID of the TIP20 token. @default `usdAddress` */
         token?: TokenId.TokenIdOrAddress | undefined;
     };
     type ReturnType = WriteContractReturnType;
@@ -142,7 +142,7 @@ export declare namespace createToken {
 export declare function getTokenAllowance<chain extends Chain | undefined, account extends Account | undefined>(client: Client<Transport, chain, account>, parameters: getTokenAllowance.Parameters<account>): Promise<getTokenAllowance.ReturnType>;
 export declare namespace getTokenAllowance {
     type Parameters<account extends Account | undefined = Account | undefined> = UnionOmit<ReadContractParameters<never, never, never>, 'abi' | 'address' | 'functionName' | 'args'> & GetAccountParameter<account> & {
-        /** Address or ID of the TIP20 token. */
+        /** Address or ID of the TIP20 token. @default `usdAddress` */
         token?: TokenId.TokenIdOrAddress | undefined;
         /** Address of the spender. */
         spender: Address;
@@ -162,7 +162,7 @@ export declare namespace getTokenAllowance {
 export declare function getTokenBalance<chain extends Chain | undefined, account extends Account | undefined>(client: Client<Transport, chain, account>, ...parameters: account extends Account ? [getTokenBalance.Parameters<account>] | [] : [getTokenBalance.Parameters<account>]): Promise<getTokenBalance.ReturnType>;
 export declare namespace getTokenBalance {
     type Parameters<account extends Account | undefined = Account | undefined> = UnionOmit<ReadContractParameters<never, never, never>, 'abi' | 'address' | 'functionName' | 'args'> & GetAccountParameter<account> & {
-        /** Address or ID of the TIP20 token. */
+        /** Address or ID of the TIP20 token. @default `usdAddress` */
         token?: TokenId.TokenIdOrAddress | undefined;
     };
     type ReturnType = ReadContractReturnType<typeof tip20Abi, 'balanceOf', never>;
@@ -180,7 +180,7 @@ export declare namespace getTokenBalance {
 export declare function getTokenMetadata<chain extends Chain | undefined>(client: Client<Transport, chain>, parameters?: getTokenMetadata.Parameters): Promise<getTokenMetadata.ReturnType>;
 export declare namespace getTokenMetadata {
     type Parameters = {
-        /** Address or ID of the TIP20 token. */
+        /** Address or ID of the TIP20 token. @default `usdAddress` */
         token?: TokenId.TokenIdOrAddress | undefined;
     };
     type ReturnType = Compute<{
@@ -305,7 +305,7 @@ export declare namespace permitToken {
         signature: Signature.Signature;
         /** Address of the spender. */
         spender: Address;
-        /** Address or ID of the TIP20 token. */
+        /** Address or ID of the TIP20 token. @default `usdAddress` */
         token?: TokenId.TokenIdOrAddress | undefined;
         /** Amount to approve. */
         value: bigint;
@@ -429,7 +429,7 @@ export declare namespace transferToken {
     type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & {
         /** Amount of tokens to transfer. */
         amount: bigint;
-        /** Address or ID of the TIP20 token. */
+        /** Address or ID of the TIP20 token. @default `usdAddress` */
         token?: TokenId.TokenIdOrAddress | undefined;
         /** Address to transfer tokens to. */
         to: Address;

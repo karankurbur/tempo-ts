@@ -1,7 +1,7 @@
 // TODO:
-// - `token` default JSDoc
 // - add `.call` to namespaces
 // - add `.simulate` to namespaces
+// - add `.estimateGas` to namespaces
 import * as Hex from 'ox/Hex';
 import * as Signature from 'ox/Signature';
 import { parseAccount } from 'viem/accounts';
@@ -73,7 +73,7 @@ export async function burnToken(client, parameters) {
     const args = memo
         ? {
             functionName: 'burnWithMemo',
-            args: [amount, memo],
+            args: [amount, Hex.padLeft(memo, 32)],
         }
         : {
             functionName: 'burn',
@@ -106,7 +106,7 @@ export async function changeTokenTransferPolicy(client, parameters) {
         address: TokenId.toAddress(token),
         abi: tip20Abi,
         chain,
-        functionName: 'changeTokenTransferPolicy',
+        functionName: 'changeTransferPolicyId',
         args: [policyId],
     });
 }
@@ -461,7 +461,7 @@ export async function setTokenSupplyCap(client, parameters) {
         address: TokenId.toAddress(token),
         abi: tip20Abi,
         chain,
-        functionName: 'setTokenSupplyCap',
+        functionName: 'setSupplyCap',
         args: [supplyCap],
     });
 }
@@ -533,12 +533,12 @@ export async function transferToken(client, parameters) {
         if (memo && from)
             return {
                 functionName: 'transferFromWithMemo',
-                args: [from, to, amount, memo],
+                args: [from, to, amount, Hex.padLeft(memo, 32)],
             };
         if (memo)
             return {
                 functionName: 'transferWithMemo',
-                args: [to, amount, memo],
+                args: [to, amount, Hex.padLeft(memo, 32)],
             };
         if (signature && v)
             return {

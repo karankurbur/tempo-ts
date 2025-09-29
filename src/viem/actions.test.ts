@@ -1,17 +1,12 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { setTimeout } from 'node:timers/promises'
-import { Hash, Hex } from 'ox'
+import { Hex } from 'ox'
 import { tempoLocal } from 'tempo/chains'
 import { Instance } from 'tempo/prool'
 import * as actions from 'tempo/viem/actions'
 import { createClient, http, parseEther, publicActions } from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
-import {
-  getCode,
-  getTransaction,
-  waitForTransactionReceipt,
-  writeContract,
-} from 'viem/actions'
+import { getCode, waitForTransactionReceipt, writeContract } from 'viem/actions'
 import { tip20Abi } from './abis.js'
 import { usdAddress, usdId } from './addresses.js'
 
