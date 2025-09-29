@@ -1,12 +1,12 @@
-import type * as Address from 'ox/Address';
 import type * as Authorization from 'ox/Authorization';
 import type * as Errors from 'ox/Errors';
 import type * as Hex from 'ox/Hex';
 import * as ox_TransactionRequest from 'ox/TransactionRequest';
 import type { Compute } from "../internal/types.js";
+import * as TokenId from "./TokenId.js";
 /** A Transaction Request that is generic to all transaction types, as defined in the [Execution API specification](https://github.com/ethereum/execution-apis/blob/4aca1d7a3e5aab24c8f6437131289ad386944eaa/src/schemas/transaction.yaml#L358-L423). */
 export type TransactionRequest<bigintType = bigint, numberType = number, type extends string = string> = Compute<ox_TransactionRequest.TransactionRequest<bigintType, numberType, type> & {
-    feeToken?: Address.Address | undefined;
+    feeToken?: TokenId.TokenIdOrAddress | undefined;
 }>;
 /** RPC representation of a {@link ox#TransactionRequest.TransactionRequest}. */
 export type Rpc = TransactionRequest<Hex.Hex, Hex.Hex, string>;

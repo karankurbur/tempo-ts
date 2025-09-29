@@ -21,3 +21,5 @@ export type GetAccountParameter<
       : false
     : false
 >
+
+export type TokenIdOrAddress = bigint | Address

@@ -7,14 +7,15 @@ import * as Hex from 'ox/Hex';
 import * as Rlp from 'ox/Rlp';
 import * as Signature from 'ox/Signature';
 import * as TransactionEnvelope from 'ox/TransactionEnvelope';
+import * as TokenId from "./TokenId.js";
 import type { Assign, Compute, PartialBy, UnionPartialBy } from "../internal/types.js";
 export type TransactionEnvelopeFeeToken<signed extends boolean = boolean, bigintType = bigint, numberType = number, type extends string = Type> = Compute<TransactionEnvelope.Base<type, signed, bigintType, numberType> & {
     /** EIP-2930 Access List. */
     accessList?: AccessList.AccessList | undefined;
     /** EIP-7702 Authorization List. */
     authorizationList?: Authorization.ListSigned<bigintType, numberType> | undefined;
-    /** Fee token preference. */
-    feeToken?: Address.Address | undefined;
+    /** Fee token preference. Address or ID of the TIP-20 token. */
+    feeToken?: TokenId.TokenIdOrAddress | undefined;
     /** Total fee per gas in wei (gasPrice/baseFeePerGas + maxPriorityFeePerGas). */
     maxFeePerGas?: bigintType | undefined;
     /** Max priority fee per gas (in wei). */

@@ -1,8 +1,4 @@
-// TODO:
-// - `Compute`
-// - JSDoc
-// - increase test cov
-import { hexToNumber, } from 'viem';
+import { hexToBigInt, } from 'viem';
 import { parseAccount } from 'viem/accounts';
 import { multicall, readContract, simulateContract, writeContract, } from 'viem/actions';
 import * as TokenId from "../ox/TokenId.js";
@@ -38,7 +34,7 @@ export async function createToken(client, parameters) {
         args: [name, symbol, currency, admin.address],
     });
     const hash = await writeContract(client, request);
-    const id = hexToNumber(result);
+    const id = hexToBigInt(result);
     const address = TokenId.toAddress(id);
     return {
         address,
@@ -64,7 +60,7 @@ export async function getTokenAllowance(client, parameters) {
         throw new Error('account is required.');
     return readContract(client, {
         ...parameters,
-        address: token,
+        address: TokenId.toAddress(token),
         abi: tip20Abi,
         functionName: 'allowance',
         args: [address, spender],
@@ -87,7 +83,7 @@ export async function getTokenBalance(client, ...parameters) {
         throw new Error('account is required.');
     return readContract(client, {
         ...parameters,
-        address: token,
+        address: TokenId.toAddress(token),
         abi: tip20Abi,
         functionName: 'balanceOf',
         args: [address],
@@ -105,47 +101,49 @@ export async function getTokenBalance(client, ...parameters) {
  */
 export async function getTokenMetadata(client, parameters = {}) {
     const { token = usdAddress, ...rest } = parameters;
+    const address = TokenId.toAddress(token);
+    const abi = tip20Abi;
     return multicall(client, {
         ...rest,
         contracts: [
             {
-                address: token,
-                abi: tip20Abi,
+                address,
+                abi,
                 functionName: 'currency',
             },
             {
-                address: token,
-                abi: tip20Abi,
+                address,
+                abi,
                 functionName: 'decimals',
             },
             {
-                address: token,
-                abi: tip20Abi,
+                address,
+                abi,
                 functionName: 'name',
             },
             {
-                address: token,
-                abi: tip20Abi,
+                address,
+                abi,
                 functionName: 'paused',
             },
             {
-                address: token,
-                abi: tip20Abi,
+                address,
+                abi,
                 functionName: 'supplyCap',
             },
             {
-                address: token,
-                abi: tip20Abi,
+                address,
+                abi,
                 functionName: 'symbol',
             },
             {
-                address: token,
-                abi: tip20Abi,
+                address,
+                abi,
                 functionName: 'totalSupply',
             },
             {
-                address: token,
-                abi: tip20Abi,
+                address,
+                abi,
                 functionName: 'transferPolicyId',
             },
         ],
@@ -177,13 +175,17 @@ export async function getUserToken(client, ...parameters) {
     if (!account_)
         throw new Error('account is required.');
     const account = parseAccount(account_);
-    return readContract(client, {
+    const address = await readContract(client, {
         ...parameters,
         address: feeManagerAddress,
         abi: feeManagerAbi,
         functionName: 'userTokens',
         args: [account.address],
     });
+    return {
+        address,
+        id: TokenId.fromAddress(address),
+    };
 }
 /**
  * Grants a role for a TIP20 token.
@@ -201,7 +203,7 @@ export async function grantTokenRole(client, parameters) {
     return writeContract(client, {
         ...parameters,
         account,
-        address: token,
+        address: TokenId.toAddress(token),
         abi: tip20Abi,
         chain,
         functionName: 'grantRole',
@@ -224,7 +226,7 @@ export async function renounceTokenRole(client, parameters) {
     return writeContract(client, {
         ...parameters,
         account,
-        address: token,
+        address: TokenId.toAddress(token),
         abi: tip20Abi,
         chain,
         functionName: 'renounceRole',
@@ -247,7 +249,7 @@ export async function revokeTokenRole(client, parameters) {
     return writeContract(client, {
         ...parameters,
         account,
-        address: token,
+        address: TokenId.toAddress(token),
         abi: tip20Abi,
         chain,
         functionName: 'revokeRole',
@@ -273,22 +275,26 @@ export async function setUserToken(client, parameters) {
         abi: feeManagerAbi,
         chain,
         functionName: 'setUserToken',
-        args: [token],
+        // TODO: remove once eth_estimateGas is fixed
+        gas: 30000n,
+        args: [TokenId.toAddress(token)],
     });
 }
-export function decorator(client) {
-    return {
-        createToken: (parameters) => createToken(client, parameters),
-        getTokenAllowance: (parameters) => getTokenAllowance(client, parameters),
-        // @ts-expect-error
-        getTokenBalance: (parameters) => getTokenBalance(client, parameters),
-        getTokenMetadata: (parameters) => getTokenMetadata(client, parameters),
-        // @ts-expect-error
-        getUserToken: (parameters) => getUserToken(client, parameters),
-        grantTokenRole: (parameters) => grantTokenRole(client, parameters),
-        renounceTokenRole: (parameters) => renounceTokenRole(client, parameters),
-        revokeTokenRole: (parameters) => revokeTokenRole(client, parameters),
-        setUserToken: (parameters) => setUserToken(client, parameters),
+export function decorator() {
+    return (client) => {
+        return {
+            createToken: (parameters) => createToken(client, parameters),
+            getTokenAllowance: (parameters) => getTokenAllowance(client, parameters),
+            // @ts-expect-error
+            getTokenBalance: (parameters) => getTokenBalance(client, parameters),
+            getTokenMetadata: (parameters) => getTokenMetadata(client, parameters),
+            // @ts-expect-error
+            getUserToken: (parameters) => getUserToken(client, parameters),
+            grantTokenRole: (parameters) => grantTokenRole(client, parameters),
+            renounceTokenRole: (parameters) => renounceTokenRole(client, parameters),
+            revokeTokenRole: (parameters) => revokeTokenRole(client, parameters),
+            setUserToken: (parameters) => setUserToken(client, parameters),
+        };
     };
 }
 //# sourceMappingURL=actions.js.map

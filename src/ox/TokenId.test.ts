@@ -4,23 +4,26 @@ import { TokenId } from 'tempo/ox'
 test('fromAddress', () => {
   expect(
     TokenId.fromAddress('0x20c0000000000000000000000000000000000000'),
-  ).toBe(0)
+  ).toBe(0n)
   expect(
     TokenId.fromAddress('0x20c0000000000000000000000000000000000001'),
-  ).toBe(1)
+  ).toBe(1n)
   expect(
     TokenId.fromAddress('0x20c0000000000000000000000000000000000def'),
-  ).toBe(0xdef)
+  ).toBe(0xdefn)
 })
 
 test('toAddress', () => {
-  expect(TokenId.toAddress(0)).toBe(
+  expect(TokenId.toAddress(0n)).toBe(
     '0x20c0000000000000000000000000000000000000',
   )
-  expect(TokenId.toAddress(1)).toBe(
+  expect(TokenId.toAddress('0x20c0000000000000000000000000000000000000')).toBe(
+    '0x20c0000000000000000000000000000000000000',
+  )
+  expect(TokenId.toAddress(1n)).toBe(
     '0x20c0000000000000000000000000000000000001',
   )
-  expect(TokenId.toAddress(0xdef)).toBe(
+  expect(TokenId.toAddress(0xdefn)).toBe(
     '0x20c0000000000000000000000000000000000def',
   )
 })

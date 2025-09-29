@@ -1,4 +1,5 @@
 import * as ox_TransactionRequest from 'ox/TransactionRequest';
+import * as TokenId from "./TokenId.js";
 import * as Transaction from "./Transaction.js";
 /**
  * Converts a {@link ox#TransactionRequest.TransactionRequest} to a {@link ox#TransactionRequest.Rpc}.
@@ -45,8 +46,8 @@ import * as Transaction from "./Transaction.js";
  */
 export function toRpc(request) {
     const request_rpc = ox_TransactionRequest.toRpc(request);
-    if (request.feeToken) {
-        request_rpc.feeToken = request.feeToken;
+    if (typeof request.feeToken !== 'undefined') {
+        request_rpc.feeToken = TokenId.toAddress(request.feeToken);
         request_rpc.type = Transaction.toRpcType.feeToken;
     }
     return request_rpc;

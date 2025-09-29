@@ -12,7 +12,10 @@ export function serializeTransaction(
   >,
   signature?: Signature | undefined,
 ) {
-  if (transaction.type === 'feeToken' || transaction.feeToken)
+  if (
+    transaction.type === 'feeToken' ||
+    typeof transaction.feeToken !== 'undefined'
+  )
     return TxFeeToken.serialize(transaction, {
       signature: signature as never,
     })

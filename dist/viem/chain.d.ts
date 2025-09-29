@@ -254,7 +254,7 @@ export declare const chainConfig: {
                 to?: `0x${string}` | null | undefined;
                 type?: string | undefined;
                 value?: bigint | undefined;
-                feeToken?: `0x${string}` | undefined;
+                feeToken?: import("../ox/TokenId.js").TokenIdOrAddress | undefined;
             }) => {
                 accessList?: readonly {
                     address: import("ox/Address").Address;
@@ -283,7 +283,7 @@ export declare const chainConfig: {
                 to?: `0x${string}` | null | undefined;
                 type?: string | undefined;
                 value?: `0x${string}` | undefined;
-                feeToken?: `0x${string}` | undefined;
+                feeToken?: import("../ox/TokenId.js").TokenIdOrAddress | undefined;
             } & {};
             type: "transactionRequest";
         };

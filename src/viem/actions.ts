@@ -1,15 +1,10 @@
-// TODO:
-// - `Compute`
-// - JSDoc
-// - increase test cov
-
 import {
   type Account,
   type Address,
   type Chain,
   type Client,
   type Hex,
-  hexToNumber,
+  hexToBigInt,
   type ReadContractParameters,
   type ReadContractReturnType,
   type Transport,
@@ -24,7 +19,7 @@ import {
   simulateContract,
   writeContract,
 } from 'viem/actions'
-import type { UnionOmit } from '../internal/types.js'
+import type { Compute, UnionOmit } from '../internal/types.js'
 import * as TokenId from '../ox/TokenId.js'
 import * as TokenRole from '../ox/TokenRole.js'
 import { feeManagerAbi, tip20Abi, tip20FactoryAbi } from './abis.js'
@@ -78,7 +73,7 @@ export async function createToken<
     args: [name, symbol, currency, admin.address],
   } as never)
   const hash = await writeContract(client as never, request as never)
-  const id = hexToNumber(result as Hex)
+  const id = hexToBigInt(result as Hex)
   const address = TokenId.toAddress(id)
   return {
     address,
@@ -104,10 +99,14 @@ export namespace createToken {
       : { admin: Account | Address })
 
   export type ReturnType = {
+    /** Address of the created TIP20 token. */
     address: Address
+    /** Admin of the token. */
     admin: Address
+    /** Transaction hash. */
     hash: Hex
-    id: number
+    /** ID of the TIP20 token. */
+    id: bigint
   }
 }
 
@@ -133,7 +132,7 @@ export async function getTokenAllowance<
   if (!address) throw new Error('account is required.')
   return readContract(client, {
     ...parameters,
-    address: token,
+    address: TokenId.toAddress(token),
     abi: tip20Abi,
     functionName: 'allowance',
     args: [address, spender],
@@ -148,7 +147,9 @@ export namespace getTokenAllowance {
     'abi' | 'address' | 'functionName' | 'args'
   > &
     GetAccountParameter<account> & {
-      token?: Address | undefined
+      /** Address or ID of the TIP20 token. */
+      token?: TokenId.TokenIdOrAddress | undefined
+      /** Address of the spender. */
       spender: Address
     }
 
@@ -183,7 +184,7 @@ export async function getTokenBalance<
   if (!address) throw new Error('account is required.')
   return readContract(client, {
     ...parameters,
-    address: token,
+    address: TokenId.toAddress(token),
     abi: tip20Abi,
     functionName: 'balanceOf',
     args: [address],
@@ -198,7 +199,8 @@ export namespace getTokenBalance {
     'abi' | 'address' | 'functionName' | 'args'
   > &
     GetAccountParameter<account> & {
-      token?: Address | undefined
+      /** Address or ID of the TIP20 token. */
+      token?: TokenId.TokenIdOrAddress | undefined
     }
 
   export type ReturnType = ReadContractReturnType<
@@ -223,47 +225,49 @@ export async function getTokenMetadata<chain extends Chain | undefined>(
   parameters: getTokenMetadata.Parameters = {},
 ): Promise<getTokenMetadata.ReturnType> {
   const { token = usdAddress, ...rest } = parameters
+  const address = TokenId.toAddress(token)
+  const abi = tip20Abi
   return multicall(client, {
     ...rest,
     contracts: [
       {
-        address: token,
-        abi: tip20Abi,
+        address,
+        abi,
         functionName: 'currency',
       },
       {
-        address: token,
-        abi: tip20Abi,
+        address,
+        abi,
         functionName: 'decimals',
       },
       {
-        address: token,
-        abi: tip20Abi,
+        address,
+        abi,
         functionName: 'name',
       },
       {
-        address: token,
-        abi: tip20Abi,
+        address,
+        abi,
         functionName: 'paused',
       },
       {
-        address: token,
-        abi: tip20Abi,
+        address,
+        abi,
         functionName: 'supplyCap',
       },
       {
-        address: token,
-        abi: tip20Abi,
+        address,
+        abi,
         functionName: 'symbol',
       },
       {
-        address: token,
-        abi: tip20Abi,
+        address,
+        abi,
         functionName: 'totalSupply',
       },
       {
-        address: token,
-        abi: tip20Abi,
+        address,
+        abi,
         functionName: 'transferPolicyId',
       },
     ] as const,
@@ -295,19 +299,28 @@ export async function getTokenMetadata<chain extends Chain | undefined>(
 
 export namespace getTokenMetadata {
   export type Parameters = {
-    token?: Address | undefined
+    /** Address or ID of the TIP20 token. */
+    token?: TokenId.TokenIdOrAddress | undefined
   }
 
-  export type ReturnType = {
-    name: string
-    symbol: string
+  export type ReturnType = Compute<{
+    /** Currency (e.g. "USD"). */
     currency: string
+    /** Decimals. */
     decimals: number
+    /** Name. */
+    name: string
+    /** Whether the token is paused. */
     paused: boolean
+    /** Supply cap. */
     supplyCap: bigint
+    /** Symbol. */
+    symbol: string
+    /** Total supply. */
     totalSupply: bigint
+    /** Transfer policy. */
     transferPolicy: TransferPolicy
-  }
+  }>
 }
 
 /**
@@ -332,13 +345,17 @@ export async function getUserToken<
   const { account: account_ = client.account } = parameters[0] ?? {}
   if (!account_) throw new Error('account is required.')
   const account = parseAccount(account_)
-  return readContract(client, {
+  const address = await readContract(client, {
     ...parameters,
     address: feeManagerAddress,
     abi: feeManagerAbi,
     functionName: 'userTokens',
     args: [account.address],
   })
+  return {
+    address,
+    id: TokenId.fromAddress(address),
+  }
 }
 
 export namespace getUserToken {
@@ -350,11 +367,10 @@ export namespace getUserToken {
   > &
     GetAccountParameter<account>
 
-  export type ReturnType = ReadContractReturnType<
-    typeof feeManagerAbi,
-    'userTokens',
-    never
-  >
+  export type ReturnType = {
+    address: Address
+    id: bigint
+  }
 }
 
 /**
@@ -384,7 +400,7 @@ export async function grantTokenRole<
   return writeContract(client, {
     ...parameters,
     account,
-    address: token,
+    address: TokenId.toAddress(token),
     abi: tip20Abi,
     chain,
     functionName: 'grantRole',
@@ -400,8 +416,11 @@ export namespace grantTokenRole {
     WriteContractParameters<never, never, never, chain, account>,
     'abi' | 'address' | 'functionName' | 'args'
   > & {
-    token: Address
+    /** Address or ID of the TIP20 token. */
+    token: TokenId.TokenIdOrAddress
+    /** Role to grant. */
     role: TokenRole.TokenRole
+    /** Address to grant the role to. */
     to: Address
   }
 
@@ -430,7 +449,7 @@ export async function renounceTokenRole<
   return writeContract(client, {
     ...parameters,
     account,
-    address: token,
+    address: TokenId.toAddress(token),
     abi: tip20Abi,
     chain,
     functionName: 'renounceRole',
@@ -446,7 +465,9 @@ export namespace renounceTokenRole {
     WriteContractParameters<never, never, never, chain, account>,
     'abi' | 'address' | 'functionName' | 'args'
   > & {
-    token: Address
+    /** Address or ID of the TIP20 token. */
+    token: TokenId.TokenIdOrAddress
+    /** Role to renounce. */
     role: TokenRole.TokenRole
   }
 
@@ -480,7 +501,7 @@ export async function revokeTokenRole<
   return writeContract(client, {
     ...parameters,
     account,
-    address: token,
+    address: TokenId.toAddress(token),
     abi: tip20Abi,
     chain,
     functionName: 'revokeRole',
@@ -496,9 +517,12 @@ export namespace revokeTokenRole {
     WriteContractParameters<never, never, never, chain, account>,
     'abi' | 'address' | 'functionName' | 'args'
   > & {
+    /** Address to revoke the role from. */
     from: Address
+    /** Role to revoke. */
     role: TokenRole.TokenRole
-    token: Address
+    /** Address or ID of the TIP20 token. */
+    token: TokenId.TokenIdOrAddress
   }
 
   export type ReturnType = WriteContractReturnType
@@ -529,7 +553,9 @@ export async function setUserToken<
     abi: feeManagerAbi,
     chain,
     functionName: 'setUserToken',
-    args: [token],
+    // TODO: remove once eth_estimateGas is fixed
+    gas: 30_000n,
+    args: [TokenId.toAddress(token)],
   } as never)
 }
 
@@ -541,7 +567,8 @@ export namespace setUserToken {
     WriteContractParameters<never, never, never, chain, account>,
     'abi' | 'address' | 'functionName' | 'args'
   > & {
-    token: Address
+    /** Address or ID of the TIP20 token. */
+    token: TokenId.TokenIdOrAddress
   }
 
   export type ReturnType = WriteContractReturnType
@@ -674,22 +701,26 @@ export type Decorator<
   ) => Promise<setUserToken.ReturnType>
 }
 
-export function decorator<
-  transport extends Transport,
-  chain extends Chain | undefined,
-  account extends Account | undefined,
->(client: Client<transport, chain, account>): Decorator<chain, account> {
-  return {
-    createToken: (parameters) => createToken(client, parameters),
-    getTokenAllowance: (parameters) => getTokenAllowance(client, parameters),
-    // @ts-expect-error
-    getTokenBalance: (parameters) => getTokenBalance(client, parameters),
-    getTokenMetadata: (parameters) => getTokenMetadata(client, parameters),
-    // @ts-expect-error
-    getUserToken: (parameters) => getUserToken(client, parameters),
-    grantTokenRole: (parameters) => grantTokenRole(client, parameters),
-    renounceTokenRole: (parameters) => renounceTokenRole(client, parameters),
-    revokeTokenRole: (parameters) => revokeTokenRole(client, parameters),
-    setUserToken: (parameters) => setUserToken(client, parameters),
+export function decorator() {
+  return <
+    transport extends Transport,
+    chain extends Chain | undefined,
+    account extends Account | undefined,
+  >(
+    client: Client<transport, chain, account>,
+  ): Decorator<chain, account> => {
+    return {
+      createToken: (parameters) => createToken(client, parameters),
+      getTokenAllowance: (parameters) => getTokenAllowance(client, parameters),
+      // @ts-expect-error
+      getTokenBalance: (parameters) => getTokenBalance(client, parameters),
+      getTokenMetadata: (parameters) => getTokenMetadata(client, parameters),
+      // @ts-expect-error
+      getUserToken: (parameters) => getUserToken(client, parameters),
+      grantTokenRole: (parameters) => grantTokenRole(client, parameters),
+      renounceTokenRole: (parameters) => renounceTokenRole(client, parameters),
+      revokeTokenRole: (parameters) => revokeTokenRole(client, parameters),
+      setUserToken: (parameters) => setUserToken(client, parameters),
+    }
   }
 }

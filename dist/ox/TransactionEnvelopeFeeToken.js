@@ -7,6 +7,7 @@ import * as Rlp from 'ox/Rlp';
 import * as Signature from 'ox/Signature';
 import * as TransactionEnvelope from 'ox/TransactionEnvelope';
 import * as TransactionEnvelopeEip1559 from 'ox/TransactionEnvelopeEip1559';
+import * as TokenId from "./TokenId.js";
 export const serializedType = '0x77';
 export const type = 'feeToken';
 /**
@@ -361,7 +362,7 @@ export function serialize(envelope, options = {}) {
     const serialized = [
         Hex.fromNumber(chainId),
         nonce ? Hex.fromNumber(nonce) : '0x',
-        feeToken ?? '0x',
+        typeof feeToken !== 'undefined' ? TokenId.toAddress(feeToken) : '0x',
         maxPriorityFeePerGas ? Hex.fromNumber(maxPriorityFeePerGas) : '0x',
         maxFeePerGas ? Hex.fromNumber(maxFeePerGas) : '0x',
         gas ? Hex.fromNumber(gas) : '0x',

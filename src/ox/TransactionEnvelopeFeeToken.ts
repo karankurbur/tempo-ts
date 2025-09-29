@@ -8,6 +8,7 @@ import * as Rlp from 'ox/Rlp'
 import * as Signature from 'ox/Signature'
 import * as TransactionEnvelope from 'ox/TransactionEnvelope'
 import * as TransactionEnvelopeEip1559 from 'ox/TransactionEnvelopeEip1559'
+import * as TokenId from './TokenId.js'
 import type {
   Assign,
   Compute,
@@ -28,8 +29,8 @@ export type TransactionEnvelopeFeeToken<
     authorizationList?:
       | Authorization.ListSigned<bigintType, numberType>
       | undefined
-    /** Fee token preference. */
-    feeToken?: Address.Address | undefined
+    /** Fee token preference. Address or ID of the TIP-20 token. */
+    feeToken?: TokenId.TokenIdOrAddress | undefined
     /** Total fee per gas in wei (gasPrice/baseFeePerGas + maxPriorityFeePerGas). */
     maxFeePerGas?: bigintType | undefined
     /** Max priority fee per gas (in wei). */
@@ -538,7 +539,7 @@ export function serialize(
   const serialized = [
     Hex.fromNumber(chainId),
     nonce ? Hex.fromNumber(nonce) : '0x',
-    feeToken ?? '0x',
+    typeof feeToken !== 'undefined' ? TokenId.toAddress(feeToken) : '0x',
     maxPriorityFeePerGas ? Hex.fromNumber(maxPriorityFeePerGas) : '0x',
     maxFeePerGas ? Hex.fromNumber(maxFeePerGas) : '0x',
     gas ? Hex.fromNumber(gas) : '0x',

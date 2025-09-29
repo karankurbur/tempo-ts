@@ -4,4 +4,5 @@ export const feeManagerAddress = '0xfeec000000000000000000000000000000000000';
 export const tip20FactoryAddress = '0x20fc000000000000000000000000000000000000';
 export const tip403RegistryAddress = '0x403c000000000000000000000000000000000000';
 export const usdAddress = '0x20c0000000000000000000000000000000000000';
+export const usdId = 0n;
 //# sourceMappingURL=addresses.js.map

@@ -1,7 +1,10 @@
-import type * as Address from 'ox/Address'
+import * as Address from 'ox/Address'
 import * as Hex from 'ox/Hex'
 
 const tip20Prefix = '0x20c0'
+
+export type TokenId = bigint
+export type TokenIdOrAddress = TokenId | Address.Address
 
 /**
  * Converts a TIP20 token address to a token ID.
@@ -9,10 +12,10 @@ const tip20Prefix = '0x20c0'
  * @param address - The token address.
  * @returns The token ID.
  */
-export function fromAddress(address: Address.Address) {
-  if (!address.startsWith(tip20Prefix))
+export function fromAddress(address: Address.Address): TokenId {
+  if (!address.toLowerCase().startsWith(tip20Prefix))
     throw new Error('invalid tip20 address.')
-  return Hex.toNumber(Hex.slice(address, tip20Prefix.length))
+  return Hex.toBigInt(Hex.slice(address, tip20Prefix.length))
 }
 
 /**
@@ -21,7 +24,12 @@ export function fromAddress(address: Address.Address) {
  * @param tokenId - The token ID.
  * @returns The address.
  */
-export function toAddress(tokenId: number) {
+export function toAddress(tokenId: TokenIdOrAddress): Address.Address {
+  if (typeof tokenId === 'string') {
+    Address.assert(tokenId)
+    return tokenId
+  }
+
   const tokenIdHex = Hex.fromNumber(tokenId, { size: 18 })
   return Hex.concat(tip20Prefix, tokenIdHex)
 }
