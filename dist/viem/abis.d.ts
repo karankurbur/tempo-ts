@@ -1278,24 +1278,6 @@ export declare const tip20Abi: readonly [{
     readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
-    readonly name: "salts";
-    readonly inputs: readonly [{
-        readonly name: "";
-        readonly type: "address";
-        readonly internalType: "address";
-    }, {
-        readonly name: "";
-        readonly type: "bytes4";
-        readonly internalType: "bytes4";
-    }];
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly type: "bool";
-        readonly internalType: "bool";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
     readonly name: "setRoleAdmin";
     readonly inputs: readonly [{
         readonly name: "role";
@@ -1340,6 +1322,28 @@ export declare const tip20Abi: readonly [{
     readonly stateMutability: "view";
 }, {
     readonly type: "function";
+    readonly name: "systemTransferFrom";
+    readonly inputs: readonly [{
+        readonly name: "from";
+        readonly type: "address";
+        readonly internalType: "address";
+    }, {
+        readonly name: "to";
+        readonly type: "address";
+        readonly internalType: "address";
+    }, {
+        readonly name: "amount";
+        readonly type: "uint256";
+        readonly internalType: "uint256";
+    }];
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly type: "bool";
+        readonly internalType: "bool";
+    }];
+    readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
     readonly name: "totalSupply";
     readonly inputs: readonly [];
     readonly outputs: readonly [{
@@ -1365,6 +1369,38 @@ export declare const tip20Abi: readonly [{
         readonly type: "bool";
         readonly internalType: "bool";
     }];
+    readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly name: "transferFeePostTx";
+    readonly inputs: readonly [{
+        readonly name: "to";
+        readonly type: "address";
+        readonly internalType: "address";
+    }, {
+        readonly name: "refund";
+        readonly type: "uint256";
+        readonly internalType: "uint256";
+    }, {
+        readonly name: "actualUsed";
+        readonly type: "uint256";
+        readonly internalType: "uint256";
+    }];
+    readonly outputs: readonly [];
+    readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly name: "transferFeePreTx";
+    readonly inputs: readonly [{
+        readonly name: "from";
+        readonly type: "address";
+        readonly internalType: "address";
+    }, {
+        readonly name: "amount";
+        readonly type: "uint256";
+        readonly internalType: "uint256";
+    }];
+    readonly outputs: readonly [];
     readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
@@ -1437,44 +1473,6 @@ export declare const tip20Abi: readonly [{
         readonly internalType: "uint256";
     }, {
         readonly name: "memo";
-        readonly type: "bytes32";
-        readonly internalType: "bytes32";
-    }];
-    readonly outputs: readonly [];
-    readonly stateMutability: "nonpayable";
-}, {
-    readonly type: "function";
-    readonly name: "transferWithSig";
-    readonly inputs: readonly [{
-        readonly name: "from";
-        readonly type: "address";
-        readonly internalType: "address";
-    }, {
-        readonly name: "to";
-        readonly type: "address";
-        readonly internalType: "address";
-    }, {
-        readonly name: "value";
-        readonly type: "uint256";
-        readonly internalType: "uint256";
-    }, {
-        readonly name: "deadline";
-        readonly type: "uint256";
-        readonly internalType: "uint256";
-    }, {
-        readonly name: "salt";
-        readonly type: "bytes4";
-        readonly internalType: "bytes4";
-    }, {
-        readonly name: "v";
-        readonly type: "uint8";
-        readonly internalType: "uint8";
-    }, {
-        readonly name: "r";
-        readonly type: "bytes32";
-        readonly internalType: "bytes32";
-    }, {
-        readonly name: "s";
         readonly type: "bytes32";
         readonly internalType: "bytes32";
     }];
@@ -1720,10 +1718,6 @@ export declare const tip20Abi: readonly [{
     readonly inputs: readonly [];
 }, {
     readonly type: "error";
-    readonly name: "SaltAlreadyUsed";
-    readonly inputs: readonly [];
-}, {
-    readonly type: "error";
     readonly name: "SupplyCapExceeded";
     readonly inputs: readonly [];
 }, {
@@ -1754,23 +1748,9 @@ export declare const tip20FactoryAbi: readonly [{
     readonly outputs: readonly [{
         readonly name: "";
         readonly type: "address";
-        readonly internalType: "contract TIP20";
-    }];
-    readonly stateMutability: "nonpayable";
-}, {
-    readonly type: "function";
-    readonly name: "isTIP20";
-    readonly inputs: readonly [{
-        readonly name: "token";
-        readonly type: "address";
         readonly internalType: "address";
     }];
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly type: "bool";
-        readonly internalType: "bool";
-    }];
-    readonly stateMutability: "pure";
+    readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
     readonly name: "tokenIdCounter";
@@ -1785,6 +1765,11 @@ export declare const tip20FactoryAbi: readonly [{
     readonly type: "event";
     readonly name: "TokenCreated";
     readonly inputs: readonly [{
+        readonly name: "token";
+        readonly type: "address";
+        readonly indexed: true;
+        readonly internalType: "address";
+    }, {
         readonly name: "tokenId";
         readonly type: "uint256";
         readonly indexed: true;

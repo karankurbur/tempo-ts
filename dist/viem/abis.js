@@ -993,16 +993,6 @@ export const tip20Abi = Abi.from([
     },
     {
         type: 'function',
-        name: 'salts',
-        inputs: [
-            { name: '', type: 'address', internalType: 'address' },
-            { name: '', type: 'bytes4', internalType: 'bytes4' },
-        ],
-        outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
-        stateMutability: 'view',
-    },
-    {
-        type: 'function',
         name: 'setRoleAdmin',
         inputs: [
             { name: 'role', type: 'bytes32', internalType: 'bytes32' },
@@ -1036,6 +1026,17 @@ export const tip20Abi = Abi.from([
     },
     {
         type: 'function',
+        name: 'systemTransferFrom',
+        inputs: [
+            { name: 'from', type: 'address', internalType: 'address' },
+            { name: 'to', type: 'address', internalType: 'address' },
+            { name: 'amount', type: 'uint256', internalType: 'uint256' },
+        ],
+        outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+        stateMutability: 'nonpayable',
+    },
+    {
+        type: 'function',
         name: 'totalSupply',
         inputs: [],
         outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
@@ -1049,6 +1050,27 @@ export const tip20Abi = Abi.from([
             { name: 'amount', type: 'uint256', internalType: 'uint256' },
         ],
         outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+        stateMutability: 'nonpayable',
+    },
+    {
+        type: 'function',
+        name: 'transferFeePostTx',
+        inputs: [
+            { name: 'to', type: 'address', internalType: 'address' },
+            { name: 'refund', type: 'uint256', internalType: 'uint256' },
+            { name: 'actualUsed', type: 'uint256', internalType: 'uint256' },
+        ],
+        outputs: [],
+        stateMutability: 'nonpayable',
+    },
+    {
+        type: 'function',
+        name: 'transferFeePreTx',
+        inputs: [
+            { name: 'from', type: 'address', internalType: 'address' },
+            { name: 'amount', type: 'uint256', internalType: 'uint256' },
+        ],
+        outputs: [],
         stateMutability: 'nonpayable',
     },
     {
@@ -1088,22 +1110,6 @@ export const tip20Abi = Abi.from([
             { name: 'to', type: 'address', internalType: 'address' },
             { name: 'amount', type: 'uint256', internalType: 'uint256' },
             { name: 'memo', type: 'bytes32', internalType: 'bytes32' },
-        ],
-        outputs: [],
-        stateMutability: 'nonpayable',
-    },
-    {
-        type: 'function',
-        name: 'transferWithSig',
-        inputs: [
-            { name: 'from', type: 'address', internalType: 'address' },
-            { name: 'to', type: 'address', internalType: 'address' },
-            { name: 'value', type: 'uint256', internalType: 'uint256' },
-            { name: 'deadline', type: 'uint256', internalType: 'uint256' },
-            { name: 'salt', type: 'bytes4', internalType: 'bytes4' },
-            { name: 'v', type: 'uint8', internalType: 'uint8' },
-            { name: 'r', type: 'bytes32', internalType: 'bytes32' },
-            { name: 's', type: 'bytes32', internalType: 'bytes32' },
         ],
         outputs: [],
         stateMutability: 'nonpayable',
@@ -1314,7 +1320,6 @@ export const tip20Abi = Abi.from([
     { type: 'error', name: 'InvalidRecipient', inputs: [] },
     { type: 'error', name: 'InvalidSignature', inputs: [] },
     { type: 'error', name: 'PolicyForbids', inputs: [] },
-    { type: 'error', name: 'SaltAlreadyUsed', inputs: [] },
     { type: 'error', name: 'SupplyCapExceeded', inputs: [] },
     { type: 'error', name: 'Unauthorized', inputs: [] },
 ]);
@@ -1328,15 +1333,8 @@ export const tip20FactoryAbi = Abi.from([
             { name: 'currency', type: 'string', internalType: 'string' },
             { name: 'admin', type: 'address', internalType: 'address' },
         ],
-        outputs: [{ name: '', type: 'address', internalType: 'contract TIP20' }],
+        outputs: [{ name: '', type: 'address', internalType: 'address' }],
         stateMutability: 'nonpayable',
-    },
-    {
-        type: 'function',
-        name: 'isTIP20',
-        inputs: [{ name: 'token', type: 'address', internalType: 'address' }],
-        outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
-        stateMutability: 'pure',
     },
     {
         type: 'function',
@@ -1349,6 +1347,12 @@ export const tip20FactoryAbi = Abi.from([
         type: 'event',
         name: 'TokenCreated',
         inputs: [
+            {
+                name: 'token',
+                type: 'address',
+                indexed: true,
+                internalType: 'address',
+            },
             {
                 name: 'tokenId',
                 type: 'uint256',

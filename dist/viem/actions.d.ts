@@ -1,7 +1,7 @@
 import * as Hex from 'ox/Hex';
 import * as Signature from 'ox/Signature';
 import type { Account, Address, Chain, Client, ReadContractParameters, ReadContractReturnType, Transport, ValueOf, WriteContractParameters, WriteContractReturnType } from 'viem';
-import type { Compute, OneOf, UnionOmit } from "../internal/types.js";
+import type { Compute, UnionOmit } from "../internal/types.js";
 import * as TokenId from "../ox/TokenId.js";
 import * as TokenRole from "../ox/TokenRole.js";
 import { tip20Abi } from "./abis.js";
@@ -429,19 +429,15 @@ export declare namespace transferToken {
     type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & {
         /** Amount of tokens to transfer. */
         amount: bigint;
-        /** Address or ID of the TIP20 token. @default `usdAddress` */
-        token?: TokenId.TokenIdOrAddress | undefined;
-        /** Address to transfer tokens to. */
-        to: Address;
-    } & OneOf<{
         /** Address to transfer tokens from. */
         from?: Address | undefined;
         /** Memo to include in the transfer. */
         memo?: Hex.Hex | undefined;
-    } | {
-        /** Signature to include in the transfer. */
-        signature?: Signature.Signature | undefined;
-    }>;
+        /** Address or ID of the TIP20 token. @default `usdAddress` */
+        token?: TokenId.TokenIdOrAddress | undefined;
+        /** Address to transfer tokens to. */
+        to: Address;
+    };
     type ReturnType = WriteContractReturnType;
 }
 /**

@@ -532,10 +532,6 @@ export async function setUserToken(client, parameters) {
  */
 export async function transferToken(client, parameters) {
     const { account = client.account, amount, chain = client.chain, from, memo, token = usdAddress, to, ...rest } = parameters;
-    const signature = parameters.signature
-        ? Signature.from(parameters.signature)
-        : undefined;
-    const v = signature ? Signature.yParityToV(signature.yParity) : undefined;
     const args = (() => {
         if (memo && from)
             return {
@@ -546,17 +542,6 @@ export async function transferToken(client, parameters) {
             return {
                 functionName: 'transferWithMemo',
                 args: [to, amount, Hex.padLeft(memo, 32)],
-            };
-        if (signature && v)
-            return {
-                functionName: 'transferWithSig',
-                args: [
-                    to,
-                    amount,
-                    v,
-                    Hex.trimLeft(Hex.fromNumber(signature.r)),
-                    Hex.trimLeft(Hex.fromNumber(signature.s)),
-                ],
             };
         if (from)
             return {
