@@ -1,10 +1,10 @@
 import * as Hex from 'ox/Hex';
 import * as Signature from 'ox/Signature';
-import type { Account, Address, Chain, Client, ReadContractParameters, ReadContractReturnType, Transport, ValueOf, WriteContractParameters, WriteContractReturnType } from 'viem';
+import type { Account, Address, Chain, Client, ExtractAbiItem, GetEventArgs, ReadContractParameters, ReadContractReturnType, Transport, ValueOf, Log as viem_Log, WatchContractEventParameters, WriteContractParameters, WriteContractReturnType } from 'viem';
 import type { Compute, UnionOmit } from "../internal/types.js";
 import * as TokenId from "../ox/TokenId.js";
 import * as TokenRole from "../ox/TokenRole.js";
-import { tip20Abi } from "./abis.js";
+import { tip20Abi, tip20FactoryAbi } from "./abis.js";
 import type { GetAccountParameter } from "./types.js";
 declare const transferPolicy: {
     readonly 0: "always-reject";
@@ -458,6 +458,52 @@ export declare namespace unpauseToken {
     };
     type ReturnType = WriteContractReturnType;
 }
+/**
+ * Watches for new TIP20 tokens created.
+ *
+ * @example
+ * TODO
+ *
+ * @param client - Client.
+ * @param parameters - Parameters.
+ * @returns A function to unsubscribe from the event.
+ */
+export declare function watchCreateToken<chain extends Chain | undefined, account extends Account | undefined>(client: Client<Transport, chain, account>, parameters: watchCreateToken.Parameters): import("viem").WatchContractEventReturnType;
+export declare namespace watchCreateToken {
+    type Args = GetEventArgs<typeof tip20FactoryAbi, 'TokenCreated', {
+        IndexedOnly: false;
+        Required: true;
+    }>;
+    type Log = viem_Log<bigint, number, false, ExtractAbiItem<typeof tip20FactoryAbi, 'TokenCreated'>, true>;
+    type Parameters = UnionOmit<WatchContractEventParameters<typeof tip20FactoryAbi, 'TokenCreated', true>, 'abi' | 'address' | 'batch' | 'eventName' | 'onLogs' | 'strict'> & {
+        /** Callback to invoke when a new TIP20 token is created. */
+        onTokenCreated: (args: Args, log: Log) => void;
+    };
+}
+/**
+ * Watches for TIP20 token mint events.
+ *
+ * @example
+ * TODO
+ *
+ * @param client - Client.
+ * @param parameters - Parameters.
+ * @returns A function to unsubscribe from the event.
+ */
+export declare function watchMintToken<chain extends Chain | undefined, account extends Account | undefined>(client: Client<Transport, chain, account>, parameters: watchMintToken.Parameters): import("viem").WatchContractEventReturnType;
+export declare namespace watchMintToken {
+    type Args = GetEventArgs<typeof tip20Abi, 'Mint', {
+        IndexedOnly: false;
+        Required: true;
+    }>;
+    type Log = viem_Log<bigint, number, false, ExtractAbiItem<typeof tip20Abi, 'Mint'>, true>;
+    type Parameters = UnionOmit<WatchContractEventParameters<typeof tip20Abi, 'Mint', true>, 'abi' | 'address' | 'batch' | 'eventName' | 'onLogs' | 'strict'> & {
+        /** Callback to invoke when tokens are minted. */
+        onMint: (args: Args, log: Log) => void;
+        /** Address or ID of the TIP20 token. @default `usdAddress` */
+        token?: TokenId.TokenIdOrAddress | undefined;
+    };
+}
 export type Decorator<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = {
     /**
      * Approves a spender to transfer TIP20 tokens on behalf of the caller.
@@ -679,6 +725,28 @@ export type Decorator<chain extends Chain | undefined = Chain | undefined, accou
      * @returns The transaction hash.
      */
     unpauseToken: (parameters: unpauseToken.Parameters<chain, account>) => Promise<unpauseToken.ReturnType>;
+    /**
+     * Watches for new TIP20 tokens created.
+     *
+     * @example
+     * TODO
+     *
+     * @param client - Client.
+     * @param parameters - Parameters.
+     * @returns A function to unsubscribe from the event.
+     */
+    watchCreateToken: (parameters: watchCreateToken.Parameters) => () => void;
+    /**
+     * Watches for TIP20 token mint events.
+     *
+     * @example
+     * TODO
+     *
+     * @param client - Client.
+     * @param parameters - Parameters.
+     * @returns A function to unsubscribe from the event.
+     */
+    watchMintToken: (parameters: watchMintToken.Parameters) => () => void;
 };
 export declare function decorator(): <transport extends Transport, chain extends Chain | undefined, account extends Account | undefined>(client: Client<transport, chain, account>) => Decorator<chain, account>;
 export {};

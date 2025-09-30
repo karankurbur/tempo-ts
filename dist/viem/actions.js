@@ -6,7 +6,7 @@
 import * as Hex from 'ox/Hex';
 import * as Signature from 'ox/Signature';
 import { parseAccount } from 'viem/accounts';
-import { multicall, readContract, simulateContract, writeContract, } from 'viem/actions';
+import { multicall, readContract, simulateContract, watchContractEvent, writeContract, } from 'viem/actions';
 import * as TokenId from "../ox/TokenId.js";
 import * as TokenRole from "../ox/TokenRole.js";
 import { feeManagerAbi, tip20Abi, tip20FactoryAbi } from "./abis.js";
@@ -515,8 +515,6 @@ export async function setUserToken(client, parameters) {
         abi: feeManagerAbi,
         chain,
         functionName: 'setUserToken',
-        // TODO: remove once eth_estimateGas is fixed
-        gas: 30000n,
         args: [TokenId.toAddress(token)],
     });
 }
@@ -584,6 +582,54 @@ export async function unpauseToken(client, parameters) {
         args: [],
     });
 }
+/**
+ * Watches for new TIP20 tokens created.
+ *
+ * @example
+ * TODO
+ *
+ * @param client - Client.
+ * @param parameters - Parameters.
+ * @returns A function to unsubscribe from the event.
+ */
+export function watchCreateToken(client, parameters) {
+    const { onTokenCreated, ...rest } = parameters;
+    return watchContractEvent(client, {
+        ...rest,
+        address: tip20FactoryAddress,
+        abi: tip20FactoryAbi,
+        eventName: 'TokenCreated',
+        onLogs: (logs) => {
+            for (const log of logs)
+                onTokenCreated(log.args, log);
+        },
+        strict: true,
+    });
+}
+/**
+ * Watches for TIP20 token mint events.
+ *
+ * @example
+ * TODO
+ *
+ * @param client - Client.
+ * @param parameters - Parameters.
+ * @returns A function to unsubscribe from the event.
+ */
+export function watchMintToken(client, parameters) {
+    const { onMint, token = usdAddress, ...rest } = parameters;
+    return watchContractEvent(client, {
+        ...rest,
+        address: TokenId.toAddress(token),
+        abi: tip20Abi,
+        eventName: 'Mint',
+        onLogs: (logs) => {
+            for (const log of logs)
+                onMint(log.args, log);
+        },
+        strict: true,
+    });
+}
 export function decorator() {
     return (client) => {
         return {
@@ -609,6 +655,8 @@ export function decorator() {
             setUserToken: (parameters) => setUserToken(client, parameters),
             transferToken: (parameters) => transferToken(client, parameters),
             unpauseToken: (parameters) => unpauseToken(client, parameters),
+            watchCreateToken: (parameters) => watchCreateToken(client, parameters),
+            watchMintToken: (parameters) => watchMintToken(client, parameters),
         };
     };
 }
