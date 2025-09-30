@@ -9,6 +9,7 @@ import { mnemonicToAccount } from 'viem/accounts'
 import { getCode, waitForTransactionReceipt, writeContract } from 'viem/actions'
 import { tip20Abi } from './abis.js'
 import { usdAddress, usdId } from './addresses.js'
+import { createTempoClient } from './client.js'
 
 const instance = Instance.tempo({ port: 8545 })
 
@@ -27,11 +28,9 @@ const account3 = mnemonicToAccount(
   { accountIndex: 2 },
 )
 
-const client = createClient({
+const client = createTempoClient({
   account,
-  chain: tempoLocal,
   pollingInterval: 100,
-  transport: http(),
 }).extend(publicActions)
 
 describe.skipIf(!!process.env.CI)('approveToken', () => {
@@ -666,14 +665,6 @@ describe.skipIf(!!process.env.CI)('transferToken', () => {
     })
     await waitForTransactionReceipt(client, { hash: approveHash })
 
-    // Create client for account2
-    const client2 = createClient({
-      account: account2,
-      chain: tempoLocal,
-      pollingInterval: 100,
-      transport: http(),
-    })
-
     // Transfer tokens for gas
     const gasHash = await writeContract(client, {
       abi: tip20Abi,
@@ -689,12 +680,13 @@ describe.skipIf(!!process.env.CI)('transferToken', () => {
     })
 
     // Account2 transfers from account to account3
-    const transferHash = await actions.transferToken(client2, {
+    const transferHash = await actions.transferToken(client, {
+      account: account2,
       from: account.address,
       to: account3.address,
       amount: parseEther('25'),
     })
-    await waitForTransactionReceipt(client2, { hash: transferHash })
+    await waitForTransactionReceipt(client, { hash: transferHash })
 
     // Verify balance
     const balanceAfter = await actions.getTokenBalance(client, {
