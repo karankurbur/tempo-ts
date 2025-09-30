@@ -16,7 +16,14 @@ import * as actions from './actions.js'
  * Instantiates a default Tempo client.
  *
  * @example
- * TODO
+ * ```ts
+ * import { createTempoClient } from 'tempo/viem'
+ * import { privateKeyToAccount } from 'viem/accounts'
+ *
+ * const client = createTempoClient({
+ *   account: privateKeyToAccount('0x...')
+ * })
+ * ```
  *
  * @param parameters - The parameters for the client.
  * @returns A Tempo client.
