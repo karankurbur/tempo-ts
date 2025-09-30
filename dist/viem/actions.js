@@ -713,7 +713,7 @@ export function watchSetUserToken(client, parameters) {
  * @returns A function to unsubscribe from the event.
  */
 export function watchTokenRole(client, parameters) {
-    const { onRoleMembershipUpdated, token = usdAddress, ...rest } = parameters;
+    const { onRoleUpdated, token = usdAddress, ...rest } = parameters;
     return watchContractEvent(client, {
         ...rest,
         address: TokenId.toAddress(token),
@@ -722,7 +722,7 @@ export function watchTokenRole(client, parameters) {
         onLogs: (logs) => {
             for (const log of logs) {
                 const type = log.args.hasRole ? 'granted' : 'revoked';
-                onRoleMembershipUpdated({ ...log.args, type }, log);
+                onRoleUpdated({ ...log.args, type }, log);
             }
         },
         strict: true,

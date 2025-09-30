@@ -596,7 +596,7 @@ export declare namespace watchTokenRole {
     type Log = viem_Log<bigint, number, false, ExtractAbiItem<typeof tip20Abi, 'RoleMembershipUpdated'>, true>;
     type Parameters = UnionOmit<WatchContractEventParameters<typeof tip20Abi, 'RoleMembershipUpdated', true>, 'abi' | 'address' | 'batch' | 'eventName' | 'onLogs' | 'strict'> & {
         /** Callback to invoke when a role membership is updated. */
-        onRoleMembershipUpdated: (args: Args, log: Log) => void;
+        onRoleUpdated: (args: Args, log: Log) => void;
         /** Address or ID of the TIP20 token. @default `usdAddress` */
         token?: TokenId.TokenIdOrAddress | undefined;
     };
