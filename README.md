@@ -42,8 +42,11 @@ const client = createClient({
   .extend(walletActions)
 
 const hash = await client.sendTransaction({
+  calls: [
+    { data: '0x...', to: '0x...' },
+    { data: '0x...', to: '0x...' }
+  ],
   feeToken: '0x20c0000000000000000000000000000000000000',
-  to: '0x0000000000000000000000000000000000000000',
 })
 
 const transaction = await client.getTransaction({ hash })
