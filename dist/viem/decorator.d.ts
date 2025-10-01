@@ -1,6 +1,7 @@
 import type { Account, Chain, Client, Transport } from 'viem';
 import * as ammActions from "./actions/amm.js";
 import * as feeActions from "./actions/fee.js";
+import * as policyActions from "./actions/policy.js";
 import * as tokenActions from "./actions/token.js";
 export type Decorator<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = {
     amm: {
@@ -309,6 +310,215 @@ export type Decorator<chain extends Chain | undefined = Chain | undefined, accou
          * @returns A function to unsubscribe from the event.
          */
         watchSetUserToken: (parameters: feeActions.watchSetUserToken.Parameters) => () => void;
+    };
+    policy: {
+        /**
+         * Creates a new policy.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         * import { privateKeyToAccount } from 'viem/accounts'
+         *
+         * const client = createTempoClient({
+         *   account: privateKeyToAccount('0x...')
+         * })
+         *
+         * const hash = await client.policy.create({
+         *   admin: '0x...',
+         *   type: 'whitelist',
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The transaction hash.
+         */
+        create: (parameters: policyActions.create.Parameters<chain, account>) => Promise<policyActions.create.ReturnType>;
+        /**
+         * Sets the admin for a policy.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         * import { privateKeyToAccount } from 'viem/accounts'
+         *
+         * const client = createTempoClient({
+         *   account: privateKeyToAccount('0x...')
+         * })
+         *
+         * const hash = await client.policy.setAdmin({
+         *   policyId: 2n,
+         *   admin: '0x...',
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The transaction hash.
+         */
+        setAdmin: (parameters: policyActions.setAdmin.Parameters<chain, account>) => Promise<policyActions.setAdmin.ReturnType>;
+        /**
+         * Modifies a policy whitelist.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         * import { privateKeyToAccount } from 'viem/accounts'
+         *
+         * const client = createTempoClient({
+         *   account: privateKeyToAccount('0x...')
+         * })
+         *
+         * const hash = await client.policy.modifyWhitelist({
+         *   policyId: 2n,
+         *   address: '0x...',
+         *   allowed: true,
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The transaction hash.
+         */
+        modifyWhitelist: (parameters: policyActions.modifyWhitelist.Parameters<chain, account>) => Promise<policyActions.modifyWhitelist.ReturnType>;
+        /**
+         * Modifies a policy blacklist.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         * import { privateKeyToAccount } from 'viem/accounts'
+         *
+         * const client = createTempoClient({
+         *   account: privateKeyToAccount('0x...')
+         * })
+         *
+         * const hash = await client.policy.modifyBlacklist({
+         *   policyId: 2n,
+         *   address: '0x...',
+         *   restricted: true,
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The transaction hash.
+         */
+        modifyBlacklist: (parameters: policyActions.modifyBlacklist.Parameters<chain, account>) => Promise<policyActions.modifyBlacklist.ReturnType>;
+        /**
+         * Gets policy data.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const data = await client.policy.getData({
+         *   policyId: 2n,
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The policy data.
+         */
+        getData: (parameters: policyActions.getData.Parameters) => Promise<policyActions.getData.ReturnType>;
+        /**
+         * Checks if a user is authorized by a policy.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const authorized = await client.policy.isAuthorized({
+         *   policyId: 2n,
+         *   user: '0x...',
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns Whether the user is authorized.
+         */
+        isAuthorized: (parameters: policyActions.isAuthorized.Parameters) => Promise<policyActions.isAuthorized.ReturnType>;
+        /**
+         * Watches for policy creation events.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const unwatch = client.policy.watchCreate({
+         *   onPolicyCreated: (args, log) => {
+         *     console.log('Policy created:', args)
+         *   },
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns A function to unsubscribe from the event.
+         */
+        watchCreate: (parameters: policyActions.watchCreate.Parameters) => () => void;
+        /**
+         * Watches for policy admin update events.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const unwatch = client.policy.watchAdminUpdated({
+         *   onAdminUpdated: (args, log) => {
+         *     console.log('Policy admin updated:', args)
+         *   },
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns A function to unsubscribe from the event.
+         */
+        watchAdminUpdated: (parameters: policyActions.watchAdminUpdated.Parameters) => () => void;
+        /**
+         * Watches for whitelist update events.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const unwatch = client.policy.watchWhitelistUpdated({
+         *   onWhitelistUpdated: (args, log) => {
+         *     console.log('Whitelist updated:', args)
+         *   },
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns A function to unsubscribe from the event.
+         */
+        watchWhitelistUpdated: (parameters: policyActions.watchWhitelistUpdated.Parameters) => () => void;
+        /**
+         * Watches for blacklist update events.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const unwatch = client.policy.watchBlacklistUpdated({
+         *   onBlacklistUpdated: (args, log) => {
+         *     console.log('Blacklist updated:', args)
+         *   },
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns A function to unsubscribe from the event.
+         */
+        watchBlacklistUpdated: (parameters: policyActions.watchBlacklistUpdated.Parameters) => () => void;
     };
     token: {
         /**

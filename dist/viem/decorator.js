@@ -1,5 +1,6 @@
 import * as ammActions from "./actions/amm.js";
 import * as feeActions from "./actions/fee.js";
+import * as policyActions from "./actions/policy.js";
 import * as tokenActions from "./actions/token.js";
 export function decorator() {
     return (client) => {
@@ -24,6 +25,18 @@ export function decorator() {
                 feeActions.getUserToken(client, parameters),
                 setUserToken: (parameters) => feeActions.setUserToken(client, parameters),
                 watchSetUserToken: (parameters) => feeActions.watchSetUserToken(client, parameters),
+            },
+            policy: {
+                create: (parameters) => policyActions.create(client, parameters),
+                setAdmin: (parameters) => policyActions.setAdmin(client, parameters),
+                modifyWhitelist: (parameters) => policyActions.modifyWhitelist(client, parameters),
+                modifyBlacklist: (parameters) => policyActions.modifyBlacklist(client, parameters),
+                getData: (parameters) => policyActions.getData(client, parameters),
+                isAuthorized: (parameters) => policyActions.isAuthorized(client, parameters),
+                watchCreate: (parameters) => policyActions.watchCreate(client, parameters),
+                watchAdminUpdated: (parameters) => policyActions.watchAdminUpdated(client, parameters),
+                watchWhitelistUpdated: (parameters) => policyActions.watchWhitelistUpdated(client, parameters),
+                watchBlacklistUpdated: (parameters) => policyActions.watchBlacklistUpdated(client, parameters),
             },
             token: {
                 approve: (parameters) => tokenActions.approve(client, parameters),
