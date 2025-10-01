@@ -50,7 +50,7 @@ type TransferPolicy = ValueOf<typeof transferPolicy>
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -59,7 +59,7 @@ type TransferPolicy = ValueOf<typeof transferPolicy>
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.approve(client, {
+ * const hash = await actions.token.approve(client, {
  *   spender: '0x...',
  *   amount: 100n,
  * })
@@ -121,7 +121,7 @@ export namespace approve {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -130,7 +130,7 @@ export namespace approve {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.burnBlocked(client, {
+ * const hash = await actions.token.burnBlocked(client, {
  *   from: '0x...',
  *   amount: 100n,
  *   token: '0x...',
@@ -193,7 +193,7 @@ export namespace burnBlocked {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -202,7 +202,7 @@ export namespace burnBlocked {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.burn(client, {
+ * const hash = await actions.token.burn(client, {
  *   amount: 100n,
  *   token: '0x...',
  * })
@@ -274,7 +274,7 @@ export namespace burn {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -283,7 +283,7 @@ export namespace burn {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.changeTransferPolicy(client, {
+ * const hash = await actions.token.changeTransferPolicy(client, {
  *   token: '0x...',
  *   policyId: 1n,
  * })
@@ -342,7 +342,7 @@ export namespace changeTransferPolicy {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -351,7 +351,7 @@ export namespace changeTransferPolicy {
  *   transport: http(),
  * })
  *
- * const { hash, id, address } = await tokenActions.create(client, {
+ * const { hash, id, address } = await actions.token.create(client, {
  *   name: 'My Token',
  *   symbol: 'MTK',
  *   currency: 'USD',
@@ -434,7 +434,7 @@ export namespace create {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -443,7 +443,7 @@ export namespace create {
  *   transport: http(),
  * })
  *
- * const allowance = await tokenActions.getAllowance(client, {
+ * const allowance = await actions.token.getAllowance(client, {
  *   spender: '0x...',
  * })
  * ```
@@ -504,7 +504,7 @@ export namespace getAllowance {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -513,7 +513,7 @@ export namespace getAllowance {
  *   transport: http(),
  * })
  *
- * const balance = await tokenActions.getBalance(client, {
+ * const balance = await actions.token.getBalance(client, {
  *   token: '0x...',
  * })
  * ```
@@ -573,7 +573,7 @@ export namespace getBalance {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -582,7 +582,7 @@ export namespace getBalance {
  *   transport: http(),
  * })
  *
- * const metadata = await tokenActions.getMetadata(client, {
+ * const metadata = await actions.token.getMetadata(client, {
  *   token: '0x...',
  * })
  * ```
@@ -701,7 +701,7 @@ export namespace getMetadata {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -710,7 +710,7 @@ export namespace getMetadata {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.grantRoles(client, {
+ * const hash = await actions.token.grantRoles(client, {
  *   token: '0x...',
  *   to: '0x...',
  *   roles: ['minter'],
@@ -775,7 +775,7 @@ export namespace grantRoles {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -784,7 +784,7 @@ export namespace grantRoles {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.mint(client, {
+ * const hash = await actions.token.mint(client, {
  *   to: '0x...',
  *   amount: 100n,
  *   token: '0x...',
@@ -862,7 +862,7 @@ export namespace mint {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -871,7 +871,7 @@ export namespace mint {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.pause(client, {
+ * const hash = await actions.token.pause(client, {
  *   token: '0x...',
  * })
  * ```
@@ -926,7 +926,7 @@ export namespace pause {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -935,7 +935,7 @@ export namespace pause {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.permit(client, {
+ * const hash = await actions.token.permit(client, {
  *   owner: '0x...',
  *   spender: '0x...',
  *   value: 100n,
@@ -1019,7 +1019,7 @@ export namespace permit {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -1028,7 +1028,7 @@ export namespace permit {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.renounceRoles(client, {
+ * const hash = await actions.token.renounceRoles(client, {
  *   token: '0x...',
  *   roles: ['minter'],
  * })
@@ -1089,7 +1089,7 @@ export namespace renounceRoles {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -1098,7 +1098,7 @@ export namespace renounceRoles {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.revokeRoles(client, {
+ * const hash = await actions.token.revokeRoles(client, {
  *   token: '0x...',
  *   from: '0x...',
  *   roles: ['minter'],
@@ -1163,7 +1163,7 @@ export namespace revokeRoles {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -1172,7 +1172,7 @@ export namespace revokeRoles {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.setSupplyCap(client, {
+ * const hash = await actions.token.setSupplyCap(client, {
  *   token: '0x...',
  *   supplyCap: 1000000n,
  * })
@@ -1231,7 +1231,7 @@ export namespace setSupplyCap {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -1240,7 +1240,7 @@ export namespace setSupplyCap {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.setRoleAdmin(client, {
+ * const hash = await actions.token.setRoleAdmin(client, {
  *   token: '0x...',
  *   role: 'minter',
  *   adminRole: 'admin',
@@ -1305,7 +1305,7 @@ export namespace setRoleAdmin {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -1314,7 +1314,7 @@ export namespace setRoleAdmin {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.transfer(client, {
+ * const hash = await actions.token.transfer(client, {
  *   to: '0x...',
  *   amount: 100n,
  * })
@@ -1404,7 +1404,7 @@ export namespace transfer {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -1413,7 +1413,7 @@ export namespace transfer {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.unpause(client, {
+ * const hash = await actions.token.unpause(client, {
  *   token: '0x...',
  * })
  * ```
@@ -1468,14 +1468,14 @@ export namespace unpause {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  *
  * const client = createClient({
  *   chain: tempo,
  *   transport: http(),
  * })
  *
- * const unwatch = tokenActions.watchApprove(client, {
+ * const unwatch = actions.token.watchApprove(client, {
  *   onApproval: (args, log) => {
  *     console.log('Approval:', args)
  *   },
@@ -1539,14 +1539,14 @@ export namespace watchApprove {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  *
  * const client = createClient({
  *   chain: tempo,
  *   transport: http(),
  * })
  *
- * const unwatch = tokenActions.watchBurn(client, {
+ * const unwatch = actions.token.watchBurn(client, {
  *   onBurn: (args, log) => {
  *     console.log('Burn:', args)
  *   },
@@ -1607,14 +1607,14 @@ export namespace watchBurn {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  *
  * const client = createClient({
  *   chain: tempo,
  *   transport: http(),
  * })
  *
- * const unwatch = tokenActions.watchCreate(client, {
+ * const unwatch = actions.token.watchCreate(client, {
  *   onTokenCreated: (args, log) => {
  *     console.log('Token created:', args)
  *   },
@@ -1676,14 +1676,14 @@ export namespace watchCreate {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  *
  * const client = createClient({
  *   chain: tempo,
  *   transport: http(),
  * })
  *
- * const unwatch = tokenActions.watchMint(client, {
+ * const unwatch = actions.token.watchMint(client, {
  *   onMint: (args, log) => {
  *     console.log('Mint:', args)
  *   },
@@ -1744,14 +1744,14 @@ export namespace watchMint {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  *
  * const client = createClient({
  *   chain: tempo,
  *   transport: http(),
  * })
  *
- * const unwatch = tokenActions.watchAdminRole(client, {
+ * const unwatch = actions.token.watchAdminRole(client, {
  *   onRoleAdminUpdated: (args, log) => {
  *     console.log('Role admin updated:', args)
  *   },
@@ -1815,14 +1815,14 @@ export namespace watchAdminRole {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  *
  * const client = createClient({
  *   chain: tempo,
  *   transport: http(),
  * })
  *
- * const unwatch = tokenActions.watchRole(client, {
+ * const unwatch = actions.token.watchRole(client, {
  *   onRoleUpdated: (args, log) => {
  *     console.log('Role updated:', args)
  *   },
@@ -1893,7 +1893,7 @@ export namespace watchRole {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  *
  * const client = createClient({
  *   account: privateKeyToAccount('0x...'),
@@ -1901,7 +1901,7 @@ export namespace watchRole {
  *   transport: http(),
  * })
  *
- * const unwatch = tokenActions.watchTransfer(client, {
+ * const unwatch = actions.token.watchTransfer(client, {
  *   onTransfer: (args, log) => {
  *     console.log('Transfer:', args)
  *   },

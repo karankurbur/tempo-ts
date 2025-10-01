@@ -1,7 +1,250 @@
 import type { Account, Chain, Client, Transport } from 'viem';
+import * as ammActions from "./actions/amm.js";
 import * as feeActions from "./actions/fee.js";
 import * as tokenActions from "./actions/token.js";
 export type Decorator<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = {
+    amm: {
+        /**
+         * Gets the pool ID for a token pair.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const poolId = await client.amm.getPoolId({
+         *   userToken: '0x...',
+         *   validatorToken: '0x...',
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The pool ID.
+         */
+        getPoolId: (parameters: ammActions.getPoolId.Parameters) => Promise<ammActions.getPoolId.ReturnType>;
+        /**
+         * Gets the reserves for a liquidity pool.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const pool = await client.amm.getPool({
+         *   userToken: '0x...',
+         *   validatorToken: '0x...',
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The pool reserves.
+         */
+        getPool: (parameters: ammActions.getPool.Parameters) => Promise<ammActions.getPool.ReturnType>;
+        /**
+         * Gets the total supply of LP tokens for a pool.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const poolId = await client.amm.getPoolId({
+         *   userToken: '0x...',
+         *   validatorToken: '0x...',
+         * })
+         *
+         * const totalSupply = await client.amm.getTotalSupply({ poolId })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The total supply of LP tokens.
+         */
+        getTotalSupply: (parameters: ammActions.getTotalSupply.Parameters) => Promise<ammActions.getTotalSupply.ReturnType>;
+        /**
+         * Gets the LP token balance for an account in a specific pool.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const poolId = await client.amm.getPoolId({
+         *   userToken: '0x...',
+         *   validatorToken: '0x...',
+         * })
+         *
+         * const balance = await client.amm.getLiquidityBalance({
+         *   poolId,
+         *   address: '0x...',
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The LP token balance.
+         */
+        getLiquidityBalance: (parameters: ammActions.getLiquidityBalance.Parameters) => Promise<ammActions.getLiquidityBalance.ReturnType>;
+        /**
+         * Performs a rebalance swap from validator token to user token.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         * import { privateKeyToAccount } from 'viem/accounts'
+         *
+         * const client = createTempoClient({
+         *   account: privateKeyToAccount('0x...')
+         * })
+         *
+         * const hash = await client.amm.rebalanceSwap({
+         *   userToken: '0x...',
+         *   validatorToken: '0x...',
+         *   amountOut: 100n,
+         *   to: '0x...',
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The transaction hash.
+         */
+        rebalanceSwap: (parameters: ammActions.rebalanceSwap.Parameters<chain, account>) => Promise<ammActions.rebalanceSwap.ReturnType>;
+        /**
+         * Adds liquidity to a pool.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         * import { privateKeyToAccount } from 'viem/accounts'
+         *
+         * const client = createTempoClient({
+         *   account: privateKeyToAccount('0x...')
+         * })
+         *
+         * const hash = await client.amm.mint({
+         *   userToken: {
+         *     address: '0x...',
+         *     amount: 100n,
+         *   },
+         *   validatorToken: {
+         *     address: '0x...',
+         *     amount: 100n,
+         *   },
+         *   to: '0x...',
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The transaction hash.
+         */
+        mint: (parameters: ammActions.mint.Parameters<chain, account>) => Promise<ammActions.mint.ReturnType>;
+        /**
+         * Removes liquidity from a pool.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         * import { privateKeyToAccount } from 'viem/accounts'
+         *
+         * const client = createTempoClient({
+         *   account: privateKeyToAccount('0x...')
+         * })
+         *
+         * const hash = await client.amm.burn({
+         *   userToken: '0x...',
+         *   validatorToken: '0x...',
+         *   liquidity: 50n,
+         *   to: '0x...',
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns The transaction hash.
+         */
+        burn: (parameters: ammActions.burn.Parameters<chain, account>) => Promise<ammActions.burn.ReturnType>;
+        /**
+         * Watches for rebalance swap events.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const unwatch = client.amm.watchRebalanceSwap({
+         *   onRebalanceSwap: (args, log) => {
+         *     console.log('Rebalance swap:', args)
+         *   },
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns A function to unsubscribe from the event.
+         */
+        watchRebalanceSwap: (parameters: ammActions.watchRebalanceSwap.Parameters) => () => void;
+        /**
+         * Watches for fee swap events.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const unwatch = client.amm.watchFeeSwap({
+         *   onFeeSwap: (args, log) => {
+         *     console.log('Fee swap:', args)
+         *   },
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns A function to unsubscribe from the event.
+         */
+        watchFeeSwap: (parameters: ammActions.watchFeeSwap.Parameters) => () => void;
+        /**
+         * Watches for liquidity mint events.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const unwatch = client.amm.watchMint({
+         *   onMint: (args, log) => {
+         *     console.log('Liquidity added:', args)
+         *   },
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns A function to unsubscribe from the event.
+         */
+        watchMint: (parameters: ammActions.watchMint.Parameters) => () => void;
+        /**
+         * Watches for liquidity burn events.
+         *
+         * @example
+         * ```ts
+         * import { createTempoClient } from 'tempo/viem'
+         *
+         * const client = createTempoClient()
+         *
+         * const unwatch = client.amm.watchBurn({
+         *   onBurn: (args, log) => {
+         *     console.log('Liquidity removed:', args)
+         *   },
+         * })
+         * ```
+         *
+         * @param parameters - Parameters.
+         * @returns A function to unsubscribe from the event.
+         */
+        watchBurn: (parameters: ammActions.watchBurn.Parameters) => () => void;
+    };
     fee: {
         /**
          * Gets the user's default fee token.

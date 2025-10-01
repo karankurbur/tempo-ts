@@ -14,7 +14,7 @@ import { feeManagerAddress } from "../addresses.js";
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -23,7 +23,7 @@ import { feeManagerAddress } from "../addresses.js";
  *   transport: http(),
  * })
  *
- * const { address, id } = await tokenActions.getUserToken(client)
+ * const { address, id } = await actions.fee.getUserToken(client)
  * ```
  *
  * @param client - Client.
@@ -54,7 +54,7 @@ export async function getUserToken(client, ...parameters) {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
@@ -63,7 +63,7 @@ export async function getUserToken(client, ...parameters) {
  *   transport: http(),
  * })
  *
- * const hash = await tokenActions.setUserToken(client, {
+ * const hash = await actions.fee.setUserToken(client, {
  *   token: '0x...',
  * })
  * ```
@@ -91,14 +91,14 @@ export async function setUserToken(client, parameters) {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo/chains'
- * import { tokenActions } from 'tempo/viem'
+ * import * as actions from 'tempo/viem/actions'
  *
  * const client = createClient({
  *   chain: tempo,
  *   transport: http(),
  * })
  *
- * const unwatch = tokenActions.watchSetUserToken(client, {
+ * const unwatch = actions.fee.watchSetUserToken(client, {
  *   onUserTokenSet: (args, log) => {
  *     console.log('User token set:', args)
  *   },

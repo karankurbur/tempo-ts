@@ -1,8 +1,22 @@
+import * as ammActions from "./actions/amm.js";
 import * as feeActions from "./actions/fee.js";
 import * as tokenActions from "./actions/token.js";
 export function decorator() {
     return (client) => {
         return {
+            amm: {
+                getPoolId: (parameters) => ammActions.getPoolId(client, parameters),
+                getPool: (parameters) => ammActions.getPool(client, parameters),
+                getTotalSupply: (parameters) => ammActions.getTotalSupply(client, parameters),
+                getLiquidityBalance: (parameters) => ammActions.getLiquidityBalance(client, parameters),
+                rebalanceSwap: (parameters) => ammActions.rebalanceSwap(client, parameters),
+                mint: (parameters) => ammActions.mint(client, parameters),
+                burn: (parameters) => ammActions.burn(client, parameters),
+                watchRebalanceSwap: (parameters) => ammActions.watchRebalanceSwap(client, parameters),
+                watchFeeSwap: (parameters) => ammActions.watchFeeSwap(client, parameters),
+                watchMint: (parameters) => ammActions.watchMint(client, parameters),
+                watchBurn: (parameters) => ammActions.watchBurn(client, parameters),
+            },
             fee: {
                 // @ts-expect-error
                 getUserToken: (parameters) => 

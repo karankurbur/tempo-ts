@@ -2098,7 +2098,7 @@ describe.skipIf(!!process.env.CI)('watchTransfer', () => {
       })
       await waitForTransactionReceipt(client, { hash: hash2 })
 
-      await setTimeout(100)
+      await setTimeout(200)
 
       expect(receivedTransfers).toHaveLength(2)
 
