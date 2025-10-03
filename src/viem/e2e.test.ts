@@ -1,9 +1,12 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { RpcRequest, RpcResponse } from 'ox'
 import { tempoLocal } from 'tempo/chains'
 import { Instance } from 'tempo/prool'
 import { createClient, http, publicActions, walletActions } from 'viem'
 import { mnemonicToAccount, privateKeyToAccount } from 'viem/accounts'
+import { tempoActions } from './index.js'
 import { parseTransaction } from './transaction.js'
+import { withRelay } from './transport.js'
 
 const instance = Instance.tempo({ port: 8545 })
 
@@ -197,6 +200,119 @@ describe.skipIf(!!process.env.CI)('signTransaction', () => {
         "r": "0x37dd9c584f676de7cb054c182cab39f5256921c1a2e768e7ba18699b1c93b2d0",
         "s": "0x49ea80aa9fb1f54c9743e63411b5cf3859146e352af239e93ca4d918ec3a6008",
         "to": "0xcafebabecafebabecafebabecafebabecafebabe",
+        "transactionIndex": 0,
+        "type": "feeToken",
+        "typeHex": "0x77",
+        "v": 28n,
+        "value": 0n,
+        "yParity": 1,
+      }
+    `)
+  })
+})
+
+describe.skipIf(!!process.env.CI)('relay', () => {
+  test('default', async () => {
+    const { url } = Bun.serve({
+      port: 8546,
+      async fetch(req) {
+        const client = createClient({
+          account: mnemonicToAccount(
+            'test test test test test test test test test test test junk',
+          ),
+          chain: tempoLocal,
+          transport: http(),
+        }).extend(walletActions)
+
+        const request = RpcRequest.from(await req.json())
+
+        if (request.method !== 'eth_sendRawTransaction')
+          return Response.json(
+            RpcResponse.from(
+              {
+                error: new RpcResponse.MethodNotSupportedError({
+                  message: 'relay only supports `eth_sendRawTransaction`',
+                }),
+              },
+              { request },
+            ),
+          )
+
+        const serialized = request.params[0] as `0x77${string}`
+        if (!serialized.startsWith('0x77'))
+          return Response.json(
+            RpcResponse.from(
+              {
+                error: new RpcResponse.InvalidParamsError({
+                  message: 'relay only supports `0x77` transactions',
+                }),
+              },
+              { request },
+            ),
+          )
+
+        const transaction = parseTransaction(serialized)
+        const serializedTransaction = await client.signTransaction({
+          ...transaction,
+          feePayer: client.account,
+        })
+        const hash = await client.sendRawTransaction({
+          serializedTransaction,
+        })
+
+        return Response.json(RpcResponse.from({ result: hash }, { request }))
+      },
+    })
+
+    const client = createClient({
+      account: privateKeyToAccount(
+        // unfunded PK
+        '0xecc3fe55647412647e5c6b657c496803b08ef956f927b7a821da298cfbdd9666',
+      ),
+      chain: tempoLocal,
+      transport: withRelay(http(), http(url.toString())),
+    })
+      .extend(tempoActions())
+      .extend(walletActions)
+      .extend(publicActions)
+
+    const hash = await client.fee.setUserToken({
+      token: 1n,
+    })
+    await client.waitForTransactionReceipt({ hash })
+
+    const {
+      blockHash: _,
+      blockNumber: __,
+      ...transaction
+    } = await client.getTransaction({ hash })
+
+    expect(transaction).toMatchInlineSnapshot(`
+      {
+        "accessList": [],
+        "authorizationList": [],
+        "chainId": 1337,
+        "data": "0xe789744400000000000000000000000020c0000000000000000000000000000000000001",
+        "feePayer": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "feePayerSignature": {
+          "r": "0xcc7cb7625e176ed4cd8c4f7f0fe0179d651ff81f9b2e0aadcf76a384629a343c",
+          "s": "0x1f216b194605f37b8dd0f8c3c408ca56b5d775401da5af2e8368f847dea7fcdf",
+          "v": 27n,
+          "yParity": 0,
+        },
+        "feeToken": null,
+        "from": "0x697c9fad5a9824020c01ed7ef2519f3dcc22a5d8",
+        "gas": 22563n,
+        "gasPrice": 44n,
+        "hash": "0x5a49ad5c4efacca483d7f4f76f08d7ed9828a71dcb5ecae52c10df094d944f85",
+        "input": "0xe789744400000000000000000000000020c0000000000000000000000000000000000001",
+        "maxFeePerBlobGas": undefined,
+        "maxFeePerGas": 52n,
+        "maxPriorityFeePerGas": 0n,
+        "nonce": 0,
+        "r": "0x53e6d3139943b876dace108c6da435ae62b4f6bfee859ba42355d3c309241a19",
+        "s": "0x7da02ee7c649bfec235f87793ede9579da6dc23d0f411e1a5977762bcbaae987",
+        "to": "0xfeec000000000000000000000000000000000000",
         "transactionIndex": 0,
         "type": "feeToken",
         "typeHex": "0x77",

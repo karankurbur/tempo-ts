@@ -60,13 +60,17 @@ export const formatTransactionRequest = (
   r: TransactionRequest,
   action?: string | undefined,
 ): TransactionRequestRpc => {
-  if (!isTempoTransaction(r))
+  const request = r as TransactionRequestFeeToken
+
+  // map "eip1559" to "feeToken" ;)
+  if (r.type === 'eip1559') request.type = 'feeToken'
+
+  if (!isTempoTransaction(request))
     return viem_formatTransactionRequest(
       r as never,
       action,
     ) as TransactionRequestRpc
 
-  const request = r as TransactionRequestFeeToken
   const rpc = ox_TransactionRequest.toRpc({
     ...request,
     authorizationList: request.authorizationList?.map((auth) => ({

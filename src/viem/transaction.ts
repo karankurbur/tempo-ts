@@ -142,6 +142,9 @@ export async function serializeTransaction(
   },
   signature?: viem_Signature | undefined,
 ) {
+  // map "eip1559" to "feeToken" ;)
+  if (transaction.type === 'eip1559') (transaction as any).type = 'feeToken'
+
   if (!isTempoTransaction(transaction))
     return viem_serializeTransaction(transaction as never, signature)
 
