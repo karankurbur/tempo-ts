@@ -3,7 +3,7 @@ import { chainConfig } from './viem/chain.js'
 
 export const tempo = /*#__PURE__*/ defineChain({
   ...chainConfig,
-  id: 42424,
+  id: 1337,
   name: 'Tempo',
   nativeCurrency: {
     name: 'USD',
