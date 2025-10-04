@@ -51,7 +51,6 @@ export async function serializeTransaction(transaction, signature) {
             yParity: Number(auth.yParity),
         })),
         chainId: Number(chainId),
-        ...(nonce ? { nonce: BigInt(nonce) } : {}),
         feePayerSignature: feePayerSignature
             ? {
                 r: BigInt(feePayerSignature.r),
@@ -61,6 +60,7 @@ export async function serializeTransaction(transaction, signature) {
             : feePayer
                 ? null
                 : undefined,
+        ...(nonce ? { nonce: BigInt(nonce) } : {}),
         ...(r ? { r: BigInt(r) } : {}),
         ...(s ? { s: BigInt(s) } : {}),
         ...(v ? { v: Number(v) } : {}),
