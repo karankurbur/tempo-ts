@@ -28,15 +28,14 @@
 			"src": "src"
 		}
 	},
+	"dependencies": {
+		"ox": "~0.9.8"
+	},
 	"peerDependencies": {
-		"ox": ">=0.9.8",
 		"prool": "^0",
 		"viem": ">=2.37.12"
 	},
 	"peerDependenciesMeta": {
-		"ox": {
-			"optional": true
-		},
 		"prool": {
 			"optional": true
 		},
@@ -56,7 +55,6 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.4",
 		"@types/bun": "latest",
-		"ox": "^0.9.8",
 		"prool": "latest",
 		"simple-git-hooks": "^2.13.1",
 		"typescript": "^5.9.2",
