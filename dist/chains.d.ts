@@ -19,7 +19,7 @@ export declare const tempo: {
         };
     };
     ensTlds?: readonly string[] | undefined;
-    id: 42424;
+    id: 1337;
     name: "Tempo";
     nativeCurrency: {
         readonly name: "USD";

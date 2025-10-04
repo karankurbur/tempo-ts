@@ -34,9 +34,6 @@ export function parseTransaction(serializedTransaction) {
     return viem_parseTransaction(serializedTransaction);
 }
 export async function serializeTransaction(transaction, signature) {
-    // map "eip1559" to "feeToken" ;)
-    if (transaction.type === 'eip1559')
-        transaction.type = 'feeToken';
     if (!isTempoTransaction(transaction))
         return viem_serializeTransaction(transaction, signature);
     const signature_ = transaction.r && transaction.s ? transaction : signature;

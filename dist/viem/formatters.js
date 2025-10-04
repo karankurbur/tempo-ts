@@ -35,9 +35,6 @@ export const formatTransaction = (transaction) => {
 };
 export const formatTransactionRequest = (r, action) => {
     const request = r;
-    // map "eip1559" to "feeToken" ;)
-    if (r.type === 'eip1559')
-        request.type = 'feeToken';
     if (!isTempoTransaction(request))
         return viem_formatTransactionRequest(r, action);
     const rpc = ox_TransactionRequest.toRpc({
@@ -50,13 +47,15 @@ export const formatTransactionRequest = (r, action) => {
             yParity: Number(auth.yParity),
         })),
         nonce: request.nonce ? BigInt(request.nonce) : undefined,
+        type: 'feeToken',
     });
     return {
         ...rpc,
-        type: '0x77',
-        ...(typeof request.feePayer === 'object'
+        ...(request.feePayer
             ? {
-                feePayer: parseAccount(request.feePayer),
+                feePayer: typeof request.feePayer === 'object'
+                    ? parseAccount(request.feePayer)
+                    : request.feePayer,
             }
             : {}),
         ...(action === 'estimateGas'
