@@ -1,11 +1,8 @@
-// TODO:
-// - add `.call` to namespaces
-// - add `.simulate` to namespaces
-// - add `.estimateGas` to namespaces
 import { readContract, watchContractEvent, writeContract } from 'viem/actions';
-import { TokenId } from "../../ox/index.js";
+import * as TokenId from "../../ox/TokenId.js";
 import { feeAmmAbi } from "../abis.js";
 import { feeManagerAddress } from "../addresses.js";
+import { defineCall } from "../utils.js";
 /**
  * Gets the pool ID for a token pair.
  *
@@ -31,15 +28,29 @@ import { feeManagerAddress } from "../addresses.js";
  * @returns The pool ID.
  */
 export async function getPoolId(client, parameters) {
-    const { userToken, validatorToken, ...rest } = parameters;
     return readContract(client, {
-        ...rest,
-        address: feeManagerAddress,
-        abi: feeAmmAbi,
-        functionName: 'getPoolId',
-        args: [TokenId.toAddress(userToken), TokenId.toAddress(validatorToken)],
+        ...parameters,
+        ...getPoolId.call(parameters),
     });
 }
+(function (getPoolId) {
+    /**
+     * Defines a call to the `getPoolId` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { userToken, validatorToken } = args;
+        return defineCall({
+            address: feeManagerAddress,
+            abi: feeAmmAbi,
+            args: [TokenId.toAddress(userToken), TokenId.toAddress(validatorToken)],
+            functionName: 'getPoolId',
+        });
+    }
+    getPoolId.call = call;
+})(getPoolId || (getPoolId = {}));
 /**
  * Gets the reserves for a liquidity pool.
  *
@@ -65,15 +76,29 @@ export async function getPoolId(client, parameters) {
  * @returns The pool reserves.
  */
 export async function getPool(client, parameters) {
-    const { userToken, validatorToken, ...rest } = parameters;
     return readContract(client, {
-        ...rest,
-        address: feeManagerAddress,
-        abi: feeAmmAbi,
-        functionName: 'getPool',
-        args: [TokenId.toAddress(userToken), TokenId.toAddress(validatorToken)],
+        ...parameters,
+        ...getPool.call(parameters),
     });
 }
+(function (getPool) {
+    /**
+     * Defines a call to the `getPool` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { userToken, validatorToken } = args;
+        return defineCall({
+            address: feeManagerAddress,
+            abi: feeAmmAbi,
+            args: [TokenId.toAddress(userToken), TokenId.toAddress(validatorToken)],
+            functionName: 'getPool',
+        });
+    }
+    getPool.call = call;
+})(getPool || (getPool = {}));
 /**
  * Gets the total supply of LP tokens for a pool.
  *
@@ -101,15 +126,29 @@ export async function getPool(client, parameters) {
  * @returns The total supply of LP tokens.
  */
 export async function getTotalSupply(client, parameters) {
-    const { poolId, ...rest } = parameters;
     return readContract(client, {
-        ...rest,
-        address: feeManagerAddress,
-        abi: feeAmmAbi,
-        functionName: 'totalSupply',
-        args: [poolId],
+        ...parameters,
+        ...getTotalSupply.call(parameters),
     });
 }
+(function (getTotalSupply) {
+    /**
+     * Defines a call to the `totalSupply` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { poolId } = args;
+        return defineCall({
+            address: feeManagerAddress,
+            abi: feeAmmAbi,
+            args: [poolId],
+            functionName: 'totalSupply',
+        });
+    }
+    getTotalSupply.call = call;
+})(getTotalSupply || (getTotalSupply = {}));
 /**
  * Gets the LP token balance for an account in a specific pool.
  *
@@ -140,15 +179,29 @@ export async function getTotalSupply(client, parameters) {
  * @returns The LP token balance.
  */
 export async function getLiquidityBalance(client, parameters) {
-    const { address, poolId, ...rest } = parameters;
     return readContract(client, {
-        ...rest,
-        address: feeManagerAddress,
-        abi: feeAmmAbi,
-        functionName: 'liquidityBalances',
-        args: [poolId, address],
+        ...parameters,
+        ...getLiquidityBalance.call(parameters),
     });
 }
+(function (getLiquidityBalance) {
+    /**
+     * Defines a call to the `liquidityBalances` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { address, poolId } = args;
+        return defineCall({
+            address: feeManagerAddress,
+            abi: feeAmmAbi,
+            args: [poolId, address],
+            functionName: 'liquidityBalances',
+        });
+    }
+    getLiquidityBalance.call = call;
+})(getLiquidityBalance || (getLiquidityBalance = {}));
 /**
  * Performs a rebalance swap from validator token to user token.
  *
@@ -178,22 +231,69 @@ export async function getLiquidityBalance(client, parameters) {
  * @returns The transaction hash.
  */
 export async function rebalanceSwap(client, parameters) {
-    const { account = client.account, amountOut, chain = client.chain, to, userToken, validatorToken, ...rest } = parameters;
+    const call = rebalanceSwap.call(parameters);
     return writeContract(client, {
-        ...rest,
-        account,
-        address: feeManagerAddress,
-        abi: feeAmmAbi,
-        chain,
-        functionName: 'rebalanceSwap',
-        args: [
-            TokenId.toAddress(userToken),
-            TokenId.toAddress(validatorToken),
-            amountOut,
-            to,
-        ],
+        ...parameters,
+        ...call,
     });
 }
+(function (rebalanceSwap) {
+    /**
+     * Defines a call to the `rebalanceSwap` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.amm.rebalanceSwap.call({
+     *       userToken: '0x20c0...beef',
+     *       validatorToken: '0x20c0...babe',
+     *       amountOut: 100n,
+     *       to: '0xfeed...fede',
+     *     }),
+     *     actions.amm.rebalanceSwap.call({
+     *       userToken: '0x20c0...babe',
+     *       validatorToken: '0x20c0...babe',
+     *       amountOut: 100n,
+     *       to: '0xfeed...fede',
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { userToken, validatorToken, amountOut, to } = args;
+        return defineCall({
+            address: feeManagerAddress,
+            abi: feeAmmAbi,
+            functionName: 'rebalanceSwap',
+            args: [
+                TokenId.toAddress(userToken),
+                TokenId.toAddress(validatorToken),
+                amountOut,
+                to,
+            ],
+        });
+    }
+    rebalanceSwap.call = call;
+})(rebalanceSwap || (rebalanceSwap = {}));
 /**
  * Adds liquidity to a pool.
  *
@@ -212,14 +312,14 @@ export async function rebalanceSwap(client, parameters) {
  *
  * const hash = await actions.amm.mint(client, {
  *   userToken: {
- *     address: '0x...',
+ *     address: '0x20c0...beef',
  *     amount: 100n,
  *   },
  *   validatorToken: {
- *     address: '0x...',
+ *     address: '0x20c0...babe',
  *     amount: 100n,
  *   },
- *   to: '0x...',
+ *   to: '0xfeed...fede',
  * })
  * ```
  *
@@ -228,23 +328,80 @@ export async function rebalanceSwap(client, parameters) {
  * @returns The transaction hash.
  */
 export async function mint(client, parameters) {
-    const { account = client.account, chain = client.chain, to, userToken, validatorToken, ...rest } = parameters;
+    const call = mint.call(parameters);
     return writeContract(client, {
-        ...rest,
-        account,
-        address: feeManagerAddress,
-        abi: feeAmmAbi,
-        chain,
-        functionName: 'mint',
-        args: [
-            TokenId.toAddress(userToken.address),
-            TokenId.toAddress(validatorToken.address),
-            userToken.amount,
-            validatorToken.amount,
-            to,
-        ],
+        ...parameters,
+        ...call,
     });
 }
+(function (mint) {
+    /**
+     * Defines a call to the `mint` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.amm.mint.call({
+     *       userToken: {
+     *         address: '0x20c0...beef',
+     *         amount: 100n,
+     *       },
+     *       validatorToken: {
+     *         address: '0x20c0...babe',
+     *         amount: 100n,
+     *       },
+     *       to: '0xfeed...fede',
+     *     }),
+     *     actions.amm.mint.call({
+     *       userToken: {
+     *         address: '0x20c0...babe',
+     *         amount: 100n,
+     *       },
+     *       validatorToken: {
+     *         address: '0x20c0...babe',
+     *         amount: 100n,
+     *       },
+     *       to: '0xfeed...fede',
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { to, userToken, validatorToken } = args;
+        return defineCall({
+            address: feeManagerAddress,
+            abi: feeAmmAbi,
+            functionName: 'mint',
+            args: [
+                TokenId.toAddress(userToken.address),
+                TokenId.toAddress(validatorToken.address),
+                userToken.amount,
+                validatorToken.amount,
+                to,
+            ],
+        });
+    }
+    mint.call = call;
+})(mint || (mint = {}));
 /**
  * Removes liquidity from a pool.
  *
@@ -262,10 +419,10 @@ export async function mint(client, parameters) {
  * })
  *
  * const hash = await actions.amm.burn(client, {
- *   userToken: '0x...',
- *   validatorToken: '0x...',
+ *   userToken: '0x20c0...beef',
+ *   validatorToken: '0x20c0...babe',
  *   liquidity: 50n,
- *   to: '0x...',
+ *   to: '0xfeed...fede',
  * })
  * ```
  *
@@ -274,22 +431,69 @@ export async function mint(client, parameters) {
  * @returns The transaction hash.
  */
 export async function burn(client, parameters) {
-    const { account = client.account, chain = client.chain, liquidity, to, userToken, validatorToken, ...rest } = parameters;
+    const call = burn.call(parameters);
     return writeContract(client, {
-        ...rest,
-        account,
-        address: feeManagerAddress,
-        abi: feeAmmAbi,
-        chain,
-        functionName: 'burn',
-        args: [
-            TokenId.toAddress(userToken),
-            TokenId.toAddress(validatorToken),
-            liquidity,
-            to,
-        ],
+        ...parameters,
+        ...call,
     });
 }
+(function (burn) {
+    /**
+     * Defines a call to the `burn` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.amm.burn.call({
+     *       liquidity: 100n,
+     *       to: '0xfeed...fede',
+     *       userToken: '0x20c0...beef',
+     *       validatorToken: '0x20c0...babe',
+     *     }),
+     *     actions.amm.burn.call({
+     *       liquidity: 100n,
+     *       to: '0xfeed...fede',
+     *       userToken: '0x20c0...babe',
+     *       validatorToken: '0x20c0...babe',
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { liquidity, to, userToken, validatorToken } = args;
+        return defineCall({
+            address: feeManagerAddress,
+            abi: feeAmmAbi,
+            functionName: 'burn',
+            args: [
+                TokenId.toAddress(userToken),
+                TokenId.toAddress(validatorToken),
+                liquidity,
+                to,
+            ],
+        });
+    }
+    burn.call = call;
+})(burn || (burn = {}));
 /**
  * Watches for rebalance swap events.
  *

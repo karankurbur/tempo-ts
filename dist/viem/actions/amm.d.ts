@@ -1,6 +1,6 @@
 import type { Account, Address, Chain, Client, ExtractAbiItem, GetEventArgs, Hex, ReadContractParameters, ReadContractReturnType, Transport, Log as viem_Log, WatchContractEventParameters, WriteContractParameters, WriteContractReturnType } from 'viem';
 import type { Compute, UnionOmit } from "../../internal/types.js";
-import { TokenId } from "../../ox/index.js";
+import * as TokenId from "../../ox/TokenId.js";
 import { feeAmmAbi } from "../abis.js";
 /**
  * Gets the pool ID for a token pair.
@@ -28,13 +28,50 @@ import { feeAmmAbi } from "../abis.js";
  */
 export declare function getPoolId<chain extends Chain | undefined>(client: Client<Transport, chain>, parameters: getPoolId.Parameters): Promise<getPoolId.ReturnType>;
 export declare namespace getPoolId {
-    type Parameters = UnionOmit<ReadContractParameters<never, never, never>, 'abi' | 'address' | 'functionName' | 'args'> & {
+    type Parameters = UnionOmit<ReadContractParameters<never, never, never>, 'abi' | 'address' | 'functionName' | 'args'> & Args;
+    type Args = {
         /** Address or ID of the user token. */
         userToken: TokenId.TokenIdOrAddress;
         /** Address or ID of the validator token. */
         validatorToken: TokenId.TokenIdOrAddress;
     };
     type ReturnType = ReadContractReturnType<typeof feeAmmAbi, 'getPoolId', never>;
+    /**
+     * Defines a call to the `getPoolId` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args: Args): {
+        abi: [{
+            readonly type: "function";
+            readonly name: "getPoolId";
+            readonly inputs: readonly [{
+                readonly name: "userToken";
+                readonly type: "address";
+                readonly internalType: "address";
+            }, {
+                readonly name: "validatorToken";
+                readonly type: "address";
+                readonly internalType: "address";
+            }];
+            readonly outputs: readonly [{
+                readonly name: "";
+                readonly type: "bytes32";
+                readonly internalType: "bytes32";
+            }];
+            readonly stateMutability: "pure";
+        }];
+        functionName: "getPoolId";
+        args?: readonly [`0x${string}`, `0x${string}`] | undefined;
+    } & {
+        args: readonly [`0x${string}`, `0x${string}`];
+    } & {
+        address: Address;
+    } & {
+        data: Hex;
+        to: Address;
+    };
 }
 /**
  * Gets the reserves for a liquidity pool.
@@ -62,7 +99,8 @@ export declare namespace getPoolId {
  */
 export declare function getPool<chain extends Chain | undefined>(client: Client<Transport, chain>, parameters: getPool.Parameters): Promise<getPool.ReturnType>;
 export declare namespace getPool {
-    type Parameters = UnionOmit<ReadContractParameters<never, never, never>, 'abi' | 'address' | 'functionName' | 'args'> & {
+    type Parameters = UnionOmit<ReadContractParameters<never, never, never>, 'abi' | 'address' | 'functionName' | 'args'> & Args;
+    type Args = {
         /** Address or ID of the user token. */
         userToken: TokenId.TokenIdOrAddress;
         /** Address or ID of the validator token. */
@@ -74,6 +112,51 @@ export declare namespace getPool {
         /** Reserve of validator token. */
         reserveValidatorToken: bigint;
     }>;
+    /**
+     * Defines a call to the `getPool` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args: Args): {
+        abi: [{
+            readonly type: "function";
+            readonly name: "getPool";
+            readonly inputs: readonly [{
+                readonly name: "userToken";
+                readonly type: "address";
+                readonly internalType: "address";
+            }, {
+                readonly name: "validatorToken";
+                readonly type: "address";
+                readonly internalType: "address";
+            }];
+            readonly outputs: readonly [{
+                readonly name: "";
+                readonly type: "tuple";
+                readonly internalType: "struct FeeAMM.Pool";
+                readonly components: readonly [{
+                    readonly name: "reserveUserToken";
+                    readonly type: "uint128";
+                    readonly internalType: "uint128";
+                }, {
+                    readonly name: "reserveValidatorToken";
+                    readonly type: "uint128";
+                    readonly internalType: "uint128";
+                }];
+            }];
+            readonly stateMutability: "view";
+        }];
+        functionName: "getPool";
+        args?: readonly [`0x${string}`, `0x${string}`] | undefined;
+    } & {
+        args: readonly [`0x${string}`, `0x${string}`];
+    } & {
+        address: Address;
+    } & {
+        data: Hex;
+        to: Address;
+    };
 }
 /**
  * Gets the total supply of LP tokens for a pool.
@@ -103,11 +186,44 @@ export declare namespace getPool {
  */
 export declare function getTotalSupply<chain extends Chain | undefined>(client: Client<Transport, chain>, parameters: getTotalSupply.Parameters): Promise<getTotalSupply.ReturnType>;
 export declare namespace getTotalSupply {
-    type Parameters = UnionOmit<ReadContractParameters<never, never, never>, 'abi' | 'address' | 'functionName' | 'args'> & {
+    type Parameters = UnionOmit<ReadContractParameters<never, never, never>, 'abi' | 'address' | 'functionName' | 'args'> & Args;
+    type Args = {
         /** Pool ID. */
         poolId: Hex;
     };
     type ReturnType = ReadContractReturnType<typeof feeAmmAbi, 'totalSupply', never>;
+    /**
+     * Defines a call to the `totalSupply` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args: Args): {
+        abi: [{
+            readonly type: "function";
+            readonly name: "totalSupply";
+            readonly inputs: readonly [{
+                readonly name: "";
+                readonly type: "bytes32";
+                readonly internalType: "bytes32";
+            }];
+            readonly outputs: readonly [{
+                readonly name: "";
+                readonly type: "uint256";
+                readonly internalType: "uint256";
+            }];
+            readonly stateMutability: "view";
+        }];
+        functionName: "totalSupply";
+        args?: readonly [`0x${string}`] | undefined;
+    } & {
+        args: readonly [`0x${string}`];
+    } & {
+        address: Address;
+    } & {
+        data: Hex;
+        to: Address;
+    };
 }
 /**
  * Gets the LP token balance for an account in a specific pool.
@@ -140,13 +256,50 @@ export declare namespace getTotalSupply {
  */
 export declare function getLiquidityBalance<chain extends Chain | undefined>(client: Client<Transport, chain>, parameters: getLiquidityBalance.Parameters): Promise<getLiquidityBalance.ReturnType>;
 export declare namespace getLiquidityBalance {
-    type Parameters = UnionOmit<ReadContractParameters<never, never, never>, 'abi' | 'address' | 'functionName' | 'args'> & {
+    type Parameters = UnionOmit<ReadContractParameters<never, never, never>, 'abi' | 'address' | 'functionName' | 'args'> & Args;
+    type Args = {
         /** Address to check balance for. */
         address: Address;
         /** Pool ID. */
         poolId: Hex;
     };
     type ReturnType = ReadContractReturnType<typeof feeAmmAbi, 'liquidityBalances', never>;
+    /**
+     * Defines a call to the `liquidityBalances` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args: Args): {
+        abi: [{
+            readonly type: "function";
+            readonly name: "liquidityBalances";
+            readonly inputs: readonly [{
+                readonly name: "";
+                readonly type: "bytes32";
+                readonly internalType: "bytes32";
+            }, {
+                readonly name: "";
+                readonly type: "address";
+                readonly internalType: "address";
+            }];
+            readonly outputs: readonly [{
+                readonly name: "";
+                readonly type: "uint256";
+                readonly internalType: "uint256";
+            }];
+            readonly stateMutability: "view";
+        }];
+        functionName: "liquidityBalances";
+        args?: readonly [`0x${string}`, `0x${string}`] | undefined;
+    } & {
+        args: readonly [`0x${string}`, `0x${string}`];
+    } & {
+        address: Address;
+    } & {
+        data: Hex;
+        to: Address;
+    };
 }
 /**
  * Performs a rebalance swap from validator token to user token.
@@ -178,7 +331,8 @@ export declare namespace getLiquidityBalance {
  */
 export declare function rebalanceSwap<chain extends Chain | undefined, account extends Account | undefined>(client: Client<Transport, chain, account>, parameters: rebalanceSwap.Parameters<chain, account>): Promise<rebalanceSwap.ReturnType>;
 export declare namespace rebalanceSwap {
-    type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & {
+    type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & Args;
+    type Args = {
         /** Amount of user token to receive. */
         amountOut: bigint;
         /** Address to send the user token to. */
@@ -189,6 +343,84 @@ export declare namespace rebalanceSwap {
         validatorToken: TokenId.TokenIdOrAddress;
     };
     type ReturnType = WriteContractReturnType;
+    /**
+     * Defines a call to the `rebalanceSwap` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.amm.rebalanceSwap.call({
+     *       userToken: '0x20c0...beef',
+     *       validatorToken: '0x20c0...babe',
+     *       amountOut: 100n,
+     *       to: '0xfeed...fede',
+     *     }),
+     *     actions.amm.rebalanceSwap.call({
+     *       userToken: '0x20c0...babe',
+     *       validatorToken: '0x20c0...babe',
+     *       amountOut: 100n,
+     *       to: '0xfeed...fede',
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args: Args): {
+        abi: [{
+            readonly type: "function";
+            readonly name: "rebalanceSwap";
+            readonly inputs: readonly [{
+                readonly name: "userToken";
+                readonly type: "address";
+                readonly internalType: "address";
+            }, {
+                readonly name: "validatorToken";
+                readonly type: "address";
+                readonly internalType: "address";
+            }, {
+                readonly name: "amountOut";
+                readonly type: "uint256";
+                readonly internalType: "uint256";
+            }, {
+                readonly name: "to";
+                readonly type: "address";
+                readonly internalType: "address";
+            }];
+            readonly outputs: readonly [{
+                readonly name: "amountIn";
+                readonly type: "uint256";
+                readonly internalType: "uint256";
+            }];
+            readonly stateMutability: "nonpayable";
+        }];
+        functionName: "rebalanceSwap";
+        args?: readonly [`0x${string}`, `0x${string}`, bigint, `0x${string}`] | undefined;
+    } & {
+        args: readonly [`0x${string}`, `0x${string}`, bigint, `0x${string}`];
+    } & {
+        address: Address;
+    } & {
+        data: Hex;
+        to: Address;
+    };
 }
 /**
  * Adds liquidity to a pool.
@@ -208,14 +440,14 @@ export declare namespace rebalanceSwap {
  *
  * const hash = await actions.amm.mint(client, {
  *   userToken: {
- *     address: '0x...',
+ *     address: '0x20c0...beef',
  *     amount: 100n,
  *   },
  *   validatorToken: {
- *     address: '0x...',
+ *     address: '0x20c0...babe',
  *     amount: 100n,
  *   },
- *   to: '0x...',
+ *   to: '0xfeed...fede',
  * })
  * ```
  *
@@ -225,7 +457,8 @@ export declare namespace rebalanceSwap {
  */
 export declare function mint<chain extends Chain | undefined, account extends Account | undefined>(client: Client<Transport, chain, account>, parameters: mint.Parameters<chain, account>): Promise<mint.ReturnType>;
 export declare namespace mint {
-    type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & {
+    type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & Args;
+    type Args = {
         /** Address to mint LP tokens to. */
         to: Address;
         /** User token address and amount. */
@@ -244,6 +477,98 @@ export declare namespace mint {
         };
     };
     type ReturnType = WriteContractReturnType;
+    /**
+     * Defines a call to the `mint` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.amm.mint.call({
+     *       userToken: {
+     *         address: '0x20c0...beef',
+     *         amount: 100n,
+     *       },
+     *       validatorToken: {
+     *         address: '0x20c0...babe',
+     *         amount: 100n,
+     *       },
+     *       to: '0xfeed...fede',
+     *     }),
+     *     actions.amm.mint.call({
+     *       userToken: {
+     *         address: '0x20c0...babe',
+     *         amount: 100n,
+     *       },
+     *       validatorToken: {
+     *         address: '0x20c0...babe',
+     *         amount: 100n,
+     *       },
+     *       to: '0xfeed...fede',
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args: Args): {
+        abi: [{
+            readonly type: "function";
+            readonly name: "mint";
+            readonly inputs: readonly [{
+                readonly name: "userToken";
+                readonly type: "address";
+                readonly internalType: "address";
+            }, {
+                readonly name: "validatorToken";
+                readonly type: "address";
+                readonly internalType: "address";
+            }, {
+                readonly name: "amountUserToken";
+                readonly type: "uint256";
+                readonly internalType: "uint256";
+            }, {
+                readonly name: "amountValidatorToken";
+                readonly type: "uint256";
+                readonly internalType: "uint256";
+            }, {
+                readonly name: "to";
+                readonly type: "address";
+                readonly internalType: "address";
+            }];
+            readonly outputs: readonly [{
+                readonly name: "liquidity";
+                readonly type: "uint256";
+                readonly internalType: "uint256";
+            }];
+            readonly stateMutability: "nonpayable";
+        }];
+        functionName: "mint";
+        args?: readonly [`0x${string}`, `0x${string}`, bigint, bigint, `0x${string}`] | undefined;
+    } & {
+        args: readonly [`0x${string}`, `0x${string}`, bigint, bigint, `0x${string}`];
+    } & {
+        address: Address;
+    } & {
+        data: Hex;
+        to: Address;
+    };
 }
 /**
  * Removes liquidity from a pool.
@@ -262,10 +587,10 @@ export declare namespace mint {
  * })
  *
  * const hash = await actions.amm.burn(client, {
- *   userToken: '0x...',
- *   validatorToken: '0x...',
+ *   userToken: '0x20c0...beef',
+ *   validatorToken: '0x20c0...babe',
  *   liquidity: 50n,
- *   to: '0x...',
+ *   to: '0xfeed...fede',
  * })
  * ```
  *
@@ -275,7 +600,8 @@ export declare namespace mint {
  */
 export declare function burn<chain extends Chain | undefined, account extends Account | undefined>(client: Client<Transport, chain, account>, parameters: burn.Parameters<chain, account>): Promise<burn.ReturnType>;
 export declare namespace burn {
-    type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & {
+    type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & Args;
+    type Args = {
         /** Amount of LP tokens to burn. */
         liquidity: bigint;
         /** Address to send tokens to. */
@@ -286,6 +612,88 @@ export declare namespace burn {
         validatorToken: TokenId.TokenIdOrAddress;
     };
     type ReturnType = WriteContractReturnType;
+    /**
+     * Defines a call to the `burn` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.amm.burn.call({
+     *       liquidity: 100n,
+     *       to: '0xfeed...fede',
+     *       userToken: '0x20c0...beef',
+     *       validatorToken: '0x20c0...babe',
+     *     }),
+     *     actions.amm.burn.call({
+     *       liquidity: 100n,
+     *       to: '0xfeed...fede',
+     *       userToken: '0x20c0...babe',
+     *       validatorToken: '0x20c0...babe',
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args: Args): {
+        abi: [{
+            readonly type: "function";
+            readonly name: "burn";
+            readonly inputs: readonly [{
+                readonly name: "userToken";
+                readonly type: "address";
+                readonly internalType: "address";
+            }, {
+                readonly name: "validatorToken";
+                readonly type: "address";
+                readonly internalType: "address";
+            }, {
+                readonly name: "liquidity";
+                readonly type: "uint256";
+                readonly internalType: "uint256";
+            }, {
+                readonly name: "to";
+                readonly type: "address";
+                readonly internalType: "address";
+            }];
+            readonly outputs: readonly [{
+                readonly name: "amountUserToken";
+                readonly type: "uint256";
+                readonly internalType: "uint256";
+            }, {
+                readonly name: "amountValidatorToken";
+                readonly type: "uint256";
+                readonly internalType: "uint256";
+            }];
+            readonly stateMutability: "nonpayable";
+        }];
+        functionName: "burn";
+        args?: readonly [`0x${string}`, `0x${string}`, bigint, `0x${string}`] | undefined;
+    } & {
+        args: readonly [`0x${string}`, `0x${string}`, bigint, `0x${string}`];
+    } & {
+        address: Address;
+    } & {
+        data: Hex;
+        to: Address;
+    };
 }
 /**
  * Watches for rebalance swap events.

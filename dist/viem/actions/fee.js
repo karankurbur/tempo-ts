@@ -1,12 +1,9 @@
-// TODO:
-// - add `.call` to namespaces
-// - add `.simulate` to namespaces
-// - add `.estimateGas` to namespaces
 import { parseAccount } from 'viem/accounts';
 import { readContract, watchContractEvent, writeContract } from 'viem/actions';
 import * as TokenId from "../../ox/TokenId.js";
 import { feeManagerAbi } from "../abis.js";
 import { feeManagerAddress } from "../addresses.js";
+import { defineCall } from "../utils.js";
 /**
  * Gets the user's default fee token.
  *
@@ -37,16 +34,31 @@ export async function getUserToken(client, ...parameters) {
     const account = parseAccount(account_);
     const address = await readContract(client, {
         ...rest,
-        address: feeManagerAddress,
-        abi: feeManagerAbi,
-        functionName: 'userTokens',
-        args: [account.address],
+        ...getUserToken.call({ account: account.address }),
     });
     return {
         address,
         id: TokenId.fromAddress(address),
     };
 }
+(function (getUserToken) {
+    /**
+     * Defines a call to the `userTokens` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { account } = args;
+        return defineCall({
+            address: feeManagerAddress,
+            abi: feeManagerAbi,
+            args: [account],
+            functionName: 'userTokens',
+        });
+    }
+    getUserToken.call = call;
+})(getUserToken || (getUserToken = {}));
 /**
  * Sets the user's default fee token.
  *
@@ -73,17 +85,58 @@ export async function getUserToken(client, ...parameters) {
  * @returns The transaction hash.
  */
 export async function setUserToken(client, parameters) {
-    const { account = client.account, chain = client.chain, token, ...rest } = parameters;
+    const call = setUserToken.call(parameters);
     return writeContract(client, {
-        ...rest,
-        account,
-        address: feeManagerAddress,
-        abi: feeManagerAbi,
-        chain,
-        functionName: 'setUserToken',
-        args: [TokenId.toAddress(token)],
+        ...parameters,
+        ...call,
     });
 }
+(function (setUserToken) {
+    /**
+     * Defines a call to the `setUserToken` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.fee.setUserToken.call({
+     *       token: '0x20c0...beef',
+     *     }),
+     *     actions.fee.setUserToken.call({
+     *       token: '0x20c0...babe',
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { token } = args;
+        return defineCall({
+            address: feeManagerAddress,
+            abi: feeManagerAbi,
+            functionName: 'setUserToken',
+            args: [TokenId.toAddress(token)],
+        });
+    }
+    setUserToken.call = call;
+})(setUserToken || (setUserToken = {}));
 /**
  * Watches for user token set events.
  *

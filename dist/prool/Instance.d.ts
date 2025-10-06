@@ -50,6 +50,10 @@ export declare namespace tempo {
          */
         chain?: string | undefined;
         /**
+         * Consensus configuration for this node.
+         */
+        consensusConfig?: string | undefined;
+        /**
          * Development options.
          */
         dev?: {

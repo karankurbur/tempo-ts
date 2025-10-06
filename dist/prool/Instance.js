@@ -1,8 +1,8 @@
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { toArgs } from 'prool';
 import { defineInstance } from 'prool/instances';
 import { execa } from 'prool/processes';
-import chainJson from './internal/chain.json' with { type: 'json' };
 /**
  * Defines a Tempo instance.
  *
@@ -15,7 +15,7 @@ import chainJson from './internal/chain.json' with { type: 'json' };
  * ```
  */
 export const tempo = defineInstance((parameters = {}) => {
-    const { binary = 'tempo', builder, chain = './tmp/chain.json', dev, faucet, ...args } = parameters;
+    const { binary = 'tempo', builder, chain = path.resolve(import.meta.dirname, './internal/chain.json'), consensusConfig = path.resolve(import.meta.dirname, './internal/consensus.toml'), dev, faucet, ...args } = parameters;
     const { deadline = 3, gaslimit = 3000000000, maxTasks = 8 } = builder ?? {};
     const { blockTime = '2ms' } = dev ?? {};
     const { address = '0x20c0000000000000000000000000000000000000', amount = 1000000000000000, privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80', } = faucet ?? {};
@@ -37,7 +37,6 @@ export const tempo = defineInstance((parameters = {}) => {
             }
             catch { }
             fs.mkdirSync('./tmp', { recursive: true });
-            fs.writeFileSync('./tmp/chain.json', JSON.stringify(chainJson, null, 2));
             return await process.start(($) => $ `${binary} node --http --dev --engine.disable-precompile-cache --faucet.enabled ${toArgs({
                 ...args,
                 builder: {
@@ -46,6 +45,7 @@ export const tempo = defineInstance((parameters = {}) => {
                     maxTasks,
                 },
                 chain,
+                consensusConfig,
                 datadir: './tmp/data',
                 dev: {
                     blockTime,

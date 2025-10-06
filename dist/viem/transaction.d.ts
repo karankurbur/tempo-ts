@@ -47,6 +47,8 @@ export declare namespace parseTransaction {
     type ReturnType<serialized extends TransactionSerializedGeneric = TransactionSerializedGeneric> = serialized extends TransactionSerializedFeeToken ? TransactionSerializableFeeToken : ParseTransactionReturnType<serialized>;
 }
 export declare function serializeTransaction(transaction: TransactionSerializable & {
+    calls?: readonly Calls.Call[] | undefined;
     feePayer?: Account | true | undefined;
+    from?: Address | undefined;
 }, signature?: viem_Signature | undefined): Promise<`0x${string}`>;
 //# sourceMappingURL=transaction.d.ts.map

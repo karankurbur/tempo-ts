@@ -47,6 +47,7 @@ import * as Transaction from "./Transaction.js";
  */
 export function toRpc(request) {
     const request_rpc = ox_TransactionRequest.toRpc(request);
+    request_rpc.calls = request.calls;
     if (typeof request.feeToken !== 'undefined')
         request_rpc.feeToken = TokenId.toAddress(request.feeToken);
     if (request.calls && request.from) {

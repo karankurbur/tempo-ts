@@ -1,11 +1,8 @@
-// TODO:
-// - add `.call` to namespaces
-// - add `.simulate` to namespaces
-// - add `.estimateGas` to namespaces
 import { parseAccount } from 'viem/accounts';
 import { readContract, simulateContract, watchContractEvent, writeContract, } from 'viem/actions';
 import { tip403RegistryAbi } from "../abis.js";
 import { tip403RegistryAddress } from "../addresses.js";
+import { defineCall } from "../utils.js";
 const policyTypeMap = {
     whitelist: 0,
     blacklist: 1,
@@ -41,21 +38,68 @@ export async function create(client, parameters) {
     if (!account)
         throw new Error('`account` is required');
     const admin = parseAccount(account).address;
-    const args = addresses
-        ? [admin, policyTypeMap[type], addresses]
-        : [admin, policyTypeMap[type]];
+    const call = create.call({ admin, type, addresses });
     const { request, result } = await simulateContract(client, {
         ...rest,
         account,
-        address: tip403RegistryAddress,
-        abi: tip403RegistryAbi,
         chain,
-        functionName: 'createPolicy',
-        args,
+        ...call,
     });
     const hash = await writeContract(client, request);
     return { hash, policyId: result };
 }
+(function (create) {
+    /**
+     * Defines a call to the `createPolicy` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.policy.create.call({
+     *       admin: '0xfeed...fede',
+     *       type: 'whitelist',
+     *     }),
+     *     actions.policy.create.call({
+     *       admin: '0xfeed...fede',
+     *       type: 'blacklist',
+     *       addresses: ['0x20c0...beef', '0x20c0...babe'],
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { admin, type, addresses } = args;
+        const callArgs = addresses
+            ? [admin, policyTypeMap[type], addresses]
+            : [admin, policyTypeMap[type]];
+        return defineCall({
+            address: tip403RegistryAddress,
+            abi: tip403RegistryAbi,
+            functionName: 'createPolicy',
+            args: callArgs,
+        });
+    }
+    create.call = call;
+})(create || (create = {}));
 /**
  * Sets the admin for a policy.
  *
@@ -83,17 +127,60 @@ export async function create(client, parameters) {
  * @returns The transaction hash.
  */
 export async function setAdmin(client, parameters) {
-    const { account = client.account, admin, chain = client.chain, policyId, ...rest } = parameters;
+    const call = setAdmin.call(parameters);
     return writeContract(client, {
-        ...rest,
-        account,
-        address: tip403RegistryAddress,
-        abi: tip403RegistryAbi,
-        chain,
-        functionName: 'setPolicyAdmin',
-        args: [policyId, admin],
+        ...parameters,
+        ...call,
     });
 }
+(function (setAdmin) {
+    /**
+     * Defines a call to the `setPolicyAdmin` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.policy.setAdmin.call({
+     *       policyId: 2n,
+     *       admin: '0xfeed...fede',
+     *     }),
+     *     actions.policy.setAdmin.call({
+     *       policyId: 3n,
+     *       admin: '0xfeed...babe',
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { policyId, admin } = args;
+        return defineCall({
+            address: tip403RegistryAddress,
+            abi: tip403RegistryAbi,
+            functionName: 'setPolicyAdmin',
+            args: [policyId, admin],
+        });
+    }
+    setAdmin.call = call;
+})(setAdmin || (setAdmin = {}));
 /**
  * Modifies a policy whitelist.
  *
@@ -122,17 +209,63 @@ export async function setAdmin(client, parameters) {
  * @returns The transaction hash.
  */
 export async function modifyWhitelist(client, parameters) {
-    const { account = client.account, address: targetAccount, allowed, chain = client.chain, policyId, ...rest } = parameters;
+    const { address: targetAccount, ...rest } = parameters;
+    const call = modifyWhitelist.call({ ...rest, address: targetAccount });
     return writeContract(client, {
-        ...rest,
-        account,
-        address: tip403RegistryAddress,
-        abi: tip403RegistryAbi,
-        chain,
-        functionName: 'modifyPolicyWhitelist',
-        args: [policyId, targetAccount, allowed],
+        ...parameters,
+        ...call,
     });
 }
+(function (modifyWhitelist) {
+    /**
+     * Defines a call to the `modifyPolicyWhitelist` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.policy.modifyWhitelist.call({
+     *       policyId: 2n,
+     *       address: '0x20c0...beef',
+     *       allowed: true,
+     *     }),
+     *     actions.policy.modifyWhitelist.call({
+     *       policyId: 2n,
+     *       address: '0x20c0...babe',
+     *       allowed: false,
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { policyId, address, allowed } = args;
+        return defineCall({
+            address: tip403RegistryAddress,
+            abi: tip403RegistryAbi,
+            functionName: 'modifyPolicyWhitelist',
+            args: [policyId, address, allowed],
+        });
+    }
+    modifyWhitelist.call = call;
+})(modifyWhitelist || (modifyWhitelist = {}));
 /**
  * Modifies a policy blacklist.
  *
@@ -161,17 +294,63 @@ export async function modifyWhitelist(client, parameters) {
  * @returns The transaction hash.
  */
 export async function modifyBlacklist(client, parameters) {
-    const { account = client.account, address: targetAccount, chain = client.chain, policyId, restricted, ...rest } = parameters;
+    const { address: targetAccount, ...rest } = parameters;
+    const call = modifyBlacklist.call({ ...rest, address: targetAccount });
     return writeContract(client, {
-        ...rest,
-        account,
-        address: tip403RegistryAddress,
-        abi: tip403RegistryAbi,
-        chain,
-        functionName: 'modifyPolicyBlacklist',
-        args: [policyId, targetAccount, restricted],
+        ...parameters,
+        ...call,
     });
 }
+(function (modifyBlacklist) {
+    /**
+     * Defines a call to the `modifyPolicyBlacklist` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.policy.modifyBlacklist.call({
+     *       policyId: 2n,
+     *       address: '0x20c0...beef',
+     *       restricted: true,
+     *     }),
+     *     actions.policy.modifyBlacklist.call({
+     *       policyId: 2n,
+     *       address: '0x20c0...babe',
+     *       restricted: false,
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { policyId, address, restricted } = args;
+        return defineCall({
+            address: tip403RegistryAddress,
+            abi: tip403RegistryAbi,
+            functionName: 'modifyPolicyBlacklist',
+            args: [policyId, address, restricted],
+        });
+    }
+    modifyBlacklist.call = call;
+})(modifyBlacklist || (modifyBlacklist = {}));
 /**
  * Gets policy data.
  *
@@ -196,19 +375,33 @@ export async function modifyBlacklist(client, parameters) {
  * @returns The policy data.
  */
 export async function getData(client, parameters) {
-    const { policyId, ...rest } = parameters;
     const result = await readContract(client, {
-        ...rest,
-        address: tip403RegistryAddress,
-        abi: tip403RegistryAbi,
-        functionName: 'policyData',
-        args: [policyId],
+        ...parameters,
+        ...getData.call(parameters),
     });
     return {
         admin: result[1],
         type: result[0] === 0 ? 'whitelist' : 'blacklist',
     };
 }
+(function (getData) {
+    /**
+     * Defines a call to the `policyData` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { policyId } = args;
+        return defineCall({
+            address: tip403RegistryAddress,
+            abi: tip403RegistryAbi,
+            args: [policyId],
+            functionName: 'policyData',
+        });
+    }
+    getData.call = call;
+})(getData || (getData = {}));
 /**
  * Checks if a user is authorized by a policy.
  *
@@ -234,15 +427,29 @@ export async function getData(client, parameters) {
  * @returns Whether the user is authorized.
  */
 export async function isAuthorized(client, parameters) {
-    const { policyId, user, ...rest } = parameters;
     return readContract(client, {
-        ...rest,
-        address: tip403RegistryAddress,
-        abi: tip403RegistryAbi,
-        functionName: 'isAuthorized',
-        args: [policyId, user],
+        ...parameters,
+        ...isAuthorized.call(parameters),
     });
 }
+(function (isAuthorized) {
+    /**
+     * Defines a call to the `isAuthorized` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args) {
+        const { policyId, user } = args;
+        return defineCall({
+            address: tip403RegistryAddress,
+            abi: tip403RegistryAbi,
+            args: [policyId, user],
+            functionName: 'isAuthorized',
+        });
+    }
+    isAuthorized.call = call;
+})(isAuthorized || (isAuthorized = {}));
 /**
  * Watches for policy creation events.
  *

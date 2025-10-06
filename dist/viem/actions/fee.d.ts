@@ -1,5 +1,5 @@
 import type { Account, Address, Chain, Client, ExtractAbiItem, GetEventArgs, ReadContractParameters, Transport, Log as viem_Log, WatchContractEventParameters, WriteContractParameters, WriteContractReturnType } from 'viem';
-import type { UnionOmit } from "../../internal/types.js";
+import type { Compute, UnionOmit } from "../../internal/types.js";
 import * as TokenId from "../../ox/TokenId.js";
 import { feeManagerAbi } from "../abis.js";
 import type { GetAccountParameter } from "../types.js";
@@ -29,9 +29,45 @@ import type { GetAccountParameter } from "../types.js";
 export declare function getUserToken<chain extends Chain | undefined, account extends Account | undefined>(client: Client<Transport, chain, account>, ...parameters: account extends Account ? [getUserToken.Parameters<account>] | [] : [getUserToken.Parameters<account>]): Promise<getUserToken.ReturnType>;
 export declare namespace getUserToken {
     type Parameters<account extends Account | undefined = Account | undefined> = UnionOmit<ReadContractParameters<never, never, never>, 'abi' | 'address' | 'functionName' | 'args'> & GetAccountParameter<account>;
-    type ReturnType = {
+    type Args = {
+        /** Account address. */
+        account: Address;
+    };
+    type ReturnType = Compute<{
         address: Address;
         id: bigint;
+    }>;
+    /**
+     * Defines a call to the `userTokens` function.
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args: Args): {
+        abi: [{
+            readonly type: "function";
+            readonly name: "userTokens";
+            readonly inputs: readonly [{
+                readonly name: "";
+                readonly type: "address";
+                readonly internalType: "address";
+            }];
+            readonly outputs: readonly [{
+                readonly name: "";
+                readonly type: "address";
+                readonly internalType: "address";
+            }];
+            readonly stateMutability: "view";
+        }];
+        functionName: "userTokens";
+        args?: readonly [`0x${string}`] | undefined;
+    } & {
+        args: readonly [`0x${string}`];
+    } & {
+        address: Address;
+    } & {
+        data: import("viem").Hex;
+        to: Address;
     };
 }
 /**
@@ -61,11 +97,68 @@ export declare namespace getUserToken {
  */
 export declare function setUserToken<chain extends Chain | undefined, account extends Account | undefined>(client: Client<Transport, chain, account>, parameters: setUserToken.Parameters<chain, account>): Promise<setUserToken.ReturnType>;
 export declare namespace setUserToken {
-    type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & {
+    type Parameters<chain extends Chain | undefined = Chain | undefined, account extends Account | undefined = Account | undefined> = UnionOmit<WriteContractParameters<never, never, never, chain, account>, 'abi' | 'address' | 'functionName' | 'args'> & Args;
+    type Args = {
         /** Address or ID of the TIP20 token. */
         token: TokenId.TokenIdOrAddress;
     };
     type ReturnType = WriteContractReturnType;
+    /**
+     * Defines a call to the `setUserToken` function.
+     *
+     * Can be passed as a parameter to:
+     * - [`estimateContractGas`](https://viem.sh/docs/contract/estimateContractGas): estimate the gas cost of the call
+     * - [`simulateContract`](https://viem.sh/docs/contract/simulateContract): simulate the call
+     * - [`sendCalls`](https://viem.sh/docs/actions/wallet/sendCalls): send multiple calls
+     *
+     * @example
+     * ```ts
+     * import { createClient, http, walletActions } from 'viem'
+     * import { tempo } from 'tempo/chains'
+     * import * as actions from 'tempo/viem/actions'
+     *
+     * const client = createClient({
+     *   chain: tempo,
+     *   transport: http(),
+     * }).extend(walletActions)
+     *
+     * const { result } = await client.sendCalls({
+     *   calls: [
+     *     actions.fee.setUserToken.call({
+     *       token: '0x20c0...beef',
+     *     }),
+     *     actions.fee.setUserToken.call({
+     *       token: '0x20c0...babe',
+     *     }),
+     *   ]
+     * })
+     * ```
+     *
+     * @param args - Arguments.
+     * @returns The call.
+     */
+    function call(args: Args): {
+        abi: [{
+            readonly type: "function";
+            readonly name: "setUserToken";
+            readonly inputs: readonly [{
+                readonly name: "token";
+                readonly type: "address";
+                readonly internalType: "address";
+            }];
+            readonly outputs: readonly [];
+            readonly stateMutability: "nonpayable";
+        }];
+        functionName: "setUserToken";
+        args?: readonly [`0x${string}`] | undefined;
+    } & {
+        args: readonly [`0x${string}`];
+    } & {
+        address: Address;
+    } & {
+        data: import("viem").Hex;
+        to: Address;
+    };
 }
 /**
  * Watches for user token set events.
