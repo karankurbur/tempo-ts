@@ -10,12 +10,12 @@ export declare const chainConfig: {
     formatters: {
         transaction: {
             exclude: [] | undefined;
-            format: (args: import("./transaction.js").TransactionRpc) => ({
+            format: (args: import("./transaction.js").TransactionRpc, action?: string | undefined) => ({
                 input: import("viem").Hex;
-                from: import("viem").Address;
+                from: import("abitype").Address;
                 gas: bigint;
                 nonce: number;
-                to: import("viem").Address | null;
+                to: import("abitype").Address | null;
                 value: bigint;
                 r: import("viem").Hex;
                 s: import("viem").Hex;
@@ -41,14 +41,14 @@ export declare const chainConfig: {
             } | {
                 blockHash: `0x${string}` | null;
                 blockNumber: bigint | null;
-                from: import("viem").Address;
+                from: import("abitype").Address;
                 gas: bigint;
                 hash: import("viem").Hash;
                 input: import("viem").Hex;
                 nonce: number;
                 r: import("viem").Hex;
                 s: import("viem").Hex;
-                to: import("viem").Address | null;
+                to: import("abitype").Address | null;
                 transactionIndex: number | null;
                 typeHex: import("viem").Hex | null;
                 v: bigint;
@@ -69,14 +69,14 @@ export declare const chainConfig: {
             } | {
                 blockHash: `0x${string}` | null;
                 blockNumber: bigint | null;
-                from: import("viem").Address;
+                from: import("abitype").Address;
                 gas: bigint;
                 hash: import("viem").Hash;
                 input: import("viem").Hex;
                 nonce: number;
                 r: import("viem").Hex;
                 s: import("viem").Hex;
-                to: import("viem").Address | null;
+                to: import("abitype").Address | null;
                 transactionIndex: number | null;
                 typeHex: import("viem").Hex | null;
                 v: bigint;
@@ -97,14 +97,14 @@ export declare const chainConfig: {
             } | {
                 blockHash: `0x${string}` | null;
                 blockNumber: bigint | null;
-                from: import("viem").Address;
+                from: import("abitype").Address;
                 gas: bigint;
                 hash: import("viem").Hash;
                 input: import("viem").Hex;
                 nonce: number;
                 r: import("viem").Hex;
                 s: import("viem").Hex;
-                to: import("viem").Address | null;
+                to: import("abitype").Address | null;
                 transactionIndex: number | null;
                 typeHex: import("viem").Hex | null;
                 v: bigint;
@@ -125,14 +125,14 @@ export declare const chainConfig: {
             } | {
                 blockHash: `0x${string}` | null;
                 blockNumber: bigint | null;
-                from: import("viem").Address;
+                from: import("abitype").Address;
                 gas: bigint;
                 hash: import("viem").Hash;
                 input: import("viem").Hex;
                 nonce: number;
                 r: import("viem").Hex;
                 s: import("viem").Hex;
-                to: import("viem").Address | null;
+                to: import("abitype").Address | null;
                 transactionIndex: number | null;
                 typeHex: import("viem").Hex | null;
                 v: bigint;
@@ -153,14 +153,14 @@ export declare const chainConfig: {
             } | {
                 blockHash: `0x${string}` | null;
                 blockNumber: bigint | null;
-                from: import("viem").Address;
+                from: import("abitype").Address;
                 gas: bigint;
                 hash: import("viem").Hash;
                 input: import("viem").Hex;
                 nonce: number;
                 r: import("viem").Hex;
                 s: import("viem").Hex;
-                to: import("viem").Address | null;
+                to: import("abitype").Address | null;
                 transactionIndex: number | null;
                 typeHex: import("viem").Hex | null;
                 v: bigint;
@@ -183,7 +183,7 @@ export declare const chainConfig: {
         };
         transactionRequest: {
             exclude: [] | undefined;
-            format: (args: import("./transaction.js").TransactionRequest) => ({
+            format: (args: import("./transaction.js").TransactionRequest, action?: string | undefined) => ({
                 data?: `0x${string}` | undefined;
                 from?: `0x${string}` | undefined;
                 gas?: `0x${string}` | undefined;
@@ -254,15 +254,36 @@ export declare const chainConfig: {
                 type?: "0x3" | undefined;
                 value?: `0x${string}` | undefined;
                 to: `0x${string}` | null;
+                gasPrice?: undefined | undefined;
+                maxFeePerBlobGas?: `0x${string}` | undefined;
                 maxFeePerGas?: `0x${string}` | undefined;
                 maxPriorityFeePerGas?: `0x${string}` | undefined;
-                gasPrice?: undefined | undefined;
-                maxFeePerBlobGas: `0x${string}`;
                 accessList?: import("viem").AccessList | undefined;
+                sidecars?: readonly import("viem").BlobSidecar<`0x${string}`>[] | undefined;
+                blobs?: readonly `0x${string}`[] | readonly import("viem").ByteArray[] | undefined;
+                blobVersionedHashes: readonly import("viem").Hex[];
+                kzg?: undefined;
+                authorizationList?: undefined;
+                feeToken?: undefined;
+                feePayer?: undefined;
+                calls?: undefined;
+            } | {
+                data?: `0x${string}` | undefined;
+                from?: `0x${string}` | undefined;
+                gas?: `0x${string}` | undefined;
+                nonce?: `0x${string}` | undefined;
+                type?: "0x3" | undefined;
+                value?: `0x${string}` | undefined;
+                to: `0x${string}` | null;
+                gasPrice?: undefined | undefined;
+                maxFeePerBlobGas?: `0x${string}` | undefined;
+                maxFeePerGas?: `0x${string}` | undefined;
+                maxPriorityFeePerGas?: `0x${string}` | undefined;
+                accessList?: import("viem").AccessList | undefined;
+                sidecars?: readonly import("viem").BlobSidecar<`0x${string}`>[] | undefined;
                 blobs: readonly import("viem").Hex[] | readonly import("viem").ByteArray[];
                 blobVersionedHashes?: readonly `0x${string}`[] | undefined;
                 kzg?: import("viem").Kzg | undefined;
-                sidecars?: readonly import("viem").BlobSidecar<`0x${string}`>[] | undefined;
                 authorizationList?: undefined;
                 feeToken?: undefined;
                 feePayer?: undefined;

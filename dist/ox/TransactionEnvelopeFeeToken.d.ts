@@ -25,6 +25,8 @@ export type TransactionEnvelopeFeeToken<signed extends boolean = boolean, bigint
     maxPriorityFeePerGas?: bigintType | undefined;
 }>;
 export type Rpc<signed extends boolean = boolean> = TransactionEnvelopeFeeToken<signed, Hex.Hex, Hex.Hex, '0x77'>;
+export declare const feePayerMagic: "0x78";
+export type FeePayerMagic = typeof feePayerMagic;
 export type Serialized = `${SerializedType}${string}`;
 export type Signed = TransactionEnvelopeFeeToken<true>;
 export declare const serializedType: "0x77";

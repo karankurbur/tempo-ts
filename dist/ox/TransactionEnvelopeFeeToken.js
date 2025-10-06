@@ -8,6 +8,7 @@ import * as Signature from 'ox/Signature';
 import * as TransactionEnvelope from 'ox/TransactionEnvelope';
 import * as TransactionEnvelopeEip1559 from 'ox/TransactionEnvelopeEip1559';
 import * as TokenId from "./TokenId.js";
+export const feePayerMagic = '0x78';
 export const serializedType = '0x77';
 export const type = 'feeToken';
 /**
@@ -417,7 +418,7 @@ export function serialize(envelope, options = {}) {
         feePayerSignatureOrSender,
         ...(signature ? Signature.toTuple(signature) : []),
     ];
-    return Hex.concat(options.format !== 'feePayer' ? serializedType : '0x', Rlp.fromHex(serialized));
+    return Hex.concat(options.format === 'feePayer' ? feePayerMagic : serializedType, Rlp.fromHex(serialized));
 }
 /**
  * Validates a {@link ox#TransactionEnvelopeFeeToken.TransactionEnvelopeFeeToken}. Returns `true` if the envelope is valid, `false` otherwise.
