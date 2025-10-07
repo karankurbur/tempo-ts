@@ -1,8 +1,8 @@
-name: "Install dependencies"
-description: "Prepare repository and all dependencies"
+name: 'Install dependencies'
+description: 'Prepare repository and all dependencies'
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Set up Bun
       uses: oven-sh/setup-bun@v2
@@ -10,3 +10,17 @@ runs:
     - name: Install dependencies
       shell: bash
       run: bun install
+
+    - name: Cache Tempo binary
+      id: cache-tempo
+      uses: actions/cache@v4
+      with:
+        path: test/tempo/target/release
+        key: tempo-binary-${{ runner.os }}-${{ hashFiles('test/tempo/Cargo.lock', 'test/tempo/**/*.rs', 'test/tempo/**/Cargo.toml') }}
+        restore-keys: |
+          tempo-binary-${{ runner.os }}-
+
+    - name: Install Tempo binary
+      if: steps.cache-tempo.outputs.cache-hit != 'true'
+      shell: bash
+      run: bun run test:install
