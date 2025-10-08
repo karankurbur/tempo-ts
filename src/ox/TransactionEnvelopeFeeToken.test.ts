@@ -969,54 +969,17 @@ describe('e2e', () => {
       },
     )
 
-    const hash = await transport.request({
-      method: 'eth_sendRawTransaction',
+    const receipt = await transport.request({
+      method: 'eth_sendRawTransactionSync',
       params: [serialized_signed],
     })
 
-    expect(hash).toBeDefined()
-    {
-      const response = await transport.request({
-        method: 'eth_getTransactionByHash',
-        params: [hash],
-      })
-
-      expect(response).toMatchInlineSnapshot(`
-      {
-        "accessList": [],
-        "authorizationList": [],
-        "blockHash": null,
-        "blockNumber": null,
-        "chainId": "0x539",
-        "feePayerSignature": null,
-        "feeToken": "0x20c0000000000000000000000000000000000000",
-        "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-        "gas": "0x5208",
-        "gasPrice": "0x4a817c800",
-        "hash": "0xffec2c3aee1b7ce955120c950286eb3d4f758685e440855a220ff341d6d665d7",
-        "input": "0x",
-        "maxFeePerGas": "0x4a817c800",
-        "maxPriorityFeePerGas": "0x2540be400",
-        "nonce": "0x0",
-        "r": "0xa95419f113415ccb9d7f0041e6989d09e031dc21a1605849edaddd72cff286ea",
-        "s": "0x56b4faf46d2b07c294c4efa2db09e669a50b018d51b94529987d53ff011e09ee",
-        "to": "0x0000000000000000000000000000000000000000",
-        "transactionIndex": null,
-        "type": "0x77",
-        "v": "0x1",
-        "value": "0xde0b6b3a7640000",
-        "yParity": "0x1",
-      }
-    `)
-    }
-
-    // Wait for inclusion.
-    await setTimeout(4)
+    expect(receipt).toBeDefined()
 
     {
       const response = await transport.request({
         method: 'eth_getTransactionByHash',
-        params: [hash],
+        params: [receipt.transactionHash],
       })
       if (!response) throw new Error()
 
@@ -1051,18 +1014,11 @@ describe('e2e', () => {
       `)
     }
 
-    {
-      const receipt = await transport.request({
-        method: 'eth_getTransactionReceipt',
-        params: [hash],
-      })
-      if (!receipt) throw new Error()
+    const { blockNumber, blockHash, ...rest } = receipt
 
-      const { blockNumber, blockHash, ...rest } = receipt
-
-      expect(blockNumber).toBeDefined()
-      expect(blockHash).toBeDefined()
-      expect(rest).toMatchInlineSnapshot(`
+    expect(blockNumber).toBeDefined()
+    expect(blockHash).toBeDefined()
+    expect(rest).toMatchInlineSnapshot(`
       {
         "contractAddress": null,
         "cumulativeGasUsed": "0x5208",
@@ -1078,7 +1034,6 @@ describe('e2e', () => {
         "type": "0x77",
       }
     `)
-    }
   })
 
   test('behavior: feePayerSignature (user → feePayer)', async () => {
