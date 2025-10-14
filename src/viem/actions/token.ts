@@ -206,11 +206,20 @@ export async function approveSync<
   client: Client<Transport, chain, account>,
   parameters: approveSync.Parameters<chain, account>,
 ): Promise<approveSync.ReturnValue> {
-  const { token = usdAddress, ...rest } = parameters
-  const receipt = await approve.inner(writeContractSync, client, parameters, {
-    ...rest,
-    token,
-  })
+  const {
+    throwOnReceiptRevert = true,
+    token = usdAddress,
+    ...rest
+  } = parameters
+  const receipt = await approve.inner(
+    writeContractSync,
+    client,
+    { ...parameters, throwOnReceiptRevert } as never,
+    {
+      ...rest,
+      token,
+    },
+  )
   const { args } = approve.extractEvent(receipt.logs)
   return {
     ...args,
@@ -406,7 +415,11 @@ export async function burnBlockedSync<
   client: Client<Transport, chain, account>,
   parameters: burnBlockedSync.Parameters<chain, account>,
 ): Promise<burnBlockedSync.ReturnValue> {
-  const receipt = await burnBlocked.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await burnBlocked.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = burnBlocked.extractEvent(receipt.logs)
   return {
     ...args,
@@ -607,7 +620,11 @@ export async function burnSync<
   client: Client<Transport, chain, account>,
   parameters: burnSync.Parameters<chain, account>,
 ): Promise<burnSync.ReturnValue> {
-  const receipt = await burn.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await burn.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = burn.extractEvent(receipt.logs)
   return {
     ...args,
@@ -797,11 +814,11 @@ export async function changeTransferPolicySync<
   client: Client<Transport, chain, account>,
   parameters: changeTransferPolicySync.Parameters<chain, account>,
 ): Promise<changeTransferPolicySync.ReturnValue> {
-  const receipt = await changeTransferPolicy.inner(
-    writeContractSync,
-    client,
-    parameters,
-  )
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await changeTransferPolicy.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = changeTransferPolicy.extractEvent(receipt.logs)
   return {
     ...args,
@@ -1019,7 +1036,11 @@ export async function createSync<
   client: Client<Transport, chain, account>,
   parameters: createSync.Parameters<chain, account>,
 ): Promise<createSync.ReturnValue> {
-  const receipt = await create.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await create.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
 
   const { args } = create.extractEvent(receipt.logs)
 
@@ -1587,11 +1608,11 @@ export async function grantRolesSync<
   client: Client<Transport, chain, account>,
   parameters: grantRolesSync.Parameters<chain, account>,
 ): Promise<grantRolesSync.ReturnValue> {
-  const receipt = await grantRoles.inner(
-    sendTransactionSync,
-    client,
-    parameters,
-  )
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await grantRoles.inner(sendTransactionSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const events = grantRoles.extractEvents(receipt.logs)
   const value = events.map((event) => event.args)
   return {
@@ -1794,7 +1815,11 @@ export async function mintSync<
   client: Client<Transport, chain, account>,
   parameters: mintSync.Parameters<chain, account>,
 ): Promise<mintSync.ReturnValue> {
-  const receipt = await mint.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await mint.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = mint.extractEvent(receipt.logs)
   return {
     ...args,
@@ -1979,7 +2004,11 @@ export async function pauseSync<
   client: Client<Transport, chain, account>,
   parameters: pauseSync.Parameters<chain, account>,
 ): Promise<pauseSync.ReturnValue> {
-  const receipt = await pause.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await pause.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = pause.extractEvent(receipt.logs)
   return {
     ...args,
@@ -2199,7 +2228,11 @@ export async function permitSync<
   client: Client<Transport, chain, account>,
   parameters: permitSync.Parameters<chain, account>,
 ): Promise<permitSync.ReturnValue> {
-  const receipt = await permit.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await permit.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = permit.extractEvent(receipt.logs)
   return {
     ...args,
@@ -2395,11 +2428,11 @@ export async function renounceRolesSync<
   client: Client<Transport, chain, account>,
   parameters: renounceRolesSync.Parameters<chain, account>,
 ): Promise<renounceRolesSync.ReturnValue> {
-  const receipt = await renounceRoles.inner(
-    sendTransactionSync,
-    client,
-    parameters,
-  )
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await renounceRoles.inner(sendTransactionSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const events = renounceRoles.extractEvents(receipt.logs)
   const value = events.map((event) => event.args)
   return {
@@ -2602,11 +2635,11 @@ export async function revokeRolesSync<
   client: Client<Transport, chain, account>,
   parameters: revokeRolesSync.Parameters<chain, account>,
 ): Promise<revokeRolesSync.ReturnValue> {
-  const receipt = await revokeRoles.inner(
-    sendTransactionSync,
-    client,
-    parameters,
-  )
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await revokeRoles.inner(sendTransactionSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const events = revokeRoles.extractEvents(receipt.logs)
   const value = events.map((event) => event.args)
   return {
@@ -2793,11 +2826,11 @@ export async function setSupplyCapSync<
   client: Client<Transport, chain, account>,
   parameters: setSupplyCapSync.Parameters<chain, account>,
 ): Promise<setSupplyCapSync.ReturnValue> {
-  const receipt = await setSupplyCap.inner(
-    writeContractSync,
-    client,
-    parameters,
-  )
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await setSupplyCap.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = setSupplyCap.extractEvent(receipt.logs)
   return {
     ...args,
@@ -2989,11 +3022,11 @@ export async function setRoleAdminSync<
   client: Client<Transport, chain, account>,
   parameters: setRoleAdminSync.Parameters<chain, account>,
 ): Promise<setRoleAdminSync.ReturnValue> {
-  const receipt = await setRoleAdmin.inner(
-    writeContractSync,
-    client,
-    parameters,
-  )
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await setRoleAdmin.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = setRoleAdmin.extractEvent(receipt.logs)
   return {
     ...args,
@@ -3205,7 +3238,11 @@ export async function transferSync<
   client: Client<Transport, chain, account>,
   parameters: transferSync.Parameters<chain, account>,
 ): Promise<transferSync.ReturnValue> {
-  const receipt = await transfer.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await transfer.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = transfer.extractEvent(receipt.logs)
   return {
     ...args,
@@ -3385,7 +3422,11 @@ export async function unpauseSync<
   client: Client<Transport, chain, account>,
   parameters: unpauseSync.Parameters<chain, account>,
 ): Promise<unpauseSync.ReturnValue> {
-  const receipt = await unpause.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await unpause.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = unpause.extractEvent(receipt.logs)
   return {
     ...args,

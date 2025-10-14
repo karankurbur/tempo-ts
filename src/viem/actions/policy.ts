@@ -228,7 +228,11 @@ export async function createSync<
   client: Client<Transport, chain, account>,
   parameters: createSync.Parameters<chain, account>,
 ): Promise<createSync.ReturnValue> {
-  const receipt = await create.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await create.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = create.extractEvent(receipt.logs)
   return {
     ...args,
@@ -420,7 +424,11 @@ export async function setAdminSync<
   client: Client<Transport, chain, account>,
   parameters: setAdminSync.Parameters<chain, account>,
 ): Promise<setAdminSync.ReturnValue> {
-  const receipt = await setAdmin.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await setAdmin.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = setAdmin.extractEvent(receipt.logs)
   return {
     ...args,
@@ -619,11 +627,11 @@ export async function modifyWhitelistSync<
   client: Client<Transport, chain, account>,
   parameters: modifyWhitelistSync.Parameters<chain, account>,
 ): Promise<modifyWhitelistSync.ReturnValue> {
-  const receipt = await modifyWhitelist.inner(
-    writeContractSync,
-    client,
-    parameters,
-  )
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await modifyWhitelist.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = modifyWhitelist.extractEvent(receipt.logs)
   return {
     ...args,
@@ -822,11 +830,11 @@ export async function modifyBlacklistSync<
   client: Client<Transport, chain, account>,
   parameters: modifyBlacklistSync.Parameters<chain, account>,
 ): Promise<modifyBlacklistSync.ReturnValue> {
-  const receipt = await modifyBlacklist.inner(
-    writeContractSync,
-    client,
-    parameters,
-  )
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await modifyBlacklist.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = modifyBlacklist.extractEvent(receipt.logs)
   return {
     ...args,
