@@ -8,7 +8,7 @@
 		"changeset:version": "changeset version && bun run check",
 		"check": "biome check . --write --unsafe",
 		"check:types": "tsc -b",
-		"gen:abis": "forge build --config-path ./contracts/specs/foundry.toml && bun scripts/gen:abis.ts && bun run check",
+		"gen:abis": "bun scripts/gen:abis.ts && bun run check",
 		"test": "vitest",
 		"test:install": "cd test/tempo && cargo install --path bin/tempo"
 	},

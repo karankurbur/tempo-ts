@@ -162,13 +162,18 @@ export namespace create {
   export function call(args: Args) {
     const { admin, type, addresses } = args
     const callArgs = addresses
-      ? ([admin, policyTypeMap[type], addresses] as const)
-      : ([admin, policyTypeMap[type]] as const)
+      ? ({
+          functionName: 'createPolicyWithAccounts',
+          args: [admin, policyTypeMap[type], addresses],
+        } as const)
+      : ({
+          functionName: 'createPolicy',
+          args: [admin, policyTypeMap[type]],
+        } as const)
     return defineCall({
       address: tip403RegistryAddress,
       abi: tip403RegistryAbi,
-      functionName: 'createPolicy',
-      args: callArgs,
+      ...callArgs,
     })
   }
 
