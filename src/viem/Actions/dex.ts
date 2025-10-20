@@ -191,7 +191,11 @@ export async function buySync<
   client: Client<Transport, chain, account>,
   parameters: buySync.Parameters<chain, account>,
 ): Promise<buySync.ReturnValue> {
-  const receipt = await buy.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await buy.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   return { receipt }
 }
 
@@ -366,7 +370,11 @@ export async function cancelSync<
   client: Client<Transport, chain, account>,
   parameters: cancelSync.Parameters<chain, account>,
 ): Promise<cancelSync.ReturnValue> {
-  const receipt = await cancel.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await cancel.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = cancel.extractEvent(receipt.logs)
   return {
     ...args,
@@ -551,7 +559,11 @@ export async function createPairSync<
   client: Client<Transport, chain, account>,
   parameters: createPairSync.Parameters<chain, account>,
 ): Promise<createPairSync.ReturnValue> {
-  const receipt = await createPair.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await createPair.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = createPair.extractEvent(receipt.logs)
   return {
     ...args,
@@ -1248,7 +1260,11 @@ export async function placeFlipSync<
   client: Client<Transport, chain, account>,
   parameters: placeFlipSync.Parameters<chain, account>,
 ): Promise<placeFlipSync.ReturnValue> {
-  const receipt = await placeFlip.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await placeFlip.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = placeFlip.extractEvent(receipt.logs)
   return {
     ...args,
@@ -1311,7 +1327,11 @@ export async function placeSync<
   client: Client<Transport, chain, account>,
   parameters: placeSync.Parameters<chain, account>,
 ): Promise<placeSync.ReturnValue> {
-  const receipt = await place.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await place.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   const { args } = place.extractEvent(receipt.logs)
   return {
     ...args,
@@ -1494,7 +1514,11 @@ export async function sellSync<
   client: Client<Transport, chain, account>,
   parameters: sellSync.Parameters<chain, account>,
 ): Promise<sellSync.ReturnValue> {
-  const receipt = await sell.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await sell.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   return { receipt }
 }
 
@@ -1979,7 +2003,11 @@ export async function withdrawSync<
   client: Client<Transport, chain, account>,
   parameters: withdrawSync.Parameters<chain, account>,
 ): Promise<withdrawSync.ReturnValue> {
-  const receipt = await withdraw.inner(writeContractSync, client, parameters)
+  const { throwOnReceiptRevert = true, ...rest } = parameters
+  const receipt = await withdraw.inner(writeContractSync, client, {
+    ...rest,
+    throwOnReceiptRevert,
+  } as never)
   return { receipt }
 }
 
