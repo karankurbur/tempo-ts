@@ -1452,6 +1452,47 @@ export async function getMetadata<chain extends Chain | undefined>(
   const { token = Addresses.defaultFeeToken, ...rest } = parameters
   const address = TokenId.toAddress(token)
   const abi = Abis.tip20
+
+  if (token === TokenId.fromAddress(Addresses.defaultQuoteToken))
+    return multicall(client, {
+      ...rest,
+      contracts: [
+        {
+          address,
+          abi,
+          functionName: 'currency',
+        },
+        {
+          address,
+          abi,
+          functionName: 'decimals',
+        },
+        {
+          address,
+          abi,
+          functionName: 'name',
+        },
+        {
+          address,
+          abi,
+          functionName: 'symbol',
+        },
+        {
+          address,
+          abi,
+          functionName: 'totalSupply',
+        },
+      ] as const,
+      allowFailure: false,
+      deployless: true,
+    }).then(([currency, decimals, name, symbol, totalSupply]) => ({
+      name,
+      symbol,
+      currency,
+      decimals,
+      totalSupply,
+    }))
+
   return multicall(client, {
     ...rest,
     contracts: [
@@ -1535,24 +1576,51 @@ export declare namespace getMetadata {
   }
 
   export type ReturnValue = Compute<{
-    /** Currency (e.g. "USD"). */
+    /**
+     * Currency (e.g. "USD").
+     */
     currency: string
-    /** Decimals. */
+    /**
+     * Decimals of the token.
+     */
     decimals: number
-    /** quote token. */
-    quoteToken: Address
-    /** Name. */
+    /**
+     * Quote token.
+     *
+     * Returns `undefined` for the default quote token (`0x20c...0000`).
+     */
+    quoteToken?: Address | undefined
+    /**
+     * Name of the token.
+     */
     name: string
-    /** Whether the token is paused. */
-    paused: boolean
-    /** Supply cap. */
-    supplyCap: bigint
-    /** Symbol. */
+    /**
+     * Whether the token is paused.
+     *
+     * Returns `undefined` for the default quote token (`0x20c...0000`).
+     */
+    paused?: boolean | undefined
+    /**
+     * Supply cap.
+     *
+     * Returns `undefined` for the default quote token (`0x20c...0000`).
+     */
+    supplyCap?: bigint | undefined
+    /**
+     * Symbol of the token.
+     */
     symbol: string
-    /** Total supply. */
+    /**
+     * Total supply of the token.
+     */
     totalSupply: bigint
-    /** Transfer policy ID. 0="always-reject", 1="always-allow", >2=custom policy */
-    transferPolicyId: bigint
+    /**
+     * Transfer policy ID.
+     * 0="always-reject", 1="always-allow", >2=custom policy
+     *
+     * Returns `undefined` for the default quote token (`0x20c...0000`).
+     */
+    transferPolicyId?: bigint | undefined
   }>
 }
 
@@ -1910,7 +1978,6 @@ export namespace mint {
     const call = mint.call(parameters)
     return (await action(client, {
       ...parameters,
-      gas: 30_000n,
       ...call,
     } as never)) as never
   }

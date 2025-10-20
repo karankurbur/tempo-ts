@@ -348,6 +348,22 @@ describe('getMetadata', () => {
     `)
   })
 
+  test('behavior: quote token', async () => {
+    const metadata = await actions.token.getMetadata(client, {
+      token: TokenIds.defaultQuoteToken,
+    })
+
+    expect(metadata).toMatchInlineSnapshot(`
+      {
+        "currency": "USD",
+        "decimals": 6,
+        "name": "linkingUSD",
+        "symbol": "linkingUSD",
+        "totalSupply": 0n,
+      }
+    `)
+  })
+
   test('behavior: custom token (id)', async () => {
     const token = await actions.token.createSync(client, {
       currency: 'USD',
