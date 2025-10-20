@@ -46,7 +46,7 @@ export type GetType<
             metadata: any
             publicKey: PublicKey.PublicKey
           }
-        ? 'webauthn'
+        ? 'webAuthn'
         : envelope extends { r: bigint; s: bigint; yParity: number }
           ? 'secp256k1'
           : envelope extends {
@@ -61,7 +61,7 @@ export type GetType<
  * Supports:
  * - secp256k1: Standard ECDSA signature (65 bytes)
  * - p256: P256 signature with embedded public key and prehash flag (130 bytes)
- * - webauthn: WebAuthn signature with variable-length authenticator data
+ * - webAuthn: WebAuthn signature with variable-length authenticator data
  */
 export type SignatureEnvelope<bigintType = bigint, numberType = number> = OneOf<
   | Secp256k1<bigintType, numberType>
@@ -116,7 +116,7 @@ export type WebAuthn<bigintType = bigint, numberType = number> = {
   >
   signature: Signature.Signature<false, bigintType, numberType>
   publicKey: PublicKey.PublicKey
-  type: 'webauthn'
+  type: 'webAuthn'
 }
 
 export type WebAuthnRpc = {
@@ -124,7 +124,7 @@ export type WebAuthnRpc = {
   pubKeyY: Hex.Hex
   r: Hex.Hex
   s: Hex.Hex
-  type: 'webauthn'
+  type: 'webAuthn'
   webauthnData: Hex.Hex
 }
 
@@ -132,7 +132,7 @@ export type WebAuthnRpc = {
 export type Serialized = Hex.Hex
 
 /** List of supported signature types. */
-export const types = ['secp256k1', 'p256', 'webauthn'] as const
+export const types = ['secp256k1', 'p256', 'webAuthn'] as const
 
 /** Union type of supported signature types. */
 export type Type = (typeof types)[number]
@@ -181,7 +181,7 @@ export function assert(envelope: PartialBy<SignatureEnvelope, 'type'>): void {
     return
   }
 
-  if (type === 'webauthn') {
+  if (type === 'webAuthn') {
     const webauthn = envelope as WebAuthn
     const missing: string[] = []
 
@@ -201,7 +201,7 @@ export function assert(envelope: PartialBy<SignatureEnvelope, 'type'>): void {
     }
 
     if (missing.length > 0)
-      throw new MissingPropertiesError({ envelope, missing, type: 'webauthn' })
+      throw new MissingPropertiesError({ envelope, missing, type: 'webAuthn' })
     return
   }
 }
@@ -324,7 +324,7 @@ export function deserialize(serialized: Serialized): SignatureEnvelope {
           Hex.slice(data, webauthnDataSize + 32, webauthnDataSize + 64),
         ),
       },
-      type: 'webauthn',
+      type: 'webAuthn',
     } as WebAuthn
   }
 
@@ -405,7 +405,7 @@ export function fromRpc(envelope: SignatureEnvelopeRpc): SignatureEnvelope {
     }
   }
 
-  if (envelope.type === 'webauthn') {
+  if (envelope.type === 'webAuthn') {
     const webauthnData = envelope.webauthnData
     const webauthnDataSize = Hex.size(webauthnData)
 
@@ -447,7 +447,7 @@ export function fromRpc(envelope: SignatureEnvelopeRpc): SignatureEnvelope {
         r: Hex.toBigInt(envelope.r),
         s: Hex.toBigInt(envelope.s),
       },
-      type: 'webauthn',
+      type: 'webAuthn',
     }
   }
 
@@ -466,7 +466,7 @@ export declare namespace fromRpc {
  * Determines the signature type of an envelope.
  *
  * @param envelope - The signature envelope to inspect.
- * @returns The signature type ('secp256k1', 'p256', or 'webauthn').
+ * @returns The signature type ('secp256k1', 'p256', or 'webAuthn').
  * @throws {CoercionError} If the envelope type cannot be determined.
  */
 export function getType<
@@ -511,7 +511,7 @@ export function getType<
     'metadata' in envelope &&
     'publicKey' in envelope
   )
-    return 'webauthn' as never
+    return 'webAuthn' as never
 
   throw new CoercionError({
     envelope,
@@ -549,7 +549,7 @@ export function serialize(envelope: SignatureEnvelope): Serialized {
     )
   }
 
-  if (type === 'webauthn') {
+  if (type === 'webAuthn') {
     const webauthn = envelope as WebAuthn
     // Format: 1 byte (type) + variable (authenticatorData || clientDataJSON) + 32 (r) + 32 (s) + 32 (pubKeyX) + 32 (pubKeyY)
     const webauthnData = Hex.concat(
@@ -599,7 +599,7 @@ export function toRpc(envelope: SignatureEnvelope): SignatureEnvelopeRpc {
     }
   }
 
-  if (type === 'webauthn') {
+  if (type === 'webAuthn') {
     const webauthn = envelope as WebAuthn
     const webauthnData = Hex.concat(
       webauthn.metadata.authenticatorData,
@@ -611,7 +611,7 @@ export function toRpc(envelope: SignatureEnvelope): SignatureEnvelopeRpc {
       pubKeyY: Hex.fromNumber(webauthn.publicKey.y, { size: 32 }),
       r: Hex.fromNumber(webauthn.signature.r, { size: 32 }),
       s: Hex.fromNumber(webauthn.signature.s, { size: 32 }),
-      type: 'webauthn',
+      type: 'webAuthn',
       webauthnData,
     }
   }

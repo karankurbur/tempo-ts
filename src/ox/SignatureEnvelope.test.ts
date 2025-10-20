@@ -197,7 +197,7 @@ describe('assert', () => {
     })
   })
 
-  describe('webauthn', () => {
+  describe('webAuthn', () => {
     test('behavior: validates valid WebAuthn signature', () => {
       expect(() => SignatureEnvelope.assert(signature_webauthn)).not.toThrow()
     })
@@ -213,9 +213,9 @@ describe('assert', () => {
         SignatureEnvelope.assert(withoutMetadata as any),
       ).toThrowErrorMatchingInlineSnapshot(
         `
-        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webauthn" is missing required properties: \`metadata\`.
+        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webAuthn" is missing required properties: \`metadata\`.
 
-        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"publicKey":{"prefix":4,"x":"78495282704852028275327922540131762143565388050940484317945369745559774511861#__bigint","y":"8109764566587999957624872393871720746996669263962991155166704261108473113504#__bigint"},"type":"webauthn"}]
+        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"publicKey":{"prefix":4,"x":"78495282704852028275327922540131762143565388050940484317945369745559774511861#__bigint","y":"8109764566587999957624872393871720746996669263962991155166704261108473113504#__bigint"},"type":"webAuthn"}]
       `,
       )
     })
@@ -226,9 +226,9 @@ describe('assert', () => {
         SignatureEnvelope.assert(withoutPublicKey as any),
       ).toThrowErrorMatchingInlineSnapshot(
         `
-        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webauthn" is missing required properties: \`publicKey\`.
+        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webAuthn" is missing required properties: \`publicKey\`.
 
-        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000","clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webauthn"}]
+        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000","clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webAuthn"}]
       `,
       )
     })
@@ -246,15 +246,15 @@ describe('assert', () => {
             origin: 'http://localhost',
           }),
         },
-        type: 'webauthn' as const,
+        type: 'webAuthn' as const,
       }
       expect(() =>
         SignatureEnvelope.assert(invalid),
       ).toThrowErrorMatchingInlineSnapshot(
         `
-        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webauthn" is missing required properties: \`signature.r\`.
+        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webAuthn" is missing required properties: \`signature.r\`.
 
-        Provided: {"signature":{"s":"1#__bigint"},"publicKey":{"prefix":4,"x":"78495282704852028275327922540131762143565388050940484317945369745559774511861#__bigint","y":"8109764566587999957624872393871720746996669263962991155166704261108473113504#__bigint"},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000","clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webauthn"}]
+        Provided: {"signature":{"s":"1#__bigint"},"publicKey":{"prefix":4,"x":"78495282704852028275327922540131762143565388050940484317945369745559774511861#__bigint","y":"8109764566587999957624872393871720746996669263962991155166704261108473113504#__bigint"},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000","clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webAuthn"}]
       `,
       )
     })
@@ -272,15 +272,15 @@ describe('assert', () => {
             origin: 'http://localhost',
           }),
         },
-        type: 'webauthn' as const,
+        type: 'webAuthn' as const,
       }
       expect(() =>
         SignatureEnvelope.assert(invalid),
       ).toThrowErrorMatchingInlineSnapshot(
         `
-        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webauthn" is missing required properties: \`signature.s\`.
+        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webAuthn" is missing required properties: \`signature.s\`.
 
-        Provided: {"signature":{"r":"1#__bigint"},"publicKey":{"prefix":4,"x":"78495282704852028275327922540131762143565388050940484317945369745559774511861#__bigint","y":"8109764566587999957624872393871720746996669263962991155166704261108473113504#__bigint"},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000","clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webauthn"}]
+        Provided: {"signature":{"r":"1#__bigint"},"publicKey":{"prefix":4,"x":"78495282704852028275327922540131762143565388050940484317945369745559774511861#__bigint","y":"8109764566587999957624872393871720746996669263962991155166704261108473113504#__bigint"},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000","clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webAuthn"}]
       `,
       )
     })
@@ -295,15 +295,15 @@ describe('assert', () => {
             origin: 'http://localhost',
           }),
         } as any,
-        type: 'webauthn' as const,
+        type: 'webAuthn' as const,
       }
       expect(() =>
         SignatureEnvelope.assert(invalid),
       ).toThrowErrorMatchingInlineSnapshot(
         `
-        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webauthn" is missing required properties: \`metadata.authenticatorData\`.
+        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webAuthn" is missing required properties: \`metadata.authenticatorData\`.
 
-        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"publicKey":{"prefix":4,"x":"78495282704852028275327922540131762143565388050940484317945369745559774511861#__bigint","y":"8109764566587999957624872393871720746996669263962991155166704261108473113504#__bigint"},"metadata":{"clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webauthn"}]
+        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"publicKey":{"prefix":4,"x":"78495282704852028275327922540131762143565388050940484317945369745559774511861#__bigint","y":"8109764566587999957624872393871720746996669263962991155166704261108473113504#__bigint"},"metadata":{"clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webAuthn"}]
       `,
       )
     })
@@ -317,15 +317,15 @@ describe('assert', () => {
             rpId: 'localhost',
           }),
         } as any,
-        type: 'webauthn' as const,
+        type: 'webAuthn' as const,
       }
       expect(() =>
         SignatureEnvelope.assert(invalid),
       ).toThrowErrorMatchingInlineSnapshot(
         `
-        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webauthn" is missing required properties: \`metadata.clientDataJSON\`.
+        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webAuthn" is missing required properties: \`metadata.clientDataJSON\`.
 
-        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"publicKey":{"prefix":4,"x":"78495282704852028275327922540131762143565388050940484317945369745559774511861#__bigint","y":"8109764566587999957624872393871720746996669263962991155166704261108473113504#__bigint"},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000"},"type":"webauthn"}]
+        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"publicKey":{"prefix":4,"x":"78495282704852028275327922540131762143565388050940484317945369745559774511861#__bigint","y":"8109764566587999957624872393871720746996669263962991155166704261108473113504#__bigint"},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000"},"type":"webAuthn"}]
       `,
       )
     })
@@ -343,15 +343,15 @@ describe('assert', () => {
             origin: 'http://localhost',
           }),
         },
-        type: 'webauthn' as const,
+        type: 'webAuthn' as const,
       }
       expect(() =>
         SignatureEnvelope.assert(invalid),
       ).toThrowErrorMatchingInlineSnapshot(
         `
-        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webauthn" is missing required properties: \`publicKey.x\`.
+        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webAuthn" is missing required properties: \`publicKey.x\`.
 
-        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"publicKey":{"y":"1#__bigint"},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000","clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webauthn"}]
+        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"publicKey":{"y":"1#__bigint"},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000","clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webAuthn"}]
       `,
       )
     })
@@ -369,15 +369,15 @@ describe('assert', () => {
             origin: 'http://localhost',
           }),
         },
-        type: 'webauthn' as const,
+        type: 'webAuthn' as const,
       }
       expect(() =>
         SignatureEnvelope.assert(invalid),
       ).toThrowErrorMatchingInlineSnapshot(
         `
-        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webauthn" is missing required properties: \`publicKey.y\`.
+        [SignatureEnvelope.MissingPropertiesError: Signature envelope of type "webAuthn" is missing required properties: \`publicKey.y\`.
 
-        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"publicKey":{"x":"1#__bigint"},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000","clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webauthn"}]
+        Provided: {"signature":{"r":"92602584010956101470289867944347135737570451066466093224269890121909314569518#__bigint","s":"54171125190222965779385658110416711469231271457324878825831748147306957269813#__bigint","yParity":0},"publicKey":{"x":"1#__bigint"},"metadata":{"authenticatorData":"0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000","clientDataJSON":"{\\"type\\":\\"webauthn.get\\",\\"challenge\\":\\"3q2-7w\\",\\"origin\\":\\"http://localhost\\",\\"crossOrigin\\":false}"},"type":"webAuthn"}]
       `,
       )
     })
@@ -478,7 +478,7 @@ describe('deserialize', () => {
     })
   })
 
-  describe('webauthn', () => {
+  describe('webAuthn', () => {
     test('behavior: deserializes WebAuthn signature', () => {
       const serialized = SignatureEnvelope.serialize(signature_webauthn)
       const deserialized = SignatureEnvelope.deserialize(serialized)
@@ -496,7 +496,7 @@ describe('deserialize', () => {
           authenticatorData: signature_webauthn.metadata.authenticatorData,
           clientDataJSON: signature_webauthn.metadata.clientDataJSON,
         },
-        type: 'webauthn',
+        type: 'webAuthn',
       })
     })
 
@@ -615,7 +615,7 @@ describe('from', () => {
     })
   })
 
-  describe('webauthn', () => {
+  describe('webAuthn', () => {
     test('behavior: coerces from hex string', () => {
       const serialized = SignatureEnvelope.serialize(signature_webauthn)
       const envelope = SignatureEnvelope.from(serialized)
@@ -625,7 +625,7 @@ describe('from', () => {
           r: signature_webauthn.signature.r,
           s: signature_webauthn.signature.s,
         },
-        type: 'webauthn',
+        type: 'webAuthn',
       })
     })
 
@@ -633,7 +633,7 @@ describe('from', () => {
       const { type: _, ...withoutType } = signature_webauthn
       const envelope = SignatureEnvelope.from(withoutType)
 
-      expect(envelope.type).toBe('webauthn')
+      expect(envelope.type).toBe('webAuthn')
     })
   })
 })
@@ -672,14 +672,14 @@ describe('getType', () => {
     })
   })
 
-  describe('webauthn', () => {
+  describe('webAuthn', () => {
     test('behavior: returns explicit type', () => {
-      expect(SignatureEnvelope.getType(signature_webauthn)).toBe('webauthn')
+      expect(SignatureEnvelope.getType(signature_webauthn)).toBe('webAuthn')
     })
 
     test('behavior: infers type from properties', () => {
       const { type: _, ...signatureWithoutType } = signature_webauthn
-      expect(SignatureEnvelope.getType(signatureWithoutType)).toBe('webauthn')
+      expect(SignatureEnvelope.getType(signatureWithoutType)).toBe('webAuthn')
     })
   })
 
@@ -746,7 +746,7 @@ describe('serialize', () => {
     })
   })
 
-  describe('webauthn', () => {
+  describe('webAuthn', () => {
     test('behavior: serializes WebAuthn signature with type identifier', () => {
       const serialized = SignatureEnvelope.serialize(signature_webauthn)
 
@@ -826,7 +826,7 @@ describe('serialize', () => {
       })
     })
 
-    describe('webauthn', () => {
+    describe('webAuthn', () => {
       test('behavior: roundtrips serialize -> deserialize', () => {
         const serialized = SignatureEnvelope.serialize(signature_webauthn)
         const deserialized = SignatureEnvelope.deserialize(serialized)
@@ -844,13 +844,13 @@ describe('serialize', () => {
             authenticatorData: signature_webauthn.metadata.authenticatorData,
             clientDataJSON: signature_webauthn.metadata.clientDataJSON,
           },
-          type: 'webauthn',
+          type: 'webAuthn',
         })
       })
 
       test('behavior: handles variable-length clientDataJSON', () => {
         const longClientData = JSON.stringify({
-          type: 'webauthn.get',
+          type: 'webAuthn.get',
           challenge: 'a'.repeat(100),
           origin: 'https://example.com',
         })
@@ -932,7 +932,7 @@ describe('validate', () => {
     })
   })
 
-  describe('webauthn', () => {
+  describe('webAuthn', () => {
     test('behavior: returns true for valid WebAuthn signature', () => {
       expect(SignatureEnvelope.validate(signature_webauthn)).toBe(true)
     })
@@ -1008,7 +1008,7 @@ describe('fromRpc', () => {
     })
   })
 
-  describe('webauthn', () => {
+  describe('webAuthn', () => {
     test('behavior: converts RPC WebAuthn signature', () => {
       const webauthnData = WebAuthnP256.getAuthenticatorData({
         rpId: 'localhost',
@@ -1023,7 +1023,7 @@ describe('fromRpc', () => {
         pubKeyY: Hex.fromNumber(publicKey.y, { size: 32 }),
         r: Hex.fromNumber(p256Signature.r, { size: 32 }),
         s: Hex.fromNumber(p256Signature.s, { size: 32 }),
-        type: 'webauthn',
+        type: 'webAuthn',
         webauthnData: Hex.concat(webauthnData, Hex.fromString(clientDataJSON)),
       }
 
@@ -1042,7 +1042,7 @@ describe('fromRpc', () => {
           r: p256Signature.r,
           s: p256Signature.s,
         },
-        type: 'webauthn',
+        type: 'webAuthn',
       })
     })
   })
@@ -1087,13 +1087,13 @@ describe('toRpc', () => {
     })
   })
 
-  describe('webauthn', () => {
+  describe('webAuthn', () => {
     test('behavior: converts WebAuthn signature to RPC', () => {
       const rpc = SignatureEnvelope.toRpc(
         signature_webauthn,
       ) as SignatureEnvelope.WebAuthnRpc
 
-      expect(rpc.type).toBe('webauthn')
+      expect(rpc.type).toBe('webAuthn')
       expect(typeof rpc.pubKeyX).toBe('string')
       expect(typeof rpc.pubKeyY).toBe('string')
       expect(typeof rpc.r).toBe('string')
@@ -1179,7 +1179,7 @@ describe('roundtrip: toRpc <-> fromRpc', () => {
     })
   })
 
-  describe('webauthn', () => {
+  describe('webAuthn', () => {
     test('behavior: roundtrips toRpc -> fromRpc', () => {
       const rpc = SignatureEnvelope.toRpc(signature_webauthn)
       const roundtripped = SignatureEnvelope.fromRpc(rpc)
@@ -1197,13 +1197,13 @@ describe('roundtrip: toRpc <-> fromRpc', () => {
           r: signature_webauthn.signature.r,
           s: signature_webauthn.signature.s,
         },
-        type: 'webauthn',
+        type: 'webAuthn',
       })
     })
 
     test('behavior: handles variable-length clientDataJSON in roundtrip', () => {
       const longClientData = JSON.stringify({
-        type: 'webauthn.get',
+        type: 'webAuthn.get',
         challenge: 'a'.repeat(100),
         origin: 'https://example.com',
         crossOrigin: false,
@@ -1227,7 +1227,7 @@ describe('roundtrip: toRpc <-> fromRpc', () => {
 
 describe('types', () => {
   test('behavior: contains all signature types', () => {
-    expect(SignatureEnvelope.types).toEqual(['secp256k1', 'p256', 'webauthn'])
+    expect(SignatureEnvelope.types).toEqual(['secp256k1', 'p256', 'webAuthn'])
   })
 })
 
