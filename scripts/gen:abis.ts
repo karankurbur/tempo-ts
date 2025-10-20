@@ -6,7 +6,7 @@ const extensions: Record<string, string[]> = {
   ITIP20: ['IRolesAuth'],
 }
 
-const out = Path.resolve(import.meta.dirname, '../src/viem/abis.ts')
+const out = Path.resolve(import.meta.dirname, '../src/viem/Abis.ts')
 const precompilesPath = Path.resolve(
   import.meta.dirname,
   '../test/tempo/crates/contracts/src/precompiles.rs',
@@ -65,9 +65,13 @@ for (const solMatch of content.matchAll(solBlockRegex)) {
       // Parse struct fields
       const fields = structBody
         .split(';')
-        .map((f) => f.trim())
-        .filter((f) => f && !f.startsWith('//'))
-        .map((f) => f.trim())
+        .map((f) =>
+          f
+            .split('\n')
+            .filter((line) => !line.trim().startsWith('///'))
+            .join(' ')
+            .trim(),
+        )
         .filter(Boolean)
 
       if (fields.length > 0) {
@@ -213,7 +217,7 @@ for (const [interfaceName, interfaceData] of interfaces.entries()) {
 
   Fs.appendFileSync(
     out,
-    `export const ${exportName}Abi = ${JSON.stringify(Abi.from(items))} as const\n\n`,
+    `export const ${exportName} = ${JSON.stringify(Abi.from(items))} as const\n\n`,
   )
 
   processedInterfaces.add(interfaceName)

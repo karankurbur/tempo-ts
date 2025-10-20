@@ -20,10 +20,6 @@ export const tempo = defineInstance((parameters: tempo.Parameters = {}) => {
     binary = 'tempo',
     builder,
     chain = path.resolve(import.meta.dirname, './internal/chain.json'),
-    consensusConfig = path.resolve(
-      import.meta.dirname,
-      './internal/consensus.toml',
-    ),
     dev,
     faucet,
     ...args
@@ -31,7 +27,7 @@ export const tempo = defineInstance((parameters: tempo.Parameters = {}) => {
   const { deadline = 3, gaslimit = 3000000000, maxTasks = 8 } = builder ?? {}
   const { blockTime = '2ms' } = dev ?? {}
   const {
-    address = '0x20c0000000000000000000000000000000000000',
+    address = '0x20c0000000000000000000000000000000000001',
     amount = 1000000000000000,
     privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
   } = faucet ?? {}
@@ -58,7 +54,7 @@ export const tempo = defineInstance((parameters: tempo.Parameters = {}) => {
       fs.mkdirSync(tmp, { recursive: true })
       return await process.start(
         ($) =>
-          $`${binary} node --http --dev --engine.disable-precompile-cache --faucet.enabled ${toArgs(
+          $`${binary} node --http --dev --no-consensus --engine.disable-precompile-cache --faucet.enabled ${toArgs(
             {
               ...args,
               builder: {
@@ -67,7 +63,6 @@ export const tempo = defineInstance((parameters: tempo.Parameters = {}) => {
                 maxTasks,
               },
               chain,
-              consensusConfig,
               datadir: `${tmp}/data`,
               dev: {
                 blockTime,
@@ -77,16 +72,17 @@ export const tempo = defineInstance((parameters: tempo.Parameters = {}) => {
                 amount,
                 privateKey,
               },
-              port: port! + 1,
+              port: port! + 10,
               http: {
+                api: 'all',
                 addr: '0.0.0.0',
                 port: port!,
               },
               ws: {
-                port: port! + 2,
+                port: port! + 20,
               },
               authrpc: {
-                port: port! + 3,
+                port: port! + 30,
               },
             },
           )}`,
@@ -144,10 +140,6 @@ export declare namespace tempo {
      * Chain this node is running.
      */
     chain?: string | undefined
-    /**
-     * Consensus configuration for this node.
-     */
-    consensusConfig?: string | undefined
     /**
      * Development options.
      */
