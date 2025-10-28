@@ -51,7 +51,7 @@ export const tempo = defineInstance((parameters: tempo.Parameters = {}) => {
     async start({ port = args.port }, options) {
       try {
         fs.rmSync(tmp, { recursive: true })
-      } catch { }
+      } catch {}
       fs.mkdirSync(tmp, { recursive: true })
 
       const env: Record<string, string> = {}
@@ -115,7 +115,7 @@ export const tempo = defineInstance((parameters: tempo.Parameters = {}) => {
     async stop() {
       try {
         fs.rmSync(tmp, { recursive: true })
-      } catch { }
+      } catch {}
       await process_.stop()
     },
   }
@@ -131,21 +131,21 @@ export declare namespace tempo {
      * Builder options.
      */
     builder?:
-    | {
-      /**
-       * The deadline for when the payload builder job should resolve.
-       */
-      deadline?: number | undefined
-      /**
-       * Target gas limit for built blocks.
-       */
-      gaslimit?: bigint | undefined
-      /**
-       * Maximum number of tasks to spawn for building a payload.
-       */
-      maxTasks?: number | undefined
-    }
-    | undefined
+      | {
+          /**
+           * The deadline for when the payload builder job should resolve.
+           */
+          deadline?: number | undefined
+          /**
+           * Target gas limit for built blocks.
+           */
+          gaslimit?: bigint | undefined
+          /**
+           * Maximum number of tasks to spawn for building a payload.
+           */
+          maxTasks?: number | undefined
+        }
+      | undefined
     /**
      * Chain this node is running.
      */
@@ -154,45 +154,45 @@ export declare namespace tempo {
      * Development options.
      */
     dev?:
-    | {
-      /**
-       * Interval between blocks.
-       */
-      blockTime?: string | undefined
-    }
-    | undefined
+      | {
+          /**
+           * Interval between blocks.
+           */
+          blockTime?: string | undefined
+        }
+      | undefined
     /**
      * Faucet options.
      */
     faucet?:
-    | {
-      /**
-       * Target token address for the faucet to be funding with
-       */
-      address?: string | undefined
-      /**
-       * Amount for each faucet funding transaction
-       */
-      amount?: bigint | undefined
-      /**
-       * Faucet funding mnemonic
-       */
-      privateKey?: string | undefined
-    }
-    | undefined
+      | {
+          /**
+           * Target token address for the faucet to be funding with
+           */
+          address?: string | undefined
+          /**
+           * Amount for each faucet funding transaction
+           */
+          amount?: bigint | undefined
+          /**
+           * Faucet funding mnemonic
+           */
+          privateKey?: string | undefined
+        }
+      | undefined
     /**
      * Rust log level configuration (sets RUST_LOG environment variable).
      * Can be a log level or a custom filter string.
      */
     log?:
-    | 'trace'
-    | 'debug'
-    | 'info'
-    | 'warn'
-    | 'error'
-    | (string & {})
-    | boolean
-    | undefined
+      | 'trace'
+      | 'debug'
+      | 'info'
+      | 'warn'
+      | 'error'
+      | (string & {})
+      | boolean
+      | undefined
     /**
      * Host the server will listen on.
      */
