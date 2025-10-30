@@ -7,6 +7,7 @@ import {
   Secp256k1,
   Value,
   WebAuthnP256,
+  WebCryptoP256,
 } from 'ox'
 import { createClient, http, parseEther } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -1088,6 +1089,7 @@ describe('e2e', () => {
           "accessList": [],
           "calls": [
             {
+              "data": null,
               "input": "0x",
               "to": "0x0000000000000000000000000000000000000000",
               "value": "0xde0b6b3a7640000",
@@ -1126,10 +1128,10 @@ describe('e2e', () => {
     expect(rest).toMatchInlineSnapshot(`
       {
         "contractAddress": null,
-        "cumulativeGasUsed": "0x5208",
+        "cumulativeGasUsed": "0x7f58",
         "effectiveGasPrice": "0x2540be42c",
         "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-        "gasUsed": "0x5208",
+        "gasUsed": "0x7f58",
         "logs": [],
         "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
         "status": "0x0",
@@ -1210,6 +1212,7 @@ describe('e2e', () => {
           "accessList": [],
           "calls": [
             {
+              "data": null,
               "input": "0x",
               "to": "0x0000000000000000000000000000000000000000",
               "value": "0xde0b6b3a7640000",
@@ -1249,15 +1252,131 @@ describe('e2e', () => {
     expect(rest).toMatchInlineSnapshot(`
       {
         "contractAddress": null,
-        "cumulativeGasUsed": "0x6590",
+        "cumulativeGasUsed": "0x92e0",
         "effectiveGasPrice": "0x2540be42c",
         "from": "0x6472aeab3269f4165775753156702c06ccc70f8b",
-        "gasUsed": "0x6590",
+        "gasUsed": "0x92e0",
         "logs": [],
         "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
         "status": "0x0",
         "to": "0x0000000000000000000000000000000000000000",
         "transactionHash": "0x6555ebf80163ff84929f864a281fd475685c15279b516233035d4a243f427bfe",
+        "transactionIndex": "0x0",
+        "type": "0x76",
+      }
+    `)
+  })
+
+  test('behavior: default (p256 - webcrypto)', async () => {
+    const keyPair = await WebCryptoP256.createKeyPair()
+    const address = Address.fromPublicKey(keyPair.publicKey)
+
+    const client = createClient({
+      account: privateKeyToAccount(
+        '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+      ),
+      chain: tempoLocal,
+      transport: http('http://localhost:3000'),
+    })
+
+    await Actions.token.transferSync(client, {
+      amount: parseEther('10000'),
+      to: address,
+    })
+
+    const transaction = TransactionEnvelopeAA.from({
+      calls: [
+        {
+          to: '0x0000000000000000000000000000000000000000',
+          value: Value.fromEther('1'),
+        },
+      ],
+      chainId: 1337,
+      gas: 100_000n,
+      maxFeePerGas: Value.fromGwei('20'),
+      maxPriorityFeePerGas: Value.fromGwei('10'),
+    })
+
+    const signature = await WebCryptoP256.sign({
+      payload: TransactionEnvelopeAA.getSignPayload(transaction),
+      privateKey: keyPair.privateKey,
+    })
+
+    const serialized_signed = TransactionEnvelopeAA.serialize(transaction, {
+      signature: SignatureEnvelope.from({
+        signature,
+        publicKey: keyPair.publicKey,
+        prehash: true,
+        type: 'p256',
+      }),
+    })
+
+    const receipt = await client.request({
+      method: 'eth_sendRawTransactionSync',
+      params: [serialized_signed],
+    })
+
+    expect(receipt).toBeDefined()
+
+    {
+      const response = await client.request({
+        method: 'eth_getTransactionByHash',
+        params: [receipt.transactionHash],
+      })
+      if (!response) throw new Error()
+
+      const { blockNumber, blockHash, from, hash, signature, ...rest } =
+        response as any
+
+      expect(blockNumber).toBeDefined()
+      expect(blockHash).toBeDefined()
+      expect(from).toBeDefined()
+      expect(hash).toBe(receipt.transactionHash)
+      expect(signature).toBeDefined()
+      expect(rest).toMatchInlineSnapshot(`
+        {
+          "accessList": [],
+          "calls": [
+            {
+              "data": null,
+              "input": "0x",
+              "to": "0x0000000000000000000000000000000000000000",
+              "value": "0xde0b6b3a7640000",
+            },
+          ],
+          "chainId": "0x539",
+          "feePayerSignature": null,
+          "feeToken": null,
+          "gas": "0x186a0",
+          "gasPrice": "0x2540be42c",
+          "maxFeePerGas": "0x4a817c800",
+          "maxPriorityFeePerGas": "0x2540be400",
+          "nonce": "0x0",
+          "nonceKey": "0x0",
+          "transactionIndex": "0x0",
+          "type": "0x76",
+          "validAfter": null,
+          "validBefore": null,
+        }
+      `)
+    }
+
+    const { blockNumber, blockHash, from, transactionHash, ...rest } = receipt
+
+    expect(blockNumber).toBeDefined()
+    expect(blockHash).toBeDefined()
+    expect(from).toBeDefined()
+    expect(transactionHash).toBe(receipt.transactionHash)
+    expect(rest).toMatchInlineSnapshot(`
+      {
+        "contractAddress": null,
+        "cumulativeGasUsed": "0x92e0",
+        "effectiveGasPrice": "0x2540be42c",
+        "gasUsed": "0x92e0",
+        "logs": [],
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "status": "0x0",
+        "to": "0x0000000000000000000000000000000000000000",
         "transactionIndex": "0x0",
         "type": "0x76",
       }
@@ -1339,6 +1458,7 @@ describe('e2e', () => {
           "accessList": [],
           "calls": [
             {
+              "data": null,
               "input": "0x",
               "to": "0x0000000000000000000000000000000000000000",
               "value": "0xde0b6b3a7640000",
@@ -1378,10 +1498,10 @@ describe('e2e', () => {
     expect(rest).toMatchInlineSnapshot(`
       {
         "contractAddress": null,
-        "cumulativeGasUsed": "0x6fc0",
+        "cumulativeGasUsed": "0x9d10",
         "effectiveGasPrice": "0x2540be42c",
         "from": "0x6472aeab3269f4165775753156702c06ccc70f8b",
-        "gasUsed": "0x6fc0",
+        "gasUsed": "0x9d10",
         "logs": [],
         "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
         "status": "0x0",
@@ -1460,10 +1580,10 @@ describe('e2e', () => {
     expect(rest).toMatchInlineSnapshot(`
       {
         "contractAddress": null,
-        "cumulativeGasUsed": "0x5208",
+        "cumulativeGasUsed": "0x5c30",
         "effectiveGasPrice": "0x2c",
         "from": "0x0a275bee91b39092dfd57089dee0eb0539020b90",
-        "gasUsed": "0x5208",
+        "gasUsed": "0x5c30",
         "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000008000000000008000000000000000000000000000000000000000000000000000100000000000000000000000000000010000000000000000000000000000000000020000000000000100000000040000000000000000020000000000000000000000000000000000000000000000000000000000000000002000000200000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
         "status": "0x1",
         "to": "0x0000000000000000000000000000000000000000",

@@ -1,5 +1,8 @@
+// TODO: Find opportunities to make this file less duplicated + more simplified with Viem v3.
+
 import * as Hex from 'ox/Hex'
 import {
+  type Account as viem_Account,
   formatTransaction as viem_formatTransaction,
   formatTransactionRequest as viem_formatTransactionRequest,
 } from 'viem'
@@ -10,7 +13,6 @@ import {
   isTempo,
   type Transaction,
   type TransactionRequest,
-  type TransactionRequestAA,
   type TransactionRequestRpc,
   type TransactionRpc,
 } from './Transaction.js'
@@ -54,11 +56,15 @@ export const formatTransaction = (
 }
 
 export const formatTransactionRequest = (
-  r: TransactionRequest,
+  r: TransactionRequest & { account?: viem_Account | undefined },
   action?: string | undefined,
 ): TransactionRequestRpc => {
-  const request = r as TransactionRequestAA
+  const request = r
 
+  // Convert EIP-1559 transactions to AA transactions.
+  if (request.type === 'eip1559') (request as any).type = 'aa'
+
+  // If the request is not a Tempo transaction, route to Viem formatter.
   if (!isTempo(request))
     return viem_formatTransactionRequest(
       r as never,
@@ -85,7 +91,7 @@ export const formatTransactionRequest = (
     })),
     nonce: request.nonce ? BigInt(request.nonce) : undefined,
     type: 'aa',
-  })
+  } as never)
 
   if (action === 'estimateGas') {
     rpc.maxFeePerGas = undefined
@@ -97,8 +103,20 @@ export const formatTransactionRequest = (
   rpc.data = undefined
   rpc.value = undefined
 
+  const [keyType, keyData] = (() => {
+    if (!r.account?.source) return [undefined, undefined]
+    if (r.account.source === 'webAuthn')
+      // TODO: derive correct bytes size of key data based on webauthn create metadata.
+      return ['webAuthn', `0x${'ff'.repeat(1400)}`]
+    if (['p256', 'secp256k1'].includes(r.account.source))
+      return [r.account.source, undefined]
+    return [undefined, undefined]
+  })()
+
   return {
     ...rpc,
+    ...(keyType ? { keyType } : {}),
+    ...(keyData ? { keyData } : {}),
     ...(request.feePayer
       ? {
           feePayer:

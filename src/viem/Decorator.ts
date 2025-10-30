@@ -11,27 +11,6 @@ export type Decorator<
 > = {
   amm: {
     /**
-     * Gets the pool ID for a token pair.
-     *
-     * @example
-     * ```ts
-     * import { createTempoClient } from 'tempo.ts/viem'
-     *
-     * const client = createTempoClient()
-     *
-     * const poolId = await client.amm.getPoolId({
-     *   userToken: '0x...',
-     *   validatorToken: '0x...',
-     * })
-     * ```
-     *
-     * @param parameters - Parameters.
-     * @returns The pool ID.
-     */
-    getPoolId: (
-      parameters: ammActions.getPoolId.Parameters,
-    ) => Promise<ammActions.getPoolId.ReturnValue>
-    /**
      * Gets the reserves for a liquidity pool.
      *
      * @example
@@ -52,29 +31,6 @@ export type Decorator<
     getPool: (
       parameters: ammActions.getPool.Parameters,
     ) => Promise<ammActions.getPool.ReturnValue>
-    /**
-     * Gets the total supply of LP tokens for a pool.
-     *
-     * @example
-     * ```ts
-     * import { createTempoClient } from 'tempo.ts/viem'
-     *
-     * const client = createTempoClient()
-     *
-     * const poolId = await client.amm.getPoolId({
-     *   userToken: '0x...',
-     *   validatorToken: '0x...',
-     * })
-     *
-     * const totalSupply = await client.amm.getTotalSupply({ poolId })
-     * ```
-     *
-     * @param parameters - Parameters.
-     * @returns The total supply of LP tokens.
-     */
-    getTotalSupply: (
-      parameters: ammActions.getTotalSupply.Parameters,
-    ) => Promise<ammActions.getTotalSupply.ReturnValue>
     /**
      * Gets the LP token balance for an account in a specific pool.
      *
@@ -1648,6 +1604,28 @@ export type Decorator<
       parameters: tokenActions.getMetadata.Parameters,
     ) => Promise<tokenActions.getMetadata.ReturnValue>
     /**
+     * Gets the admin role for a specific role in a TIP20 token.
+     *
+     * @example
+     * ```ts
+     * import { createTempoClient } from 'tempo.ts/viem'
+     *
+     * const client = createTempoClient()
+     *
+     * const adminRole = await client.token.getRoleAdmin({
+     *   role: 'minter',
+     *   token: '0x...',
+     * })
+     * ```
+     *
+     * @param client - Client.
+     * @param parameters - Parameters.
+     * @returns The admin role hash.
+     */
+    getRoleAdmin: (
+      parameters: tokenActions.getRoleAdmin.Parameters,
+    ) => Promise<tokenActions.getRoleAdmin.ReturnValue>
+    /**
      * Checks if an account has a specific role for a TIP20 token.
      *
      * @example
@@ -2357,10 +2335,7 @@ export function decorator() {
   ): Decorator<chain, account> => {
     return {
       amm: {
-        getPoolId: (parameters) => ammActions.getPoolId(client, parameters),
         getPool: (parameters) => ammActions.getPool(client, parameters),
-        getTotalSupply: (parameters) =>
-          ammActions.getTotalSupply(client, parameters),
         getLiquidityBalance: (parameters) =>
           ammActions.getLiquidityBalance(client, parameters),
         rebalanceSwap: (parameters) =>
@@ -2473,6 +2448,8 @@ export function decorator() {
         getBalance: (parameters) => tokenActions.getBalance(client, parameters),
         getMetadata: (parameters) =>
           tokenActions.getMetadata(client, parameters),
+        getRoleAdmin: (parameters) =>
+          tokenActions.getRoleAdmin(client, parameters),
         hasRole: (parameters) => tokenActions.hasRole(client, parameters),
         grantRoles: (parameters) => tokenActions.grantRoles(client, parameters),
         grantRolesSync: (parameters) =>
