@@ -1,11 +1,12 @@
 import { attest } from '@ark/attest'
 import { createClient, http } from 'viem'
 import { test } from 'vitest'
-import { decorator } from './Decorator.js'
+import { tempo } from '../chains.js'
 
 test('decorator', () => {
   createClient({
+    chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' }),
     transport: http('https://cloudflare-eth.com'),
-  }).extend(decorator())
-  attest.instantiations([40753, 'instantiations'])
+  })
+  attest.instantiations([62236, 'instantiations'])
 })
