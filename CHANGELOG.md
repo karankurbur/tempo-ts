@@ -95,7 +95,7 @@
   ```ts
   // fee token NOT set on client
   const client2 = createClient({
-    chain: tempo,
+    chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
     transport: http(),
   });
 

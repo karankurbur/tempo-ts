@@ -15,7 +15,7 @@ import * as viem_Actions from '../../viem/Actions/token.js'
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -73,7 +73,7 @@ export declare namespace approve {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -128,7 +128,7 @@ export declare namespace approveSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -180,7 +180,7 @@ export declare namespace burn {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -239,7 +239,7 @@ export declare namespace burnBlocked {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -298,7 +298,7 @@ export declare namespace burnBlockedSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -353,7 +353,7 @@ export declare namespace burnSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -414,7 +414,7 @@ export declare namespace changeTransferPolicy {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -472,7 +472,7 @@ export declare namespace changeTransferPolicySync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -531,7 +531,7 @@ export declare namespace create {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -587,7 +587,7 @@ export declare namespace createSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -644,7 +644,7 @@ export declare namespace updateQuoteToken {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -701,7 +701,7 @@ export declare namespace updateQuoteTokenSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -792,7 +792,7 @@ export namespace getAllowance {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -882,7 +882,7 @@ export namespace getBalance {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -972,7 +972,7 @@ export namespace getMetadata {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1063,7 +1063,7 @@ export namespace getRoleAdmin {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1122,7 +1122,7 @@ export declare namespace grantRoles {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1178,7 +1178,7 @@ export declare namespace grantRolesSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1270,7 +1270,7 @@ export namespace hasRole {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1326,7 +1326,7 @@ export declare namespace mint {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1382,7 +1382,7 @@ export declare namespace mintSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1436,7 +1436,7 @@ export declare namespace pause {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1490,7 +1490,7 @@ export declare namespace pauseSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1548,7 +1548,7 @@ export declare namespace renounceRoles {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1603,7 +1603,7 @@ export declare namespace renounceRolesSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1662,7 +1662,7 @@ export declare namespace revokeRoles {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1718,7 +1718,7 @@ export declare namespace revokeRolesSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1777,7 +1777,7 @@ export declare namespace setRoleAdmin {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1833,7 +1833,7 @@ export declare namespace setRoleAdminSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1891,7 +1891,7 @@ export declare namespace setSupplyCap {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -1946,7 +1946,7 @@ export declare namespace setSupplyCapSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2004,7 +2004,7 @@ export declare namespace transfer {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2059,7 +2059,7 @@ export declare namespace transferSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2116,7 +2116,7 @@ export declare namespace unpause {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2170,7 +2170,7 @@ export declare namespace unpauseSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2231,7 +2231,7 @@ export declare namespace prepareUpdateQuoteToken {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2289,7 +2289,7 @@ export declare namespace prepareUpdateQuoteTokenSync {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2330,7 +2330,7 @@ export declare namespace watchAdminRole {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2371,7 +2371,7 @@ export declare namespace watchApprove {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2412,7 +2412,7 @@ export declare namespace watchBurn {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2453,7 +2453,7 @@ export declare namespace watchCreate {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2496,7 +2496,7 @@ export declare namespace watchMint {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2537,7 +2537,7 @@ export declare namespace watchRole {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },
@@ -2578,7 +2578,7 @@ export declare namespace watchTransfer {
  * import { Actions } from 'tempo.ts/wagmi'
  *
  * const config = createConfig({
- *   chains: [tempo],
+ *   chains: [tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })],
  *   transports: {
  *     [tempo.id]: http(),
  *   },

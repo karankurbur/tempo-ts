@@ -29,16 +29,16 @@ import { defineCall } from '../internal/utils.js'
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo.ts/chains'
- * import * as actions from 'tempo.ts/viem/actions'
+ * import { Actions } from 'tempo.ts/viem'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
  *   account: privateKeyToAccount('0x...'),
- *   chain: tempo,
+ *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
  *   transport: http(),
  * })
  *
- * const hash = await actions.rewards.cancel(client, {
+ * const hash = await Actions.rewards.cancel(client, {
  *   id: 1n,
  *   token: '0x20c0000000000000000000000000000000000001',
  * })
@@ -72,16 +72,16 @@ export async function cancel<
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo.ts/chains'
- * import * as actions from 'tempo.ts/viem/actions'
+ * import { Actions } from 'tempo.ts/viem'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
  *   account: privateKeyToAccount('0x...'),
- *   chain: tempo,
+ *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
  *   transport: http(),
  * })
  *
- * const { funder, id, refund, receipt } = await actions.rewards.cancelSync(client, {
+ * const { funder, id, refund, receipt } = await Actions.rewards.cancelSync(client, {
  *   id: 1n,
  *   token: '0x20c0000000000000000000000000000000000001',
  * })
@@ -158,10 +158,10 @@ export namespace cancel {
    * ```ts
    * import { createClient, http, walletActions } from 'viem'
    * import { tempo } from 'tempo.ts/chains'
-   * import * as actions from 'tempo.ts/viem/actions'
+   * import { Actions } from 'tempo.ts/viem'
    *
    * const client = createClient({
-   *   chain: tempo,
+   *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
    *   transport: http(),
    * }).extend(walletActions)
    *
@@ -245,16 +245,16 @@ export declare namespace cancelSync {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo.ts/chains'
- * import * as actions from 'tempo.ts/viem/actions'
+ * import { Actions } from 'tempo.ts/viem'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
  *   account: privateKeyToAccount('0x...'),
- *   chain: tempo,
+ *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
  *   transport: http(),
  * })
  *
- * const hash = await actions.reward.claim(client, {
+ * const hash = await Actions.reward.claim(client, {
  *   token: '0x20c0000000000000000000000000000000000001',
  * })
  * ```
@@ -319,10 +319,10 @@ export namespace claim {
    * ```ts
    * import { createClient, http, walletActions } from 'viem'
    * import { tempo } from 'tempo.ts/chains'
-   * import * as actions from 'tempo.ts/viem/actions'
+   * import { Actions } from 'tempo.ts/viem'
    *
    * const client = createClient({
-   *   chain: tempo,
+   *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
    *   transport: http(),
    * }).extend(walletActions)
    *
@@ -368,16 +368,16 @@ export namespace claim {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo.ts/chains'
- * import * as actions from 'tempo.ts/viem/actions'
+ * import { Actions } from 'tempo.ts/viem'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
  *   account: privateKeyToAccount('0x...'),
- *   chain: tempo,
+ *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
  *   transport: http(),
  * })
  *
- * const { receipt } = await actions.reward.claimSync(client, {
+ * const { receipt } = await Actions.reward.claimSync(client, {
  *   token: '0x20c0000000000000000000000000000000000001',
  * })
  * ```
@@ -433,14 +433,14 @@ export namespace claimSync {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo.ts/chains'
- * import * as actions from 'tempo.ts/viem/actions'
+ * import { Actions } from 'tempo.ts/viem'
  *
  * const client = createClient({
- *   chain: tempo,
+ *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
  *   transport: http(),
  * })
  *
- * const stream = await actions.rewards.getStream(client, {
+ * const stream = await Actions.rewards.getStream(client, {
  *   id: 1n,
  *   token: '0x20c0000000000000000000000000000000000001',
  * })
@@ -504,14 +504,14 @@ export namespace getStream {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo.ts/chains'
- * import * as actions from 'tempo.ts/viem/actions'
+ * import { Actions } from 'tempo.ts/viem'
  *
  * const client = createClient({
- *   chain: tempo,
+ *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
  *   transport: http(),
  * })
  *
- * const rate = await actions.rewards.getTotalPerSecond(client, {
+ * const rate = await Actions.rewards.getTotalPerSecond(client, {
  *   token: '0x20c0000000000000000000000000000000000001',
  * })
  * ```
@@ -577,16 +577,16 @@ export namespace getTotalPerSecond {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo.ts/chains'
- * import * as actions from 'tempo.ts/viem/actions'
+ * import { Actions } from 'tempo.ts/viem'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
  *   account: privateKeyToAccount('0x...'),
- *   chain: tempo,
+ *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
  *   transport: http(),
  * })
  *
- * const hash = await actions.rewards.setRecipient(client, {
+ * const hash = await Actions.rewards.setRecipient(client, {
  *   recipient: '0xa5cc3c03994DB5b0d9A5eEdD10CabaB0813678AC',
  *   token: '0x20c0000000000000000000000000000000000001',
  * })
@@ -622,16 +622,16 @@ export async function setRecipient<
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo.ts/chains'
- * import * as actions from 'tempo.ts/viem/actions'
+ * import { Actions } from 'tempo.ts/viem'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
  *   account: privateKeyToAccount('0x...'),
- *   chain: tempo,
+ *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
  *   transport: http(),
  * })
  *
- * const { holder, recipient, receipt } = await actions.rewards.setRecipientSync(client, {
+ * const { holder, recipient, receipt } = await Actions.rewards.setRecipientSync(client, {
  *   recipient: '0xa5cc3c03994DB5b0d9A5eEdD10CabaB0813678AC',
  *   token: '0x20c0000000000000000000000000000000000001',
  * })
@@ -708,10 +708,10 @@ export namespace setRecipient {
    * ```ts
    * import { createClient, http, walletActions } from 'viem'
    * import { tempo } from 'tempo.ts/chains'
-   * import * as actions from 'tempo.ts/viem/actions'
+   * import { Actions } from 'tempo.ts/viem'
    *
    * const client = createClient({
-   *   chain: tempo,
+   *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
    *   transport: http(),
    * }).extend(walletActions)
    *
@@ -791,16 +791,16 @@ export declare namespace setRecipientSync {
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo.ts/chains'
- * import * as actions from 'tempo.ts/viem/actions'
+ * import { Actions } from 'tempo.ts/viem'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
  *   account: privateKeyToAccount('0x...'),
- *   chain: tempo,
+ *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
  *   transport: http(),
  * })
  *
- * const hash = await actions.rewards.start(client, {
+ * const hash = await Actions.rewards.start(client, {
  *   amount: 100000000000000000000n,
  *   seconds: 86400,
  *   token: '0x20c0000000000000000000000000000000000001',
@@ -840,16 +840,16 @@ export async function start<
  * ```ts
  * import { createClient, http } from 'viem'
  * import { tempo } from 'tempo.ts/chains'
- * import * as actions from 'tempo.ts/viem/actions'
+ * import { Actions } from 'tempo.ts/viem'
  * import { privateKeyToAccount } from 'viem/accounts'
  *
  * const client = createClient({
  *   account: privateKeyToAccount('0x...'),
- *   chain: tempo,
+ *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
  *   transport: http(),
  * })
  *
- * const { id, receipt } = await actions.rewards.startSync(client, {
+ * const { id, receipt } = await Actions.rewards.startSync(client, {
  *   amount: 100000000000000000000n,
  *   seconds: 86400,
  *   token: '0x20c0000000000000000000000000000000000001',
@@ -929,10 +929,10 @@ export namespace start {
    * ```ts
    * import { createClient, http, walletActions } from 'viem'
    * import { tempo } from 'tempo.ts/chains'
-   * import * as actions from 'tempo.ts/viem/actions'
+   * import { Actions } from 'tempo.ts/viem'
    *
    * const client = createClient({
-   *   chain: tempo,
+   *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
    *   transport: http(),
    * }).extend(walletActions)
    *
