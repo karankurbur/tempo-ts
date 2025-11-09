@@ -1,6 +1,7 @@
 import type { Account, Chain, Client, Transport } from 'viem'
 import * as ammActions from './Actions/amm.js'
 import * as dexActions from './Actions/dex.js'
+import * as faucetActions from './Actions/faucet.js'
 import * as feeActions from './Actions/fee.js'
 import * as policyActions from './Actions/policy.js'
 import * as rewardActions from './Actions/reward.js'
@@ -1037,6 +1038,34 @@ export type Decorator<
     watchOrderPlaced: (
       parameters: dexActions.watchOrderPlaced.Parameters,
     ) => () => void
+  }
+  faucet: {
+    /**
+     * Funds an account with an initial amount of set token(s)
+     * on Tempo's testnet.
+     *
+     * @example
+     * ```ts
+     * import { createClient, http } from 'viem'
+     * import { tempo } from 'tempo.ts/chains'
+     * import { tempoActions } from 'tempo.ts/viem'
+     *
+     * const client = createClient({
+     *   chain: tempo({ feeToken: '0x20c0000000000000000000000000000000000001' })
+     *   transport: http(),
+     * }).extend(tempoActions())
+     *
+     * const hashes = await client.faucet.fund({
+     *   account: '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
+     * })
+     * ```
+     *
+     * @param parameters - Parameters.
+     * @returns The transaction hashes.
+     */
+    fund: (
+      parameters: faucetActions.fund.Parameters,
+    ) => Promise<faucetActions.fund.ReturnValue>
   }
   fee: {
     /**
@@ -2973,6 +3002,9 @@ export function decorator() {
           dexActions.watchOrderFilled(client, parameters),
         watchOrderPlaced: (parameters) =>
           dexActions.watchOrderPlaced(client, parameters),
+      },
+      faucet: {
+        fund: (parameters) => faucetActions.fund(client, parameters),
       },
       fee: {
         // @ts-expect-error
