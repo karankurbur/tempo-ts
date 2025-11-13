@@ -11,14 +11,7 @@ import type { RequiredBy } from '../../internal/types.js'
 import * as SignatureEnvelope from '../../ox/SignatureEnvelope.js'
 import * as Transaction from '../Transaction.js'
 
-export type Account = RequiredBy<
-  Omit<LocalAccount, 'signTransaction'>,
-  'sign' | 'signAuthorization'
-> & {
-  signTransaction: (
-    transaction: Transaction.TransactionSerializable,
-  ) => Promise<Hex.Hex>
-}
+export type Account = RequiredBy<LocalAccount, 'sign' | 'signAuthorization'>
 
 // TODO: this function will be redundant when Viem migrates to Ox.
 /** @internal */
@@ -67,12 +60,13 @@ export function toPrivateKeyAccount(
         )
       return SignatureEnvelope.serialize(envelope)
     },
-    async signTransaction(transaction) {
+    async signTransaction(transaction, options) {
+      const { serializer = Transaction.serialize } = options ?? {}
       const signature = await sign({
-        hash: keccak256(await Transaction.serialize(transaction)),
+        hash: keccak256(await serializer(transaction)),
       })
       const envelope = SignatureEnvelope.from(signature)
-      return await Transaction.serialize(transaction, envelope)
+      return await serializer(transaction, envelope as never)
     },
     async signTypedData(typedData) {
       const signature = await sign({ hash: hashTypedData(typedData) })

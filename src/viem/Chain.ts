@@ -63,7 +63,12 @@ function config<const chain extends Chain>(chain: chain) {
           {
             ...transaction,
             ...(!(transaction as { feePayer?: unknown }).feePayer
-              ? { feeToken: chain.feeToken ?? undefined }
+              ? {
+                  feeToken:
+                    (transaction as { feeToken?: unknown }).feeToken ??
+                    chain.feeToken ??
+                    undefined,
+                }
               : {}),
           } as never,
           signature,
