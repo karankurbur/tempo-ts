@@ -1471,7 +1471,7 @@ export declare namespace getMetadata {
  * })
  *
  * const adminRole = await Actions.token.getRoleAdmin(client, {
- *   role: 'minter',
+ *   role: 'issuer',
  *   token: '0x...',
  * })
  * ```
@@ -1708,7 +1708,7 @@ export namespace grantRoles {
    *     actions.token.grantRoles.call({
    *       token: '0x20c0...babe',
    *       to: '0x20c0...beef',
-   *       role: 'minter',
+   *       role: 'issuer',
    *     }),
    *   ]
    * })
@@ -1765,7 +1765,7 @@ export namespace grantRoles {
  * const result = await Actions.token.grantRolesSync(client, {
  *   token: '0x...',
  *   to: '0x...',
- *   roles: ['minter'],
+ *   roles: ['issuer'],
  * })
  * ```
  *
@@ -2238,7 +2238,7 @@ export namespace pauseSync {
  *
  * const result = await Actions.token.renounceRoles(client, {
  *   token: '0x...',
- *   roles: ['minter'],
+ *   roles: ['issuer'],
  * })
  * ```
  *
@@ -2323,7 +2323,7 @@ export namespace renounceRoles {
    *   calls: [
    *     actions.token.renounceRoles.call({
    *       token: '0x20c0...babe',
-   *       role: 'minter',
+   *       role: 'issuer',
    *     }),
    *   ]
    * })
@@ -2379,7 +2379,7 @@ export namespace renounceRoles {
  *
  * const result = await Actions.token.renounceRolesSync(client, {
  *   token: '0x...',
- *   roles: ['minter'],
+ *   roles: ['issuer'],
  * })
  * ```
  *
@@ -2447,7 +2447,7 @@ export namespace renounceRolesSync {
  * const result = await Actions.token.revokeRoles(client, {
  *   token: '0x...',
  *   from: '0x...',
- *   roles: ['minter'],
+ *   roles: ['issuer'],
  * })
  * ```
  *
@@ -2535,7 +2535,7 @@ export namespace revokeRoles {
    *     actions.token.revokeRoles.call({
    *       token: '0x20c0...babe',
    *       from: '0x20c0...beef',
-   *       role: 'minter',
+   *       role: 'issuer',
    *     }),
    *   ]
    * })
@@ -2592,7 +2592,7 @@ export namespace revokeRoles {
  * const result = await Actions.token.revokeRolesSync(client, {
  *   token: '0x...',
  *   from: '0x...',
- *   roles: ['minter'],
+ *   roles: ['issuer'],
  * })
  * ```
  *
@@ -2855,7 +2855,7 @@ export namespace setSupplyCapSync {
  *
  * const result = await Actions.token.setRoleAdmin(client, {
  *   token: '0x...',
- *   role: 'minter',
+ *   role: 'issuer',
  *   adminRole: 'admin',
  * })
  * ```
@@ -2935,7 +2935,7 @@ export namespace setRoleAdmin {
    *   calls: [
    *     actions.token.setRoleAdmin.call({
    *       token: '0x20c0...babe',
-   *       role: 'minter',
+   *       role: 'issuer',
    *       adminRole: 'admin',
    *     }),
    *   ]
@@ -2992,7 +2992,7 @@ export namespace setRoleAdmin {
  *
  * const result = await Actions.token.setRoleAdminSync(client, {
  *   token: '0x...',
- *   role: 'minter',
+ *   role: 'issuer',
  *   adminRole: 'admin',
  * })
  * ```

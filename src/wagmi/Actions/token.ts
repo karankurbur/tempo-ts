@@ -988,7 +988,7 @@ export namespace getMetadata {
  * })
  *
  * const adminRole = await Actions.token.getRoleAdmin(config, {
- *   role: 'minter',
+ *   role: 'issuer',
  *   token: '0x...',
  * })
  * ```

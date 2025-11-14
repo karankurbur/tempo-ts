@@ -2185,7 +2185,7 @@ export type Decorator<
      * }).extend(tempoActions())
      *
      * const adminRole = await client.token.getRoleAdmin({
-     *   role: 'minter',
+     *   role: 'issuer',
      *   token: '0x...',
      * })
      * ```
@@ -2245,7 +2245,7 @@ export type Decorator<
      * const hash = await client.token.grantRoles({
      *   token: '0x...',
      *   to: '0x...',
-     *   roles: ['minter'],
+     *   roles: ['issuer'],
      * })
      * ```
      *
@@ -2275,7 +2275,7 @@ export type Decorator<
      * const result = await client.token.grantRolesSync({
      *   token: '0x...',
      *   to: '0x...',
-     *   roles: ['minter'],
+     *   roles: ['issuer'],
      * })
      * ```
      *
@@ -2419,7 +2419,7 @@ export type Decorator<
      *
      * const hash = await client.token.renounceRoles({
      *   token: '0x...',
-     *   roles: ['minter'],
+     *   roles: ['issuer'],
      * })
      * ```
      *
@@ -2448,7 +2448,7 @@ export type Decorator<
      *
      * const result = await client.token.renounceRolesSync({
      *   token: '0x...',
-     *   roles: ['minter'],
+     *   roles: ['issuer'],
      * })
      * ```
      *
@@ -2477,7 +2477,7 @@ export type Decorator<
      * const hash = await client.token.revokeRoles({
      *   token: '0x...',
      *   from: '0x...',
-     *   roles: ['minter'],
+     *   roles: ['issuer'],
      * })
      * ```
      *
@@ -2507,7 +2507,7 @@ export type Decorator<
      * const result = await client.token.revokeRolesSync({
      *   token: '0x...',
      *   from: '0x...',
-     *   roles: ['minter'],
+     *   roles: ['issuer'],
      * })
      * ```
      *
@@ -2593,7 +2593,7 @@ export type Decorator<
      *
      * const hash = await client.token.setRoleAdmin({
      *   token: '0x...',
-     *   role: 'minter',
+     *   role: 'issuer',
      *   adminRole: 'admin',
      * })
      * ```
@@ -2623,7 +2623,7 @@ export type Decorator<
      *
      * const result = await client.token.setRoleAdminSync({
      *   token: '0x...',
-     *   role: 'minter',
+     *   role: 'issuer',
      *   adminRole: 'admin',
      * })
      * ```

@@ -1030,7 +1030,7 @@ export declare namespace useGetMetadata {
  *
  * function App() {
  *   const { data, isLoading } = Hooks.token.useGetRoleAdmin({
- *     role: 'minter',
+ *     role: 'issuer',
  *     token: '0x...',
  *   })
  *
