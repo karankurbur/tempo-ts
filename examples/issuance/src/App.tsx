@@ -1,6 +1,5 @@
-import * as React from 'react'
 import { Hooks } from 'tempo.ts/wagmi'
-import { formatUnits, pad, parseUnits, stringToHex } from 'viem'
+import { type Address, formatUnits, pad, parseUnits, stringToHex } from 'viem'
 import {
   useAccount,
   useConnect,
@@ -23,7 +22,7 @@ export function App() {
           <Account />
           <h2>Balance</h2>
           <Balance />
-          <h2>Create Stablecoin</h2>
+
           <CreateStablecoin />
         </>
       ) : (
@@ -95,7 +94,6 @@ export function Balance() {
 
   useWatchBlockNumber({
     onBlockNumber() {
-      console.log('refetching balance')
       balance.refetch()
     },
   })
@@ -124,6 +122,8 @@ export function CreateStablecoin() {
 
   return (
     <div>
+      <h2>Create Stablecoin</h2>
+
       <form
         onSubmit={(event) => {
           event.preventDefault()
@@ -158,23 +158,28 @@ export function CreateStablecoin() {
           </a>
         </div>
       )}
+
+      {create.data?.token && <GrantTokenRoles token={create.data.token} />}
     </div>
   )
 }
 
-export function GrantTokenRoles() {
+export function GrantTokenRoles(props: { token: Address }) {
+  const { token } = props
   const { address } = useAccount()
-  const tokenAddress = '0x20c0000000000000000000000000000000000004'
 
   const grant = Hooks.token.useGrantRolesSync()
 
+  if (!address) return null
   return (
     <div>
+      <h2>Grant Issuer Role</h2>
+
       <button
         disabled={!address}
         onClick={() =>
           grant.mutate({
-            token: tokenAddress,
+            token,
             roles: ['issuer'],
             to: address,
             feeToken: alphaUsd,
@@ -182,7 +187,7 @@ export function GrantTokenRoles() {
         }
         type="button"
       >
-        Grant
+        Grant to self
       </button>
       {grant.data && (
         <div>
@@ -195,67 +200,64 @@ export function GrantTokenRoles() {
           </a>
         </div>
       )}
+
+      {grant.isSuccess && <MintToken token={token} />}
     </div>
   )
 }
 
-export function MintToken() {
+export function MintToken(props: { token: Address }) {
+  const { token } = props
   const { address } = useAccount()
-  const tokenAddress = '0x20c0000000000000000000000000000000000004'
-
-  const [recipient, setRecipient] = React.useState<string>('')
-  const [memo, setMemo] = React.useState<string>('')
 
   const metadata = Hooks.token.useGetMetadata({
-    token: tokenAddress,
+    token,
   })
   const mint = Hooks.token.useMintSync()
 
   return (
     <div>
-      <label htmlFor="recipient">Recipient address</label>
-      <input
-        type="text"
-        name="recipient"
-        value={recipient}
-        onChange={(e) => setRecipient(e.target.value)}
-        placeholder="0x..."
-      />
-      <label htmlFor="memo">Memo (optional)</label>
-      <input
-        type="text"
-        name="memo"
-        value={memo}
-        onChange={(e) => setMemo(e.target.value)}
-        placeholder="INV-12345"
-      />
-      <button
-        disabled={!address}
-        onClick={() =>
+      <h2>Issue Stablecoin</h2>
+
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          const formData = new FormData(event.target as HTMLFormElement)
+          const recipient = formData.get('recipient') as `0x${string}`
+          const memo = formData.get('memo') as string
+
+          if (!recipient) throw new Error('Recipient is required')
+          if (!metadata.data?.decimals)
+            throw new Error('metadata.decimals not found')
+
           mint.mutate({
-            amount: parseUnits('100', metadata.decimals),
+            amount: parseUnits('100', metadata.data?.decimals),
             to: recipient,
-            token: tokenAddress,
+            token,
             memo: memo ? pad(stringToHex(memo), { size: 32 }) : undefined,
             feeToken: alphaUsd,
           })
-        }
-        type="button"
-        className="text-[14px] -tracking-[2%] font-normal"
+        }}
       >
-        Mint
-      </button>
-      {mint.data && (
-        <div>
-          <a
-            href={`https://explore.tempo.xyz/tx/${mint.data.receipt.transactionHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View receipt
-          </a>
-        </div>
-      )}
+        <label htmlFor="recipient">Recipient address</label>
+        <input type="text" name="recipient" placeholder="0x..." />
+        <label htmlFor="memo">Memo (optional)</label>
+        <input type="text" name="memo" placeholder="INV-12345" />
+        <button disabled={!address} type="submit">
+          Mint
+        </button>
+        {mint.data && (
+          <div>
+            <a
+              href={`https://explore.tempo.xyz/tx/${mint.data.receipt.transactionHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View receipt
+            </a>
+          </div>
+        )}
+      </form>
     </div>
   )
 }

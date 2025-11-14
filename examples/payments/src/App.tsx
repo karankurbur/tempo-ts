@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Hooks } from 'tempo.ts/wagmi'
 import { formatUnits, pad, parseUnits, stringToHex } from 'viem'
 import {
@@ -97,8 +96,8 @@ export function Balance({
   alphaUsdBalance,
   betaUsdBalance,
 }: {
-  alphaUsdBalance: ReturnType<typeof Hooks.token.useGetBalance>
-  betaUsdBalance: ReturnType<typeof Hooks.token.useGetBalance>
+  alphaUsdBalance: Hooks.token.useGetBalance.ReturnValue
+  betaUsdBalance: Hooks.token.useGetBalance.ReturnValue
 }) {
   // Fetch metadata
   const alphaUsdMetadata = Hooks.token.useGetMetadata({
@@ -133,7 +132,7 @@ export function Balance({
         <div>
           <strong>{betaUsdMetadata.data?.name} Balance: </strong>
           {formatUnits(
-            betaUsdBalance.data as bigint,
+            betaUsdBalance.data ?? 0n,
             betaUsdMetadata.data?.decimals ?? 6,
           )}{' '}
           {betaUsdMetadata.data?.symbol}
@@ -174,47 +173,40 @@ export function FundAccount() {
 }
 
 export function SendPayment() {
-  const [recipient, setRecipient] = React.useState<string>('')
-  const [memo, setMemo] = React.useState<string>('')
   const sendPayment = Hooks.token.useTransferSync()
   const metadata = Hooks.token.useGetMetadata({
     token: alphaUsd,
   })
 
   return (
-    <div>
-      <div className="flex flex-col flex-2">
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        const formData = new FormData(event.target as HTMLFormElement)
+        const recipient = formData.get('recipient') as `0x${string}`
+        const memo = formData.get('memo') as string
+
+        if (!recipient) throw new Error('Recipient is required')
+        if (!metadata.data?.decimals)
+          throw new Error('metadata.decimals not found')
+
+        sendPayment.mutate({
+          amount: parseUnits('100', metadata.data.decimals),
+          to: recipient,
+          token: alphaUsd,
+          memo: memo ? pad(stringToHex(memo), { size: 32 }) : undefined,
+        })
+      }}
+    >
+      <div>
         <label htmlFor="recipient">Recipient address</label>
-        <input
-          type="text"
-          name="recipient"
-          value={recipient}
-          onChange={(e) => setRecipient(e.target.value)}
-          placeholder="0x..."
-        />
+        <input type="text" name="recipient" placeholder="0x..." />
       </div>
-      <div className="flex flex-col flex-1">
+      <div>
         <label htmlFor="memo">Memo (optional)</label>
-        <input
-          type="text"
-          name="memo"
-          value={memo}
-          onChange={(e) => setMemo(e.target.value)}
-          placeholder="INV-12345"
-        />
+        <input type="text" name="memo" placeholder="INV-12345" />
       </div>
-      <button
-        disabled={sendPayment.isPending}
-        type="button"
-        onClick={() =>
-          sendPayment.mutate({
-            amount: parseUnits('100', metadata.data?.decimals ?? 6),
-            to: recipient,
-            token: alphaUsd,
-            memo: memo ? pad(stringToHex(memo), { size: 32 }) : undefined,
-          })
-        }
-      >
+      <button disabled={sendPayment.isPending} type="submit">
         Send
       </button>
       {sendPayment.data && (
@@ -226,69 +218,56 @@ export function SendPayment() {
           View receipt
         </a>
       )}
-    </div>
+    </form>
   )
 }
 
 export function SendPaymentWithFeeToken() {
-  const [recipient, setRecipient] = React.useState<string>('')
-  const [memo, setMemo] = React.useState<string>('')
-  const [feeToken, setFeeToken] = React.useState<
-    typeof alphaUsd | typeof betaUsd
-  >(alphaUsd)
   const sendPayment = Hooks.token.useTransferSync()
   const metadata = Hooks.token.useGetMetadata({
     token: alphaUsd,
   })
 
   return (
-    <div>
-      <div className="flex flex-col flex-2">
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        const formData = new FormData(event.target as HTMLFormElement)
+        const recipient = formData.get('recipient') as `0x${string}`
+        const memo = formData.get('memo') as string
+        const feeToken = formData.get('feeToken') as
+          | typeof alphaUsd
+          | typeof betaUsd
+
+        if (!recipient) throw new Error('Recipient is required')
+        if (!metadata.data?.decimals)
+          throw new Error('metadata.decimals not found')
+
+        sendPayment.mutate({
+          amount: parseUnits('100', metadata.data.decimals),
+          to: recipient,
+          token: alphaUsd,
+          memo: memo ? pad(stringToHex(memo), { size: 32 }) : undefined,
+          feeToken,
+        })
+      }}
+    >
+      <div>
         <label htmlFor="recipient">Recipient address</label>
-        <input
-          type="text"
-          name="recipient"
-          value={recipient}
-          onChange={(e) => setRecipient(e.target.value)}
-          placeholder="0x..."
-        />
+        <input type="text" name="recipient" placeholder="0x..." />
       </div>
-      <div className="flex flex-col flex-1">
+      <div>
         <label htmlFor="memo">Memo (optional)</label>
-        <input
-          type="text"
-          name="memo"
-          value={memo}
-          onChange={(e) => setMemo(e.target.value)}
-          placeholder="INV-12345"
-        />
+        <input type="text" name="memo" placeholder="INV-12345" />
       </div>
       <div className="flex flex-col flex-1">
         <label htmlFor="feeToken">Fee Token</label>
-        <select
-          name="feeToken"
-          value={feeToken}
-          onChange={(e) =>
-            setFeeToken(e.target.value as typeof alphaUsd | typeof betaUsd)
-          }
-        >
+        <select name="feeToken">
           <option value={alphaUsd}>Alpha USD</option>
           <option value={betaUsd}>Beta USD</option>
         </select>
       </div>
-      <button
-        disabled={sendPayment.isPending}
-        type="button"
-        onClick={() =>
-          sendPayment.mutate({
-            amount: parseUnits('100', metadata.data?.decimals ?? 6),
-            to: recipient,
-            token: alphaUsd,
-            memo: memo ? pad(stringToHex(memo), { size: 32 }) : undefined,
-            feeToken: feeToken,
-          })
-        }
-      >
+      <button disabled={sendPayment.isPending} type="submit">
         Send
       </button>
       {sendPayment.data && (
@@ -300,6 +279,6 @@ export function SendPaymentWithFeeToken() {
           View receipt
         </a>
       )}
-    </div>
+    </form>
   )
 }

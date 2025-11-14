@@ -270,6 +270,8 @@ export function webAuthn(options: webAuthn.Parameters = {}) {
           credential ??= await WebAuthnP256.getCredential({
             ...(options.getOptions ?? {}),
             credentialId: lastActiveCredential?.id,
+            // biome-ignore lint/suspicious/noTsIgnore: _
+            // @ts-ignore
             async getPublicKey(credential) {
               {
                 const publicKey =
