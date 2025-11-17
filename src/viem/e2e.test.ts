@@ -2,29 +2,21 @@ import * as Http from 'node:http'
 import { createRequestListener } from '@remix-run/node-fetch-server'
 import { RpcRequest, RpcResponse, WebCryptoP256 } from 'ox'
 import { Account, Transaction } from 'tempo.ts/viem'
-import {
-  createClient,
-  http,
-  parseUnits,
-  publicActions,
-  walletActions,
-} from 'viem'
+import { http, parseGwei, publicActions, walletActions } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest'
+import { fetchOptions, rpcUrl } from '../../test/config.js'
 import {
   accounts,
-  addresses,
-  rpcUrl,
-  tempoTest,
+  client as client_,
+  fundAddress,
+  getClient,
 } from '../../test/viem/config.js'
 import * as actions from './Actions/index.js'
 import { tempoActions } from './index.js'
 import { withFeePayer } from './Transport.js'
 
-const client = createClient({
-  chain: tempoTest({ feeToken: 1n }),
-  transport: http(),
-})
+const client = client_
   .extend(publicActions)
   .extend(walletActions)
   .extend(tempoActions())
@@ -37,17 +29,36 @@ describe('sendTransaction', () => {
       const hash = await client.sendTransaction({
         account,
         data: '0xdeadbeef',
-        feeToken: '0x20c0000000000000000000000000000000000001',
         to: '0x0000000000000000000000000000000000000000',
       })
       await client.waitForTransactionReceipt({ hash })
 
       const {
-        blockHash: _,
-        blockNumber: __,
+        blockHash,
+        blockNumber,
+        chainId,
+        from,
+        gas,
+        gasPrice,
+        hash: hash_,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
         ...transaction
       } = await client.getTransaction({ hash })
 
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(chainId).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash_).toBe(hash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -60,27 +71,11 @@ describe('sendTransaction', () => {
               "value": 0n,
             },
           ],
-          "chainId": 1337,
           "data": undefined,
           "feePayerSignature": undefined,
           "feeToken": "0x20c0000000000000000000000000000000000001",
-          "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-          "gas": 24002n,
-          "gasPrice": 10000000000n,
-          "hash": "0x19ffdd8817d0180edc18be1ab5001445eaf267713e8d5f9e87e9b481413aca46",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 0,
           "nonceKey": 0n,
-          "signature": {
-            "signature": {
-              "r": 18480044007397695090640579354047056183881606998783899463314972543335313635471n,
-              "s": 7944214793912353709460484452936700808754473617494909879093391150696529863949n,
-              "yParity": 1,
-            },
-            "type": "secp256k1",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -95,8 +90,10 @@ describe('sendTransaction', () => {
     })
 
     test('with calls', async () => {
+      const account = accounts[0]
+
       const hash = await client.sendTransaction({
-        account: accounts[0],
+        account,
         calls: [
           actions.token.create.call({
             admin: accounts[0].address,
@@ -108,46 +105,44 @@ describe('sendTransaction', () => {
       })
       await client.waitForTransactionReceipt({ hash })
 
-      const transaction = await client.getTransaction({ hash })
-      expect({
-        ...transaction,
-        blockHash: undefined,
-        blockNumber: undefined,
-      }).toMatchInlineSnapshot(`
+      const {
+        blockHash,
+        blockNumber,
+        calls,
+        chainId,
+        from,
+        gas,
+        gasPrice,
+        hash: hash_,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
+        ...transaction
+      } = await client.getTransaction({ hash })
+
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(calls?.length).toBe(1)
+      expect(chainId).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash_).toBe(hash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
+      expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
           "accessList": [],
           "authorizationList": undefined,
-          "blockHash": undefined,
-          "blockNumber": undefined,
-          "calls": [
-            {
-              "data": "0xb395b9ac00000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000012000000000000000000000000020c0000000000000000000000000000000000000000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266000000000000000000000000000000000000000000000000000000000000000c5465737420546f6b656e203300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005544553543300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000035553440000000000000000000000000000000000000000000000000000000000",
-              "to": "0x20fc000000000000000000000000000000000000",
-              "value": 0n,
-            },
-          ],
-          "chainId": 1337,
           "data": undefined,
           "feePayerSignature": undefined,
           "feeToken": "0x20c0000000000000000000000000000000000001",
-          "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-          "gas": 217317n,
-          "gasPrice": 10000000000n,
-          "hash": "0x5644cb4aca7b42c7f4d28c324b9cbc4d0ba4ff3aeddbe41fa418a5966923ab36",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 1,
           "nonceKey": 0n,
-          "signature": {
-            "signature": {
-              "r": 1770799250379385769866461071353582741695856909786638355195145760341199788761n,
-              "s": 52417275998342468381261131517961079083566057345688940928298921493890348732163n,
-              "yParity": 1,
-            },
-            "type": "secp256k1",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -176,11 +171,35 @@ describe('sendTransaction', () => {
       await client.waitForTransactionReceipt({ hash })
 
       const {
-        blockHash: _,
-        blockNumber: __,
+        blockHash,
+        blockNumber,
+        chainId,
+        feePayer: feePayer_,
+        feePayerSignature,
+        from,
+        gas,
+        gasPrice,
+        hash: hash_,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
         ...transaction
       } = await client.getTransaction({ hash })
 
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(chainId).toBeDefined()
+      expect(feePayer_).toBe(feePayer.address.toLowerCase())
+      expect(feePayerSignature).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash_).toBe(hash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -193,33 +212,10 @@ describe('sendTransaction', () => {
               "value": 0n,
             },
           ],
-          "chainId": 1337,
           "data": undefined,
-          "feePayer": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-          "feePayerSignature": {
-            "r": "0x8f719d9463938d85897ee74b518c4121995791c59873199e2bbc1d9d69a458b6",
-            "s": "0x45c622bec0e381c5a06cfe7c5397cace1f7972137cefd1eba87174d7936a689c",
-            "v": 27n,
-            "yParity": 0,
-          },
           "feeToken": null,
-          "from": "0x740474977e01d056f04a314b5537e4dd88f35952",
-          "gas": 23938n,
-          "gasPrice": 10000000000n,
-          "hash": "0x5aae48907ceccf3331f634bf9a76fe51f52576000e4becac929ed04d953fb0bb",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 0,
           "nonceKey": 0n,
-          "signature": {
-            "signature": {
-              "r": 65079212976636076484448674374308068589367423744201870901549594095730781246312n,
-              "s": 36138663572355181246084885182221172668063229180861599797673217267233822764445n,
-              "yParity": 1,
-            },
-            "type": "secp256k1",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -241,12 +237,7 @@ describe('sendTransaction', () => {
       )
 
       // fund account
-      await client.token.transferSync({
-        account: accounts[0],
-        token: addresses.alphaUsd,
-        to: account.address,
-        amount: parseUnits('10000', 6),
-      })
+      await fundAddress(client, { address: account.address })
 
       const receipt = await client.sendTransactionSync({
         account,
@@ -254,20 +245,39 @@ describe('sendTransaction', () => {
         to: '0x0000000000000000000000000000000000000000',
       })
 
-      const transaction = await client.getTransaction({
+      const {
+        blockHash,
+        blockNumber,
+        chainId,
+        from,
+        gas,
+        gasPrice,
+        hash,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
+        ...transaction
+      } = await client.getTransaction({
         hash: receipt.transactionHash,
       })
-      expect({
-        ...transaction,
-        blockHash: undefined,
-        blockNumber: undefined,
-      }).toMatchInlineSnapshot(`
+
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(chainId).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash).toBe(receipt.transactionHash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
+      expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
           "accessList": [],
           "authorizationList": undefined,
-          "blockHash": undefined,
-          "blockNumber": undefined,
           "calls": [
             {
               "data": "0xdeadbeef",
@@ -275,32 +285,11 @@ describe('sendTransaction', () => {
               "value": 0n,
             },
           ],
-          "chainId": 1337,
           "data": undefined,
           "feePayerSignature": undefined,
           "feeToken": "0x20c0000000000000000000000000000000000001",
-          "from": "0xfc39755d501fa7b79164f74efb906e87ecde342c",
-          "gas": 29012n,
-          "gasPrice": 10000000000n,
-          "hash": "0x92497c48650181f386b4daeb3f784620b29af6dea6c8caeb995156f3f75af161",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 0,
           "nonceKey": 0n,
-          "signature": {
-            "prehash": undefined,
-            "publicKey": {
-              "prefix": 4,
-              "x": 76851314197341596384765982852901663495246887984601955818013524729577854391357n,
-              "y": 28479403900638612718017087999484027026245572142646745985103165612268853186552n,
-            },
-            "signature": {
-              "r": 73166565759729379192178736994258501393133045207516873483983141310238393892339n,
-              "s": 9678569667446118283593635726095491566145915132050642248430996816820250471583n,
-            },
-            "type": "p256",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -320,12 +309,7 @@ describe('sendTransaction', () => {
       )
 
       // fund account
-      await client.token.transferSync({
-        account: accounts[0],
-        token: addresses.alphaUsd,
-        to: account.address,
-        amount: parseUnits('10000', 6),
-      })
+      await fundAddress(client, { address: account.address })
 
       const receipt = await client.sendTransactionSync({
         account,
@@ -341,53 +325,46 @@ describe('sendTransaction', () => {
         gas: 100_000n,
       })
 
-      const transaction = await client.getTransaction({
+      const {
+        blockHash,
+        blockNumber,
+        calls,
+        chainId,
+        from,
+        gas,
+        gasPrice,
+        hash,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
+        ...transaction
+      } = await client.getTransaction({
         hash: receipt.transactionHash,
       })
-      expect({
-        ...transaction,
-        blockHash: undefined,
-        blockNumber: undefined,
-      }).toMatchInlineSnapshot(`
+
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(calls?.length).toBe(1)
+      expect(chainId).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash).toBe(receipt.transactionHash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
+      expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
           "accessList": [],
           "authorizationList": undefined,
-          "blockHash": undefined,
-          "blockNumber": undefined,
-          "calls": [
-            {
-              "data": "0xb395b9ac00000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000012000000000000000000000000020c0000000000000000000000000000000000000000000000000000000000000fc39755d501fa7b79164f74efb906e87ecde342c000000000000000000000000000000000000000000000000000000000000000c5465737420546f6b656e203400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005544553543400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000035553440000000000000000000000000000000000000000000000000000000000",
-              "to": "0x20fc000000000000000000000000000000000000",
-              "value": 0n,
-            },
-          ],
-          "chainId": 1337,
           "data": undefined,
           "feePayerSignature": undefined,
           "feeToken": "0x20c0000000000000000000000000000000000001",
-          "from": "0xfc39755d501fa7b79164f74efb906e87ecde342c",
-          "gas": 100000n,
-          "gasPrice": 10000000000n,
-          "hash": "0x42d24b367d36fe86a48a5d3e569a4a7f528eba99c44e17304c6e88ba29e50666",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 1,
           "nonceKey": 0n,
-          "signature": {
-            "prehash": undefined,
-            "publicKey": {
-              "prefix": 4,
-              "x": 76851314197341596384765982852901663495246887984601955818013524729577854391357n,
-              "y": 28479403900638612718017087999484027026245572142646745985103165612268853186552n,
-            },
-            "signature": {
-              "r": 106143051119266858928184523090857221408816991676370960197147810502258413383473n,
-              "s": 49844357009853267306291709813432165511067109946085107128095783518674413076631n,
-            },
-            "type": "p256",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -416,11 +393,35 @@ describe('sendTransaction', () => {
       await client.waitForTransactionReceipt({ hash })
 
       const {
-        blockHash: _,
-        blockNumber: __,
+        blockHash,
+        blockNumber,
+        chainId,
+        feePayer: feePayer_,
+        feePayerSignature,
+        from,
+        gas,
+        gasPrice,
+        hash: hash_,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
         ...transaction
       } = await client.getTransaction({ hash })
 
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(chainId).toBeDefined()
+      expect(feePayer_).toBe(feePayer.address.toLowerCase())
+      expect(feePayerSignature).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash_).toBe(hash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -433,38 +434,10 @@ describe('sendTransaction', () => {
               "value": 0n,
             },
           ],
-          "chainId": 1337,
           "data": undefined,
-          "feePayer": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-          "feePayerSignature": {
-            "r": "0x9d9e74278c306658fff5cca2a736f07c475d3dbe4b931ba73be8543d522b5430",
-            "s": "0x2224242aaf6fa17b8f2266bea1ad501837c2c2ad13e0d96b9ed29ecb60ba1ac4",
-            "v": 27n,
-            "yParity": 0,
-          },
           "feeToken": null,
-          "from": "0x5f704c6c7075acd14ee36527f03b5b5dcb4a966f",
-          "gas": 28947n,
-          "gasPrice": 10000000000n,
-          "hash": "0x77ce7f3b60540465d681b360293aaafca496c0a2ff2a4f5f146f144206a487dd",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 0,
           "nonceKey": 0n,
-          "signature": {
-            "prehash": undefined,
-            "publicKey": {
-              "prefix": 4,
-              "x": 89768657165983002447270155621964907577955735922001002175265262336201091268103n,
-              "y": 21692506528696391747937034302216251793515398807520467579078748804389014172835n,
-            },
-            "signature": {
-              "r": 6861653902973636215987311933940928353425544366774814432483697786223275705586n,
-              "s": 7277254520198161524871116736077233939785567558470334763663181456500888822079n,
-            },
-            "type": "p256",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -485,12 +458,7 @@ describe('sendTransaction', () => {
       const account = Account.fromWebCryptoP256(keyPair)
 
       // fund account
-      await client.token.transferSync({
-        account: accounts[0],
-        token: addresses.alphaUsd,
-        to: account.address,
-        amount: parseUnits('10000', 6),
-      })
+      await fundAddress(client, { address: account.address })
 
       const receipt = await client.sendTransactionSync({
         account,
@@ -498,23 +466,37 @@ describe('sendTransaction', () => {
         to: '0x0000000000000000000000000000000000000000',
       })
 
-      const transaction = await client.getTransaction({
+      const {
+        blockHash,
+        blockNumber,
+        chainId,
+        from,
+        gasPrice,
+        hash,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
+        ...transaction
+      } = await client.getTransaction({
         hash: receipt.transactionHash,
       })
-      expect({
-        ...transaction,
-        blockHash: undefined,
-        blockNumber: undefined,
-        from: undefined,
-        hash: undefined,
-        signature: undefined,
-      }).toMatchInlineSnapshot(`
+
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(chainId).toBeDefined()
+      expect(from).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash).toBe(receipt.transactionHash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
+      expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
           "accessList": [],
           "authorizationList": undefined,
-          "blockHash": undefined,
-          "blockNumber": undefined,
           "calls": [
             {
               "data": "0xdeadbeef",
@@ -522,20 +504,12 @@ describe('sendTransaction', () => {
               "value": 0n,
             },
           ],
-          "chainId": 1337,
           "data": undefined,
           "feePayerSignature": undefined,
           "feeToken": "0x20c0000000000000000000000000000000000001",
-          "from": undefined,
           "gas": 29012n,
-          "gasPrice": 10000000000n,
-          "hash": undefined,
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 0,
           "nonceKey": 0n,
-          "signature": undefined,
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -554,12 +528,7 @@ describe('sendTransaction', () => {
       const account = Account.fromWebCryptoP256(keyPair)
 
       // fund account
-      await client.token.transferSync({
-        account: accounts[0],
-        token: addresses.alphaUsd,
-        to: account.address,
-        amount: parseUnits('10000', 6),
-      })
+      await fundAddress(client, { address: account.address })
 
       const receipt = await client.sendTransactionSync({
         account,
@@ -575,9 +544,36 @@ describe('sendTransaction', () => {
         gas: 100_000n,
       })
 
-      const transaction = await client.getTransaction({
+      const {
+        blockHash,
+        blockNumber,
+        calls,
+        chainId,
+        from,
+        gas,
+        gasPrice,
+        hash,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
+        ...transaction
+      } = await client.getTransaction({
         hash: receipt.transactionHash,
       })
+
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(calls?.length).toBe(1)
+      expect(chainId).toBeDefined()
+      expect(from).toBeDefined()
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash).toBe(receipt.transactionHash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
       expect(transaction).toBeDefined()
     })
 
@@ -593,7 +589,30 @@ describe('sendTransaction', () => {
       })
       await client.waitForTransactionReceipt({ hash })
 
-      const transaction = await client.getTransaction({ hash })
+      const {
+        blockHash,
+        blockNumber,
+        chainId,
+        from,
+        gasPrice,
+        hash: hash_,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
+        ...transaction
+      } = await client.getTransaction({ hash })
+
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(chainId).toBeDefined()
+      expect(from).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash_).toBe(hash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
       expect(transaction).toBeDefined()
     })
   })
@@ -609,12 +628,7 @@ describe('sendTransaction', () => {
       )
 
       // fund account
-      await client.token.transferSync({
-        account: accounts[0],
-        token: addresses.alphaUsd,
-        to: account.address,
-        amount: parseUnits('10000', 6),
-      })
+      await fundAddress(client, { address: account.address })
 
       const receipt = await client.sendTransactionSync({
         account,
@@ -622,20 +636,39 @@ describe('sendTransaction', () => {
         to: '0x0000000000000000000000000000000000000000',
       })
 
-      const transaction = await client.getTransaction({
+      const {
+        blockHash,
+        blockNumber,
+        chainId,
+        from,
+        gas,
+        gasPrice,
+        hash,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
+        ...transaction
+      } = await client.getTransaction({
         hash: receipt.transactionHash,
       })
-      expect({
-        ...transaction,
-        blockHash: undefined,
-        blockNumber: undefined,
-      }).toMatchInlineSnapshot(`
+
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(chainId).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash).toBe(receipt.transactionHash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
+      expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
           "accessList": [],
           "authorizationList": undefined,
-          "blockHash": undefined,
-          "blockNumber": undefined,
           "calls": [
             {
               "data": "0xdeadbeef",
@@ -643,35 +676,11 @@ describe('sendTransaction', () => {
               "value": 0n,
             },
           ],
-          "chainId": 1337,
           "data": undefined,
           "feePayerSignature": undefined,
           "feeToken": "0x20c0000000000000000000000000000000000001",
-          "from": "0xfc39755d501fa7b79164f74efb906e87ecde342c",
-          "gas": 41404n,
-          "gasPrice": 10000000000n,
-          "hash": "0x0f9754978f1533d5e8a94c8f6e564150b8ca560a145d7adbafa95537cdd661e0",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 2,
           "nonceKey": 0n,
-          "signature": {
-            "metadata": {
-              "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000",
-              "clientDataJSON": "{"type":"webauthn.get","challenge":"pGxfglkRHnxAvl1iNopy9f3dCpA0yOtMWD52o4QjFIM","origin":"http://localhost","crossOrigin":false}",
-            },
-            "publicKey": {
-              "prefix": 4,
-              "x": 76851314197341596384765982852901663495246887984601955818013524729577854391357n,
-              "y": 28479403900638612718017087999484027026245572142646745985103165612268853186552n,
-            },
-            "signature": {
-              "r": 46181083089071531854644596388726939003590007726502882093676118825353436035851n,
-              "s": 40251117141811933316754610200955094367484007878478703779665518197624832232922n,
-            },
-            "type": "webAuthn",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -695,12 +704,7 @@ describe('sendTransaction', () => {
       )
 
       // fund account
-      await client.token.transferSync({
-        account: accounts[0],
-        token: addresses.alphaUsd,
-        to: account.address,
-        amount: parseUnits('10000', 6),
-      })
+      await fundAddress(client, { address: account.address })
 
       const receipt = await client.sendTransactionSync({
         account,
@@ -716,56 +720,46 @@ describe('sendTransaction', () => {
         gas: 100_000n,
       })
 
-      const transaction = await client.getTransaction({
+      const {
+        blockHash,
+        blockNumber,
+        calls,
+        chainId,
+        from,
+        gas,
+        gasPrice,
+        hash,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
+        ...transaction
+      } = await client.getTransaction({
         hash: receipt.transactionHash,
       })
-      expect({
-        ...transaction,
-        blockHash: undefined,
-        blockNumber: undefined,
-      }).toMatchInlineSnapshot(`
+
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(calls?.length).toBe(1)
+      expect(chainId).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash).toBe(receipt.transactionHash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
+      expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
           "accessList": [],
           "authorizationList": undefined,
-          "blockHash": undefined,
-          "blockNumber": undefined,
-          "calls": [
-            {
-              "data": "0xb395b9ac00000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000012000000000000000000000000020c0000000000000000000000000000000000000000000000000000000000000fc39755d501fa7b79164f74efb906e87ecde342c000000000000000000000000000000000000000000000000000000000000000c5465737420546f6b656e203600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005544553543600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000035553440000000000000000000000000000000000000000000000000000000000",
-              "to": "0x20fc000000000000000000000000000000000000",
-              "value": 0n,
-            },
-          ],
-          "chainId": 1337,
           "data": undefined,
           "feePayerSignature": undefined,
           "feeToken": "0x20c0000000000000000000000000000000000001",
-          "from": "0xfc39755d501fa7b79164f74efb906e87ecde342c",
-          "gas": 100000n,
-          "gasPrice": 10000000000n,
-          "hash": "0x9e431e3d0b4a04c5779d0918b1d3140429530c19cada91e5da2eb66edcd77efa",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 3,
           "nonceKey": 0n,
-          "signature": {
-            "metadata": {
-              "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000",
-              "clientDataJSON": "{"type":"webauthn.get","challenge":"DAabvi2LJ45ESyCwmmyBACb6VS9MdItb_FksnNfg2ZI","origin":"http://localhost","crossOrigin":false}",
-            },
-            "publicKey": {
-              "prefix": 4,
-              "x": 76851314197341596384765982852901663495246887984601955818013524729577854391357n,
-              "y": 28479403900638612718017087999484027026245572142646745985103165612268853186552n,
-            },
-            "signature": {
-              "r": 89695469468583132282454887497226949335068684032456007061013932756262487728086n,
-              "s": 30364371922186410926529917972734911437767801874356315397917029751067680712123n,
-            },
-            "type": "webAuthn",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -798,11 +792,35 @@ describe('sendTransaction', () => {
       await client.waitForTransactionReceipt({ hash })
 
       const {
-        blockHash: _,
-        blockNumber: __,
+        blockHash,
+        blockNumber,
+        chainId,
+        feePayer: feePayer_,
+        feePayerSignature,
+        from,
+        gas,
+        gasPrice,
+        hash: hash_,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
         ...transaction
       } = await client.getTransaction({ hash })
 
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(chainId).toBeDefined()
+      expect(feePayer_).toBe(feePayer.address.toLowerCase())
+      expect(feePayerSignature).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash_).toBe(hash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -815,41 +833,10 @@ describe('sendTransaction', () => {
               "value": 0n,
             },
           ],
-          "chainId": 1337,
           "data": undefined,
-          "feePayer": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-          "feePayerSignature": {
-            "r": "0x90b71f46a775d5ca06725fcef4fe4763b4dce34bb72cde30a527ec26407baa84",
-            "s": "0x398d0192f02d503b5463b1f886790eee882f2329e7af44b8106f27930735041d",
-            "v": 28n,
-            "yParity": 1,
-          },
           "feeToken": null,
-          "from": "0x5f704c6c7075acd14ee36527f03b5b5dcb4a966f",
-          "gas": 41340n,
-          "gasPrice": 10000000000n,
-          "hash": "0x6f6801526c00fba8e107e5064758bd20a978f3952b144f6c52bab1abfc913143",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 1,
           "nonceKey": 0n,
-          "signature": {
-            "metadata": {
-              "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000",
-              "clientDataJSON": "{"type":"webauthn.get","challenge":"dVrVJFewcT_ifvpphKoheG6VSAQJ_74h6g3O32Rri2Q","origin":"http://localhost","crossOrigin":false}",
-            },
-            "publicKey": {
-              "prefix": 4,
-              "x": 89768657165983002447270155621964907577955735922001002175265262336201091268103n,
-              "y": 21692506528696391747937034302216251793515398807520467579078748804389014172835n,
-            },
-            "signature": {
-              "r": 72341690970159629319932745028286754044171557161564831284038819357806396549916n,
-              "s": 47900412910547062549030763809045404303050255516583713899170528571925897239021n,
-            },
-            "type": "webAuthn",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -879,13 +866,13 @@ describe('signTransaction', () => {
       feePayer: true,
       to: '0xcafebabecafebabecafebabecafebabecafebabe',
     })
-    let transaction = await client.signTransaction(request)
+    let transaction = await client.signTransaction(request as never)
 
     transaction = await client.signTransaction({
       ...Transaction.deserialize(transaction),
       account,
       feePayer,
-    })
+    } as never)
     const hash = await client.sendRawTransaction({
       serializedTransaction: transaction,
     })
@@ -893,11 +880,33 @@ describe('signTransaction', () => {
     await client.waitForTransactionReceipt({ hash })
 
     const {
-      blockHash: _,
-      blockNumber: __,
+      blockHash,
+      blockNumber,
+      chainId,
+      feePayer: feePayer_,
+      feePayerSignature,
+      from,
+      gasPrice,
+      hash: hash_,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+      nonce,
+      signature,
       ...transaction2
     } = await client.getTransaction({ hash })
 
+    expect(blockHash).toBeDefined()
+    expect(blockNumber).toBeDefined()
+    expect(chainId).toBeDefined()
+    expect(feePayer_).toBe(feePayer.address.toLowerCase())
+    expect(feePayerSignature).toBeDefined()
+    expect(from).toBe(account.address.toLowerCase())
+    expect(gasPrice).toBeDefined()
+    expect(hash_).toBe(hash)
+    expect(maxFeePerGas).toBeDefined()
+    expect(maxPriorityFeePerGas).toBeDefined()
+    expect(nonce).toBeDefined()
+    expect(signature).toBeDefined()
     expect(transaction2).toMatchInlineSnapshot(`
       {
         "aaAuthorizationList": [],
@@ -910,33 +919,11 @@ describe('signTransaction', () => {
             "value": 0n,
           },
         ],
-        "chainId": 1337,
         "data": undefined,
-        "feePayer": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-        "feePayerSignature": {
-          "r": "0x669793cc2483931ffe3141aab062c7f69d3d16d15003c1192ca944b019ef445a",
-          "s": "0x037cce00c3e94063ef98c4a55e9b11cdfc826ddae125d42cf679a6fcd1c8fef9",
-          "v": 28n,
-          "yParity": 1,
-        },
         "feeToken": null,
-        "from": "0x740474977e01d056f04a314b5537e4dd88f35952",
         "gas": 24002n,
-        "gasPrice": 10000000000n,
-        "hash": "0xb0abd89951c7d053af43c7684859a604b381680dc8521e41e57a2412cef13211",
         "maxFeePerBlobGas": undefined,
-        "maxFeePerGas": 12000000000n,
-        "maxPriorityFeePerGas": 0n,
-        "nonce": 1,
         "nonceKey": 0n,
-        "signature": {
-          "signature": {
-            "r": 67093125285953111322286487053649634901104592648978739500209237696329559594663n,
-            "s": 23307791115004510736003345595881666676393686556128238040992902553893261582309n,
-            "yParity": 0,
-          },
-          "type": "secp256k1",
-        },
         "to": null,
         "transactionIndex": 1,
         "type": "aa",
@@ -952,9 +939,11 @@ describe('signTransaction', () => {
 })
 
 describe('relay', () => {
-  const client = createClient({
-    chain: tempoTest({ feeToken: 1n }),
-    transport: withFeePayer(http(), http('http://localhost:3000')),
+  const client = getClient({
+    transport: withFeePayer(
+      http(undefined, { fetchOptions }),
+      http('http://localhost:3050'),
+    ),
   })
     .extend(tempoActions())
     .extend(walletActions)
@@ -968,10 +957,8 @@ describe('relay', () => {
   beforeAll(async () => {
     server = Http.createServer(
       createRequestListener(async (r) => {
-        const client = createClient({
+        const client = getClient({
           account: accounts[0],
-          chain: tempoTest({ feeToken: 1n }),
-          transport: http(),
         }).extend(walletActions)
 
         const request = RpcRequest.from(await r.json())
@@ -1017,7 +1004,7 @@ describe('relay', () => {
 
         return Response.json(RpcResponse.from({ result }, { request }))
       }),
-    ).listen(3000)
+    ).listen(3050)
   })
 
   afterAll(() => {
@@ -1041,6 +1028,7 @@ describe('relay', () => {
 
       const { receipt } = await client.fee.setUserTokenSync({
         account,
+        maxFeePerGas: parseGwei('20'),
         feePayer: true,
         token: 1n,
       })
@@ -1054,11 +1042,35 @@ describe('relay', () => {
       `)
 
       const {
-        blockHash: _,
-        blockNumber: __,
+        blockHash,
+        blockNumber,
+        chainId,
+        feePayer,
+        feePayerSignature,
+        from,
+        gas,
+        gasPrice,
+        hash,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
         ...transaction
       } = await client.getTransaction({ hash: receipt.transactionHash })
 
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(chainId).toBeDefined()
+      expect(feePayer).toBe(accounts[0].address.toLowerCase())
+      expect(feePayerSignature).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash).toBe(receipt.transactionHash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -1071,33 +1083,10 @@ describe('relay', () => {
               "value": 0n,
             },
           ],
-          "chainId": 1337,
           "data": undefined,
-          "feePayer": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-          "feePayerSignature": {
-            "r": "0x57f6f6777f1689f87c333d1fa37207cf668b2c2d7321dcd5c63a2e6a7108077e",
-            "s": "0x3c4270f67d8add0b5e7a9de6fee2b915cd754e1c0495ee88a1b78fd7568e6619",
-            "v": 28n,
-            "yParity": 1,
-          },
           "feeToken": null,
-          "from": "0x740474977e01d056f04a314b5537e4dd88f35952",
-          "gas": 47825n,
-          "gasPrice": 10000000000n,
-          "hash": "0xd8429515914095d1093e6cd0cace8a06890ed5a2e4e3c775f3196ec78b4fa75d",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 2,
           "nonceKey": 0n,
-          "signature": {
-            "signature": {
-              "r": 3978685029830144709654747044848526179202245954092725489802520292215589805538n,
-              "s": 13481864494883849326291583961518021266257348574613329487348338733748737047938n,
-              "yParity": 1,
-            },
-            "type": "secp256k1",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -1133,11 +1122,35 @@ describe('relay', () => {
       `)
 
       const {
-        blockHash: _,
-        blockNumber: __,
+        blockHash,
+        blockNumber,
+        chainId,
+        feePayer,
+        feePayerSignature,
+        from,
+        gas,
+        gasPrice,
+        hash,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
         ...transaction
       } = await client.getTransaction({ hash: receipt.transactionHash })
 
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(chainId).toBeDefined()
+      expect(feePayer).toBe(accounts[0].address.toLowerCase())
+      expect(feePayerSignature).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash).toBe(receipt.transactionHash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -1150,38 +1163,10 @@ describe('relay', () => {
               "value": 0n,
             },
           ],
-          "chainId": 1337,
           "data": undefined,
-          "feePayer": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-          "feePayerSignature": {
-            "r": "0x44507c3e9e4df1dff5f54ca012c69b2556e5395d9166b3b4594181e4e656a1cc",
-            "s": "0x5ba80c21e194089173ffaed7c12a627f611d5fba846c84e2f6f83d55353f01d2",
-            "v": 28n,
-            "yParity": 1,
-          },
           "feeToken": null,
-          "from": "0x5f704c6c7075acd14ee36527f03b5b5dcb4a966f",
-          "gas": 53231n,
-          "gasPrice": 10000000000n,
-          "hash": "0xb6848050598c30b26855673a029127a5532885dd44719894f0ac1c6ce380cffe",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 0,
           "nonceKey": 0n,
-          "signature": {
-            "prehash": undefined,
-            "publicKey": {
-              "prefix": 4,
-              "x": 89768657165983002447270155621964907577955735922001002175265262336201091268103n,
-              "y": 21692506528696391747937034302216251793515398807520467579078748804389014172835n,
-            },
-            "signature": {
-              "r": 50668837405839025212455471714452555085562104168132337639876146018573466159747n,
-              "s": 27497318506208669156329628613746311078142570431871623594260715714766657455474n,
-            },
-            "type": "p256",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",
@@ -1218,6 +1203,7 @@ describe('relay', () => {
       const transaction = await client.getTransaction({
         hash: receipt.transactionHash,
       })
+
       expect(transaction).toBeDefined()
     })
   })
@@ -1240,18 +1226,42 @@ describe('relay', () => {
 
       const userToken = await client.fee.getUserToken({ account })
       expect(userToken).toMatchInlineSnapshot(`
-        {
-          "address": "0x20C0000000000000000000000000000000000001",
-          "id": 1n,
-        }
-      `)
+            {
+              "address": "0x20C0000000000000000000000000000000000001",
+              "id": 1n,
+            }
+          `)
 
       const {
-        blockHash: _,
-        blockNumber: __,
+        blockHash,
+        blockNumber,
+        chainId,
+        feePayer,
+        feePayerSignature,
+        from,
+        gas,
+        gasPrice,
+        hash,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        nonce,
+        signature,
         ...transaction
       } = await client.getTransaction({ hash: receipt.transactionHash })
 
+      expect(blockHash).toBeDefined()
+      expect(blockNumber).toBeDefined()
+      expect(chainId).toBeDefined()
+      expect(feePayer).toBe(accounts[0].address.toLowerCase())
+      expect(feePayerSignature).toBeDefined()
+      expect(from).toBe(account.address.toLowerCase())
+      expect(gas).toBeDefined()
+      expect(gasPrice).toBeDefined()
+      expect(hash).toBe(receipt.transactionHash)
+      expect(maxFeePerGas).toBeDefined()
+      expect(maxPriorityFeePerGas).toBeDefined()
+      expect(nonce).toBeDefined()
+      expect(signature).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -1264,41 +1274,10 @@ describe('relay', () => {
               "value": 0n,
             },
           ],
-          "chainId": 1337,
           "data": undefined,
-          "feePayer": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-          "feePayerSignature": {
-            "r": "0xc4446d8fe8fa3341d1f004cf5d54fd30ce3079909d26d8a2878ba95b7b9eec2d",
-            "s": "0x3dbe6bcd56aafcff58b0faad331ac8339389cad60b42e82cdccd23f67e1f82c8",
-            "v": 27n,
-            "yParity": 0,
-          },
           "feeToken": null,
-          "from": "0x5f704c6c7075acd14ee36527f03b5b5dcb4a966f",
-          "gas": 65648n,
-          "gasPrice": 10000000000n,
-          "hash": "0x279ae834209d6df5bded3c96bf5c74671cb34ef7b041b262cab97085d471f6f4",
           "maxFeePerBlobGas": undefined,
-          "maxFeePerGas": 12000000000n,
-          "maxPriorityFeePerGas": 0n,
-          "nonce": 0,
           "nonceKey": 0n,
-          "signature": {
-            "metadata": {
-              "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000",
-              "clientDataJSON": "{"type":"webauthn.get","challenge":"v8tl8bzz9Csc1GJFeUfNTnjOLM03xPTSseTVmPjPgGU","origin":"http://localhost","crossOrigin":false}",
-            },
-            "publicKey": {
-              "prefix": 4,
-              "x": 89768657165983002447270155621964907577955735922001002175265262336201091268103n,
-              "y": 21692506528696391747937034302216251793515398807520467579078748804389014172835n,
-            },
-            "signature": {
-              "r": 58941397289082666235265603710597281523077712128054003324346038713355012809744n,
-              "s": 40774536608463041714947524596466110685374802167796811824221384869265764799570n,
-            },
-            "type": "webAuthn",
-          },
           "to": null,
           "transactionIndex": 1,
           "type": "aa",

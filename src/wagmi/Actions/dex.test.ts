@@ -3,7 +3,8 @@ import { Tick } from 'tempo.ts/viem'
 import { Actions } from 'tempo.ts/wagmi'
 import { isAddress, parseUnits } from 'viem'
 import { beforeAll, describe, expect, test } from 'vitest'
-import { accounts, addresses } from '../../../test/viem/config.js'
+import { addresses } from '../../../test/config.js'
+import { accounts } from '../../../test/viem/config.js'
 import {
   config,
   queryClient,

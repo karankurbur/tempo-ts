@@ -17,14 +17,19 @@ export default defineConfig({
       {
         extends: true,
         test: {
-          name: 'ox',
-          root: './src/ox',
+          env: {
+            RPC_PORT: '3000',
+          },
           environment: 'node',
           include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)', '**/*.test-d.ts'],
+          globalSetup: [join(import.meta.dirname, './test/ox/setup.global.ts')],
+          name: 'ox',
+          root: './src/ox',
+          sequence: { groupOrder: 0 },
+          setupFiles: [join(import.meta.dirname, './test/ox/setup.ts')],
           typecheck: {
             enabled: true,
           },
-          sequence: { groupOrder: 0 },
         },
       },
       {
@@ -39,13 +44,17 @@ export default defineConfig({
       {
         extends: true,
         test: {
+          environment: 'node',
+          env: {
+            RPC_PORT: '8545',
+          },
           globalSetup: [
             join(import.meta.dirname, './test/viem/setup.global.ts'),
           ],
           name: 'viem',
           root: './src/viem',
-          environment: 'node',
           sequence: { groupOrder: 2 },
+          setupFiles: [join(import.meta.dirname, './test/viem/setup.ts')],
         },
       },
       // {
@@ -71,11 +80,14 @@ export default defineConfig({
             headless: true,
             screenshotFailures: false,
           },
+          env: {
+            RPC_PORT: '4000',
+          },
           globalSetup: [
             join(import.meta.dirname, './test/wagmi/setup.global.ts'),
           ],
-          setupFiles: [join(import.meta.dirname, './test/wagmi/setup.ts')],
           name: 'wagmi',
+          setupFiles: [join(import.meta.dirname, './test/wagmi/setup.ts')],
           root: './src/wagmi',
           sequence: { groupOrder: 3 },
         },

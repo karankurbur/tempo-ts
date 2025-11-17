@@ -1,7 +1,8 @@
 import { connect } from '@wagmi/core'
 import { parseUnits } from 'viem'
 import { describe, expect, test } from 'vitest'
-import { accounts, addresses } from '../../../test/viem/config.js'
+import { addresses } from '../../../test/config.js'
+import { accounts } from '../../../test/viem/config.js'
 import { config, queryClient } from '../../../test/wagmi/config.js'
 import * as token from './token.js'
 

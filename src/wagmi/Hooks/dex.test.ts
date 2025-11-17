@@ -3,7 +3,8 @@ import { Actions, Hooks } from 'tempo.ts/wagmi'
 import { type Address, isAddress, parseUnits } from 'viem'
 import { describe, expect, test, vi } from 'vitest'
 import { useConnect } from 'wagmi'
-import { accounts, addresses } from '../../../test/viem/config.js'
+import { addresses } from '../../../test/config.js'
+import { accounts } from '../../../test/viem/config.js'
 import {
   config,
   renderHook,

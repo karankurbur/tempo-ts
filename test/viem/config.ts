@@ -2,37 +2,34 @@ import type { FixedArray } from '@wagmi/core/internal'
 import { Actions, Addresses, Chain, Tick } from 'tempo.ts/viem'
 import {
   type Account,
+  type Address,
   type Client,
+  type ClientConfig,
   createClient,
+  type HttpTransportConfig,
   http,
   type LocalAccount,
   parseUnits,
   type Transport,
 } from 'viem'
-import { mnemonicToAccount } from 'viem/accounts'
+import { english, generateMnemonic, mnemonicToAccount } from 'viem/accounts'
 import { sendTransactionSync } from 'viem/actions'
+import { tempoAndantino, tempoDev } from '../../src/chains.js'
 import type { TokenIdOrAddress } from '../../src/ox/TokenId.js'
+import { transferSync } from '../../src/viem/Actions/token.js'
+import { addresses, fetchOptions, rpcEnv, rpcUrl } from '../config.js'
+
+const accountsMnemonic = (() => {
+  if (rpcEnv === 'local')
+    return 'test test test test test test test test test test test junk'
+  return generateMnemonic(english)
+})()
 
 export const accounts = Array.from({ length: 20 }, (_, i) =>
-  mnemonicToAccount(
-    'test test test test test test test test test test test junk',
-    {
-      accountIndex: i,
-    },
-  ),
+  mnemonicToAccount(accountsMnemonic, {
+    accountIndex: i,
+  }),
 ) as unknown as FixedArray<LocalAccount, 20>
-
-export const addresses = {
-  alphaUsd: '0x20c0000000000000000000000000000000000001',
-} as const
-
-export const id =
-  (typeof process !== 'undefined' &&
-    Number(process.env.VITEST_POOL_ID ?? 1) +
-      Math.floor(Math.random() * 10_000)) ||
-  1 + Math.floor(Math.random() * 10_000)
-
-export const rpcUrl = `http://localhost:8545/${id}`
 
 export const tempoTest = Chain.define({
   id: 1337,
@@ -49,12 +46,64 @@ export const tempoTest = Chain.define({
   },
 })
 
-export const client = createClient({
-  account: accounts[0],
-  chain: tempoTest({ feeToken: 1n }),
-  pollingInterval: 100,
-  transport: http(),
+export const chainFn = (() => {
+  const env = import.meta.env.VITE_RPC_ENV
+  if (env === 'testnet') return tempoAndantino
+  if (env === 'devnet') return tempoDev
+  return tempoTest
+})()
+export const chain = chainFn({ feeToken: 1n })
+
+export function getClient<
+  accountOrAddress extends Account | Address | undefined = undefined,
+>(
+  parameters: Partial<
+    Pick<
+      ClientConfig<Transport, typeof chain, accountOrAddress>,
+      'account' | 'transport'
+    >
+  > = {},
+) {
+  return createClient({
+    pollingInterval: 100,
+    chain,
+    transport: http(undefined, {
+      fetchOptions,
+      ...debugOptions({
+        enabled: import.meta.env.VITE_RPC_LOGS === 'true',
+        rpcUrl,
+      }),
+    }),
+    ...parameters,
+  })
+}
+
+export const client = getClient()
+export const clientWithAccount = getClient({
+  account: accounts.at(0)!,
 })
+
+export async function fundAddress(
+  client: Client<Transport, Chain.Chain<TokenIdOrAddress>>,
+  parameters: fundAddress.Parameters,
+) {
+  const { address } = parameters
+  const account = accounts.at(0)!
+  if (account.address === address) return
+  await transferSync(client, {
+    account,
+    amount: parseUnits('10000', 6),
+    to: address,
+    token: 1n,
+  })
+}
+
+export declare namespace fundAddress {
+  export type Parameters = {
+    /** Account to fund. */
+    address: Address
+  }
+}
 
 export async function setupToken(
   client: Client<Transport, Chain.Chain<TokenIdOrAddress>, Account>,
@@ -125,7 +174,7 @@ export async function setupPoolWithLiquidity(
 }
 
 export async function setupTokenPair(
-  client: Client<Transport, Chain.Chain<TokenIdOrAddress>, Account>,
+  client: Client<Transport, typeof chain, Account>,
 ) {
   // Create quote token
   const { token: quoteToken } = await Actions.token.createSync(client, {
@@ -142,47 +191,39 @@ export async function setupTokenPair(
     quoteToken,
   })
 
-  // Grant issuer role to mint base tokens
-  await Actions.token.grantRolesSync(client, {
-    token: baseToken,
-    roles: ['issuer'],
-    to: client.account.address,
-  })
-
-  // Grant issuer role to mint quote tokens
-  await Actions.token.grantRolesSync(client, {
-    token: quoteToken,
-    roles: ['issuer'],
-    to: client.account.address,
-  })
-
-  // Mint base tokens
-  await Actions.token.mintSync(client, {
-    token: baseToken,
-    to: client.account.address,
-    amount: parseUnits('10000', 6),
-  })
-
-  // Mint quote tokens
-  await Actions.token.mintSync(client, {
-    token: quoteToken,
-    to: client.account.address,
-    amount: parseUnits('10000', 6),
-  })
-
-  // Approve DEX to spend base tokens
-  client.chain.feeToken
-  await Actions.token.approveSync(client, {
-    token: baseToken,
-    spender: Addresses.stablecoinExchange,
-    amount: parseUnits('10000', 6),
-  })
-
-  // Approve DEX to spend quote tokens
-  await Actions.token.approveSync(client, {
-    token: quoteToken,
-    spender: Addresses.stablecoinExchange,
-    amount: parseUnits('10000', 6),
+  await sendTransactionSync(client, {
+    calls: [
+      Actions.token.grantRoles.call({
+        token: baseToken,
+        role: 'issuer',
+        to: client.account.address,
+      }),
+      Actions.token.grantRoles.call({
+        token: quoteToken,
+        role: 'issuer',
+        to: client.account.address,
+      }),
+      Actions.token.mint.call({
+        token: baseToken,
+        to: client.account.address,
+        amount: parseUnits('10000', 6),
+      }),
+      Actions.token.mint.call({
+        token: quoteToken,
+        to: client.account.address,
+        amount: parseUnits('10000', 6),
+      }),
+      Actions.token.approve.call({
+        token: baseToken,
+        spender: Addresses.stablecoinExchange,
+        amount: parseUnits('10000', 6),
+      }),
+      Actions.token.approve.call({
+        token: quoteToken,
+        spender: Addresses.stablecoinExchange,
+        amount: parseUnits('10000', 6),
+      }),
+    ],
   })
 
   // Create the pair on the DEX
@@ -192,7 +233,7 @@ export async function setupTokenPair(
 }
 
 export async function setupOrders(
-  client: Client<Transport, Chain.Chain<TokenIdOrAddress>, Account>,
+  client: Client<Transport, typeof chain, Account>,
 ) {
   const { base: base1 } = await setupTokenPair(client)
   const { base: base2 } = await setupTokenPair(client)
@@ -221,4 +262,26 @@ export async function setupOrders(
   await sendTransactionSync(client, { calls } as never)
 
   return { bases }
+}
+
+function debugOptions({
+  enabled,
+  rpcUrl,
+}: {
+  enabled: boolean
+  rpcUrl: string
+}): HttpTransportConfig | undefined {
+  if (!enabled) return undefined
+  return {
+    async onFetchRequest(_, init) {
+      console.log(`curl \\
+${rpcUrl} \\
+-X POST \\
+-H "Content-Type: application/json" \\
+-d '${JSON.stringify(JSON.parse(init.body as string))}'`)
+    },
+    async onFetchResponse(response) {
+      console.log(`> ${JSON.stringify(await response.clone().json())}`)
+    },
+  }
 }

@@ -14,7 +14,7 @@ export const tempoAndantino = /*#__PURE__*/ Chain.define({
 })
 
 export const tempoDev = /*#__PURE__*/ Chain.define({
-  id: 42429,
+  id: 42427,
   name: 'Tempo Devnet',
   nativeCurrency: {
     name: 'USD',

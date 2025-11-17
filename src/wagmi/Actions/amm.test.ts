@@ -1,11 +1,8 @@
 import { connect, getConnectorClient } from '@wagmi/core'
 import { parseUnits } from 'viem'
 import { describe, expect, test } from 'vitest'
-import {
-  accounts,
-  addresses,
-  setupPoolWithLiquidity,
-} from '../../../test/viem/config.js'
+import { addresses } from '../../../test/config.js'
+import { accounts, setupPoolWithLiquidity } from '../../../test/viem/config.js'
 import { config, queryClient } from '../../../test/wagmi/config.js'
 import * as ammActions from './amm.js'
 import * as tokenActions from './token.js'

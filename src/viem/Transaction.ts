@@ -41,7 +41,9 @@ export type Transaction<
 >
 export type TransactionRpc<pending extends boolean = false> = OneOf<
   | viem_RpcTransaction<pending>
-  | TransactionAA<Hex.Hex, Hex.Hex, pending, '0x76'>
+  | (Omit<TransactionAA<Hex.Hex, Hex.Hex, pending, '0x76'>, 'signature'> & {
+      signature: SignatureEnvelope.SignatureEnvelopeRpc
+    })
 >
 
 export type TransactionAA<
@@ -64,6 +66,7 @@ export type TransactionAA<
   feePayer?: Address | undefined
   feePayerSignature?: viem_Signature | undefined
   nonceKey?: quantity | undefined
+  signature: SignatureEnvelope.SignatureEnvelope
   type: type
   validBefore?: index | undefined
   validAfter?: index | undefined
