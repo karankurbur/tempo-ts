@@ -87,6 +87,7 @@ export async function fundSync<chain extends Chain | undefined>(
   client: Client<Transport, chain>,
   parameters: fundSync.Parameters,
 ): Promise<fundSync.ReturnValue> {
+  const { timeout = 10_000 } = parameters
   const account = parseAccount(parameters.account)
   const hashes = await client.request<{
     Method: 'tempo_fundAddress'
@@ -97,7 +98,13 @@ export async function fundSync<chain extends Chain | undefined>(
     params: [account.address],
   })
   const receipts = await Promise.all(
-    hashes.map((hash) => waitForTransactionReceipt(client, { hash })),
+    hashes.map((hash) =>
+      waitForTransactionReceipt(client, {
+        hash,
+        checkReplacement: false,
+        timeout,
+      }),
+    ),
   )
   return receipts
 }
@@ -106,6 +113,8 @@ export declare namespace fundSync {
   export type Parameters = {
     /** Account to fund. */
     account: Account | Address
+    /** Timeout. */
+    timeout?: number | undefined
   }
 
   export type ReturnValue = readonly TransactionReceipt[]
