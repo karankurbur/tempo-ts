@@ -45,7 +45,11 @@ function config<const chain extends Chain>(chain: chain) {
           Formatters.formatTransactionRequest<chain>(
             {
               ...request,
-              ...(!request.feePayer &&
+
+              // Note: if we have marked the transaction as intended to be paid
+              // by a fee payer (feePayer: true), we will not infer the fee token
+              // as the fee payer will choose their fee token.
+              ...(request.feePayer !== true &&
               (action === 'estimateGas' ||
                 action === 'fillTransaction' ||
                 action === 'sendTransaction')
@@ -64,7 +68,10 @@ function config<const chain extends Chain>(chain: chain) {
         Transaction.serialize(
           {
             ...transaction,
-            ...(!(transaction as { feePayer?: unknown }).feePayer
+            // If we have marked the transaction as intended to be paid
+            // by a fee payer (feePayer: true), we will not infer the fee token
+            // as the fee payer will choose their fee token.
+            ...((transaction as { feePayer?: unknown }).feePayer !== true
               ? {
                   feeToken:
                     (transaction as { feeToken?: unknown }).feeToken ??

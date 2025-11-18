@@ -3,7 +3,7 @@ import { createRequestListener } from '@remix-run/node-fetch-server'
 import { RpcRequest, RpcResponse, WebCryptoP256 } from 'ox'
 import { Account, Transaction } from 'tempo.ts/viem'
 import { http, parseGwei, publicActions, walletActions } from 'viem'
-import { privateKeyToAccount } from 'viem/accounts'
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest'
 import { fetchOptions, rpcUrl } from '../../test/config.js'
 import {
@@ -157,10 +157,7 @@ describe('sendTransaction', () => {
     })
 
     test('with feePayer', async () => {
-      const account = privateKeyToAccount(
-        // unfunded PK
-        '0xecc3fe55647412647e5c6b657c496803b08ef956f927b7a821da298cfbdd9666',
-      )
+      const account = privateKeyToAccount(generatePrivateKey())
       const feePayer = accounts[0]
 
       const hash = await client.sendTransaction({
@@ -184,6 +181,7 @@ describe('sendTransaction', () => {
         maxPriorityFeePerGas,
         nonce,
         signature,
+        transactionIndex,
         ...transaction
       } = await client.getTransaction({ hash })
 
@@ -200,6 +198,7 @@ describe('sendTransaction', () => {
       expect(maxPriorityFeePerGas).toBeDefined()
       expect(nonce).toBeDefined()
       expect(signature).toBeDefined()
+      expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -213,11 +212,10 @@ describe('sendTransaction', () => {
             },
           ],
           "data": undefined,
-          "feeToken": null,
+          "feeToken": "0x20c0000000000000000000000000000000000001",
           "maxFeePerBlobGas": undefined,
           "nonceKey": 0n,
           "to": null,
-          "transactionIndex": 1,
           "type": "aa",
           "typeHex": "0x76",
           "v": undefined,
@@ -257,6 +255,7 @@ describe('sendTransaction', () => {
         maxPriorityFeePerGas,
         nonce,
         signature,
+        transactionIndex,
         ...transaction
       } = await client.getTransaction({
         hash: receipt.transactionHash,
@@ -273,6 +272,7 @@ describe('sendTransaction', () => {
       expect(maxPriorityFeePerGas).toBeDefined()
       expect(nonce).toBeDefined()
       expect(signature).toBeDefined()
+      expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -291,7 +291,6 @@ describe('sendTransaction', () => {
           "maxFeePerBlobGas": undefined,
           "nonceKey": 0n,
           "to": null,
-          "transactionIndex": 1,
           "type": "aa",
           "typeHex": "0x76",
           "v": undefined,
@@ -338,6 +337,7 @@ describe('sendTransaction', () => {
         maxPriorityFeePerGas,
         nonce,
         signature,
+        transactionIndex,
         ...transaction
       } = await client.getTransaction({
         hash: receipt.transactionHash,
@@ -355,6 +355,7 @@ describe('sendTransaction', () => {
       expect(maxPriorityFeePerGas).toBeDefined()
       expect(nonce).toBeDefined()
       expect(signature).toBeDefined()
+      expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -366,7 +367,6 @@ describe('sendTransaction', () => {
           "maxFeePerBlobGas": undefined,
           "nonceKey": 0n,
           "to": null,
-          "transactionIndex": 1,
           "type": "aa",
           "typeHex": "0x76",
           "v": undefined,
@@ -406,6 +406,7 @@ describe('sendTransaction', () => {
         maxPriorityFeePerGas,
         nonce,
         signature,
+        transactionIndex,
         ...transaction
       } = await client.getTransaction({ hash })
 
@@ -422,6 +423,7 @@ describe('sendTransaction', () => {
       expect(maxPriorityFeePerGas).toBeDefined()
       expect(nonce).toBeDefined()
       expect(signature).toBeDefined()
+      expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -435,11 +437,10 @@ describe('sendTransaction', () => {
             },
           ],
           "data": undefined,
-          "feeToken": null,
+          "feeToken": "0x20c0000000000000000000000000000000000001",
           "maxFeePerBlobGas": undefined,
           "nonceKey": 0n,
           "to": null,
-          "transactionIndex": 1,
           "type": "aa",
           "typeHex": "0x76",
           "v": undefined,
@@ -477,6 +478,7 @@ describe('sendTransaction', () => {
         maxPriorityFeePerGas,
         nonce,
         signature,
+        transactionIndex,
         ...transaction
       } = await client.getTransaction({
         hash: receipt.transactionHash,
@@ -492,6 +494,7 @@ describe('sendTransaction', () => {
       expect(maxPriorityFeePerGas).toBeDefined()
       expect(nonce).toBeDefined()
       expect(signature).toBeDefined()
+      expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -511,7 +514,6 @@ describe('sendTransaction', () => {
           "maxFeePerBlobGas": undefined,
           "nonceKey": 0n,
           "to": null,
-          "transactionIndex": 1,
           "type": "aa",
           "typeHex": "0x76",
           "v": undefined,
@@ -648,6 +650,7 @@ describe('sendTransaction', () => {
         maxPriorityFeePerGas,
         nonce,
         signature,
+        transactionIndex,
         ...transaction
       } = await client.getTransaction({
         hash: receipt.transactionHash,
@@ -664,6 +667,7 @@ describe('sendTransaction', () => {
       expect(maxPriorityFeePerGas).toBeDefined()
       expect(nonce).toBeDefined()
       expect(signature).toBeDefined()
+      expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -682,7 +686,6 @@ describe('sendTransaction', () => {
           "maxFeePerBlobGas": undefined,
           "nonceKey": 0n,
           "to": null,
-          "transactionIndex": 1,
           "type": "aa",
           "typeHex": "0x76",
           "v": undefined,
@@ -733,6 +736,7 @@ describe('sendTransaction', () => {
         maxPriorityFeePerGas,
         nonce,
         signature,
+        transactionIndex,
         ...transaction
       } = await client.getTransaction({
         hash: receipt.transactionHash,
@@ -750,6 +754,7 @@ describe('sendTransaction', () => {
       expect(maxPriorityFeePerGas).toBeDefined()
       expect(nonce).toBeDefined()
       expect(signature).toBeDefined()
+      expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -761,7 +766,6 @@ describe('sendTransaction', () => {
           "maxFeePerBlobGas": undefined,
           "nonceKey": 0n,
           "to": null,
-          "transactionIndex": 1,
           "type": "aa",
           "typeHex": "0x76",
           "v": undefined,
@@ -805,6 +809,7 @@ describe('sendTransaction', () => {
         maxPriorityFeePerGas,
         nonce,
         signature,
+        transactionIndex,
         ...transaction
       } = await client.getTransaction({ hash })
 
@@ -821,6 +826,7 @@ describe('sendTransaction', () => {
       expect(maxPriorityFeePerGas).toBeDefined()
       expect(nonce).toBeDefined()
       expect(signature).toBeDefined()
+      expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -834,11 +840,10 @@ describe('sendTransaction', () => {
             },
           ],
           "data": undefined,
-          "feeToken": null,
+          "feeToken": "0x20c0000000000000000000000000000000000001",
           "maxFeePerBlobGas": undefined,
           "nonceKey": 0n,
           "to": null,
-          "transactionIndex": 1,
           "type": "aa",
           "typeHex": "0x76",
           "v": undefined,
@@ -892,6 +897,7 @@ describe('signTransaction', () => {
       maxPriorityFeePerGas,
       nonce,
       signature,
+      transactionIndex,
       ...transaction2
     } = await client.getTransaction({ hash })
 
@@ -907,6 +913,7 @@ describe('signTransaction', () => {
     expect(maxPriorityFeePerGas).toBeDefined()
     expect(nonce).toBeDefined()
     expect(signature).toBeDefined()
+    expect(transactionIndex).toBeDefined()
     expect(transaction2).toMatchInlineSnapshot(`
       {
         "aaAuthorizationList": [],
@@ -920,12 +927,11 @@ describe('signTransaction', () => {
           },
         ],
         "data": undefined,
-        "feeToken": null,
+        "feeToken": "0x20c0000000000000000000000000000000000001",
         "gas": 24002n,
         "maxFeePerBlobGas": undefined,
         "nonceKey": 0n,
         "to": null,
-        "transactionIndex": 1,
         "type": "aa",
         "typeHex": "0x76",
         "v": undefined,
@@ -1055,6 +1061,7 @@ describe('relay', () => {
         maxPriorityFeePerGas,
         nonce,
         signature,
+        transactionIndex,
         ...transaction
       } = await client.getTransaction({ hash: receipt.transactionHash })
 
@@ -1071,6 +1078,7 @@ describe('relay', () => {
       expect(maxPriorityFeePerGas).toBeDefined()
       expect(nonce).toBeDefined()
       expect(signature).toBeDefined()
+      expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -1084,11 +1092,10 @@ describe('relay', () => {
             },
           ],
           "data": undefined,
-          "feeToken": null,
+          "feeToken": "0x20c0000000000000000000000000000000000001",
           "maxFeePerBlobGas": undefined,
           "nonceKey": 0n,
           "to": null,
-          "transactionIndex": 1,
           "type": "aa",
           "typeHex": "0x76",
           "v": undefined,
@@ -1135,6 +1142,7 @@ describe('relay', () => {
         maxPriorityFeePerGas,
         nonce,
         signature,
+        transactionIndex,
         ...transaction
       } = await client.getTransaction({ hash: receipt.transactionHash })
 
@@ -1151,6 +1159,7 @@ describe('relay', () => {
       expect(maxPriorityFeePerGas).toBeDefined()
       expect(nonce).toBeDefined()
       expect(signature).toBeDefined()
+      expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -1164,11 +1173,10 @@ describe('relay', () => {
             },
           ],
           "data": undefined,
-          "feeToken": null,
+          "feeToken": "0x20c0000000000000000000000000000000000001",
           "maxFeePerBlobGas": undefined,
           "nonceKey": 0n,
           "to": null,
-          "transactionIndex": 1,
           "type": "aa",
           "typeHex": "0x76",
           "v": undefined,
@@ -1246,6 +1254,7 @@ describe('relay', () => {
         maxPriorityFeePerGas,
         nonce,
         signature,
+        transactionIndex,
         ...transaction
       } = await client.getTransaction({ hash: receipt.transactionHash })
 
@@ -1262,6 +1271,7 @@ describe('relay', () => {
       expect(maxPriorityFeePerGas).toBeDefined()
       expect(nonce).toBeDefined()
       expect(signature).toBeDefined()
+      expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
           "aaAuthorizationList": [],
@@ -1275,11 +1285,10 @@ describe('relay', () => {
             },
           ],
           "data": undefined,
-          "feeToken": null,
+          "feeToken": "0x20c0000000000000000000000000000000000001",
           "maxFeePerBlobGas": undefined,
           "nonceKey": 0n,
           "to": null,
-          "transactionIndex": 1,
           "type": "aa",
           "typeHex": "0x76",
           "v": undefined,

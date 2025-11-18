@@ -345,8 +345,13 @@ async function serializeAA(
     return serialized
   }
 
-  return TxAA.serialize(transaction_ox, {
-    feePayerSignature: undefined,
-    signature,
-  })
+  return TxAA.serialize(
+    // If we have specified a fee payer, the user will not be signing over the fee token.
+    // Defer the fee token signing to the fee payer.
+    { ...transaction_ox, ...(feePayer ? { feeToken: undefined } : {}) },
+    {
+      feePayerSignature: undefined,
+      signature,
+    },
+  )
 }
