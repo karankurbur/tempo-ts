@@ -101,7 +101,7 @@ export const formatTransactionRequest = <chain extends Chain | undefined>(
     type: 'aa',
   } as never)
 
-  if (action === 'estimateGas') {
+  if (action === 'estimateGas' || action === 'fillTransaction') {
     rpc.maxFeePerGas = undefined
     rpc.maxPriorityFeePerGas = undefined
   }

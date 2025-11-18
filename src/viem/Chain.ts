@@ -46,7 +46,9 @@ function config<const chain extends Chain>(chain: chain) {
             {
               ...request,
               ...(!request.feePayer &&
-              (action === 'estimateGas' || action === 'sendTransaction')
+              (action === 'estimateGas' ||
+                action === 'fillTransaction' ||
+                action === 'sendTransaction')
                 ? {
                     feeToken: request.feeToken ?? chain.feeToken,
                   }
