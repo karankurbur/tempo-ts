@@ -525,7 +525,7 @@ export function feePayer(options: feePayer.Options) {
     throw new Error('No client or chain provided')
   })()
 
-  const router = from()
+  const router = from(options)
 
   router.post(path, async ({ request: req }) => {
     const request = RpcRequest.from((await req.json()) as any)
