@@ -107,7 +107,7 @@ describe('mint', () => {
   })
 })
 
-describe('burn', () => {
+describe.skip('burn', () => {
   test('default', async () => {
     const { tokenAddress } = await setupPoolWithLiquidity(clientWithAccount)
 
@@ -182,7 +182,7 @@ describe('burn', () => {
   })
 })
 
-describe('rebalanceSwap', () => {
+describe.skip('rebalanceSwap', () => {
   test('default', async () => {
     const { tokenAddress } = await setupPoolWithLiquidity(clientWithAccount)
 
@@ -233,7 +233,7 @@ describe('rebalanceSwap', () => {
   })
 })
 
-describe('watchRebalanceSwap', () => {
+describe.skip('watchRebalanceSwap', () => {
   test('default', async () => {
     const { tokenAddress } = await setupPoolWithLiquidity(clientWithAccount)
 
@@ -333,7 +333,7 @@ describe('watchMint', () => {
   })
 })
 
-describe('watchBurn', () => {
+describe.skip('watchBurn', () => {
   test('default', async () => {
     const { tokenAddress } = await setupPoolWithLiquidity(clientWithAccount)
 

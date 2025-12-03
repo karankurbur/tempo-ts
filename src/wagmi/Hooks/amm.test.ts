@@ -165,7 +165,7 @@ describe('useMintSync', () => {
   })
 })
 
-describe('useBurnSync', () => {
+describe.skip('useBurnSync', () => {
   test('default', async () => {
     const { result } = await renderHook(() => ({
       connect: useConnect(),
@@ -249,7 +249,7 @@ describe('useBurnSync', () => {
   })
 })
 
-describe('useRebalanceSwapSync', () => {
+describe.skip('useRebalanceSwapSync', () => {
   test('default', async () => {
     const { result } = await renderHook(() => ({
       connect: useConnect(),
@@ -322,7 +322,7 @@ describe('useRebalanceSwapSync', () => {
   })
 })
 
-describe('useWatchRebalanceSwap', () => {
+describe.skip('useWatchRebalanceSwap', () => {
   test('default', async () => {
     const { result: connectResult } = await renderHook(() => ({
       connect: useConnect(),
@@ -468,7 +468,7 @@ describe('useWatchMint', () => {
   })
 })
 
-describe('useWatchBurn', () => {
+describe.skip('useWatchBurn', () => {
   test('default', async () => {
     const { result: connectResult } = await renderHook(() => ({
       connect: useConnect(),

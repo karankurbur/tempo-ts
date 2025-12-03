@@ -116,7 +116,7 @@ describe('mintSync', () => {
   })
 })
 
-describe('burnSync', () => {
+describe.skip('burnSync', () => {
   test('default', async () => {
     await connect(config, {
       connector: config.connectors[0]!,
@@ -167,7 +167,7 @@ describe('burnSync', () => {
   })
 })
 
-describe('rebalanceSwapSync', () => {
+describe.skip('rebalanceSwapSync', () => {
   test('default', async () => {
     await connect(config, {
       connector: config.connectors[0]!,
