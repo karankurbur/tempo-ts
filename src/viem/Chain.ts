@@ -55,6 +55,7 @@ function config<const chain extends Chain>(chain: chain) {
     },
     formatters: {
       transaction: defineTransaction({
+        exclude: ['aaAuthorizationList' as never],
         format: Formatters.formatTransaction,
       }),
       transactionReceipt: defineTransactionReceipt({

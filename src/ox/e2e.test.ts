@@ -101,8 +101,8 @@ test('behavior: default (secp256k1)', async () => {
     expect(transactionIndex).toBeDefined()
     expect(rest).toMatchInlineSnapshot(`
       {
-        "aaAuthorizationList": [],
         "accessList": [],
+        "authorizationList": [],
         "calls": [
           {
             "data": "0x",
@@ -308,8 +308,8 @@ test('behavior: default (p256)', async () => {
     expect(transactionIndex).toBeDefined()
     expect(rest).toMatchInlineSnapshot(`
       {
-        "aaAuthorizationList": [],
         "accessList": [],
+        "authorizationList": [],
         "calls": [
           {
             "data": "0x",
@@ -447,8 +447,8 @@ test('behavior: default (p256 - webcrypto)', async () => {
     expect(transactionIndex).toBeDefined()
     expect(rest).toMatchInlineSnapshot(`
       {
-        "aaAuthorizationList": [],
         "accessList": [],
+        "authorizationList": [],
         "calls": [
           {
             "data": "0x",
@@ -593,8 +593,8 @@ test('behavior: default (webauthn)', async () => {
     expect(transactionIndex).toBeDefined()
     expect(rest).toMatchInlineSnapshot(`
       {
-        "aaAuthorizationList": [],
         "accessList": [],
+        "authorizationList": [],
         "calls": [
           {
             "data": "0x",
@@ -890,8 +890,8 @@ describe('behavior: keyAuthorization', () => {
       expect(transactionIndex).toBeDefined()
       expect(rest).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
+          "authorizationList": [],
           "calls": [
             {
               "data": "0x",
@@ -1103,8 +1103,8 @@ describe('behavior: keyAuthorization', () => {
       expect(transactionIndex).toBeDefined()
       expect(rest).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
+          "authorizationList": [],
           "calls": [
             {
               "data": "0x",
@@ -1318,8 +1318,8 @@ describe('behavior: keyAuthorization', () => {
       expect(transactionIndex).toBeDefined()
       expect(rest).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
+          "authorizationList": [],
           "calls": [
             {
               "data": "0x",

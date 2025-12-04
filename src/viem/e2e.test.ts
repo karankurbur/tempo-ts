@@ -68,9 +68,8 @@ describe('sendTransaction', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "calls": [
             {
               "data": "0xdeadbeef",
@@ -145,9 +144,8 @@ describe('sendTransaction', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "data": undefined,
           "feePayerSignature": undefined,
           "feeToken": "0x20c0000000000000000000000000000000000001",
@@ -210,9 +208,8 @@ describe('sendTransaction', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "calls": [
             {
               "data": "0x",
@@ -325,9 +322,8 @@ describe('sendTransaction', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "calls": [
             {
               "data": "0xdeadbeef",
@@ -410,9 +406,8 @@ describe('sendTransaction', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "data": undefined,
           "feePayerSignature": undefined,
           "feeToken": "0x20c0000000000000000000000000000000000001",
@@ -478,9 +473,8 @@ describe('sendTransaction', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "calls": [
             {
               "data": "0x",
@@ -608,9 +602,8 @@ describe('sendTransaction', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "calls": [
             {
               "data": "0xdeadbeef",
@@ -814,9 +807,8 @@ describe('sendTransaction', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "calls": [
             {
               "data": "0xdeadbeef",
@@ -903,9 +895,8 @@ describe('sendTransaction', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "data": undefined,
           "feePayerSignature": undefined,
           "feeToken": "0x20c0000000000000000000000000000000000001",
@@ -975,9 +966,8 @@ describe('sendTransaction', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "calls": [
             {
               "data": "0x",
@@ -1153,9 +1143,8 @@ describe('signTransaction', () => {
     expect(transactionIndex).toBeDefined()
     expect(transaction2).toMatchInlineSnapshot(`
       {
-        "aaAuthorizationList": [],
         "accessList": [],
-        "authorizationList": undefined,
+        "authorizationList": [],
         "calls": [
           {
             "data": "0xdeadbeef",
@@ -1326,9 +1315,8 @@ describe('relay', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "calls": [
             {
               "data": "0xe789744400000000000000000000000020c0000000000000000000000000000000000001",
@@ -1457,9 +1445,8 @@ describe('relay', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "calls": [
             {
               "data": "0xe789744400000000000000000000000020c0000000000000000000000000000000000001",
@@ -1569,9 +1556,8 @@ describe('relay', () => {
       expect(transactionIndex).toBeDefined()
       expect(transaction).toMatchInlineSnapshot(`
         {
-          "aaAuthorizationList": [],
           "accessList": [],
-          "authorizationList": undefined,
+          "authorizationList": [],
           "calls": [
             {
               "data": "0xe789744400000000000000000000000020c0000000000000000000000000000000000001",
