@@ -8,7 +8,7 @@ import {
   formatTransactionReceipt as viem_formatTransactionReceipt,
   formatTransactionRequest as viem_formatTransactionRequest,
 } from 'viem'
-import { parseAccount } from 'viem/accounts'
+import { type Address, parseAccount } from 'viem/accounts'
 import type { UnionOmit } from '../internal/types.js'
 import * as ox_Transaction from '../ox/Transaction.js'
 import * as ox_TransactionRequest from '../ox/TransactionRequest.js'
@@ -72,13 +72,17 @@ type Request<chain extends Chain | undefined> = UnionOmit<
   TransactionRequest,
   'feeToken'
 > &
-  GetFeeTokenParameter<chain> & { account?: viem_Account | undefined }
+  GetFeeTokenParameter<chain>
 export function formatTransactionRequest<chain extends Chain | undefined>(
   r: Request<chain>,
   action?: string | undefined,
 ): TransactionRequestRpc {
-  const request = r as Request<chain>
-  const account = request.account as Account | undefined
+  const request = r as Request<chain> & {
+    account?: viem_Account | Address | undefined
+  }
+  const account = request.account
+    ? parseAccount<Account | viem_Account | Address>(request.account)
+    : undefined
 
   // Convert EIP-1559 transactions to AA transactions.
   if (request.type === 'eip1559') (request as any).type = 'aa'
@@ -122,7 +126,7 @@ export function formatTransactionRequest<chain extends Chain | undefined>(
   // TODO: `calls` will not be supported by a lot of JSON-RPC accounts (wallet),
   // use `wallet_sendCalls` or sequential `eth_sendTransaction` to mimic the
   // behavior of `calls`.
-  if (request.account?.type === 'json-rpc') {
+  if (account?.type === 'json-rpc') {
     if (rpc.calls?.length && rpc.calls.length > 1)
       throw new Error(
         'Batch calls are not supported with JSON-RPC accounts yet.',
@@ -134,14 +138,15 @@ export function formatTransactionRequest<chain extends Chain | undefined>(
   // However, `calls` may not be supported by JSON-RPC accounts (wallets) yet,
   // so we will not remove the `data`, `to`, and `value` fields to make it
   // compatible with the base transaction structure.
-  if (request.account?.type !== 'json-rpc') {
+  if (account?.type !== 'json-rpc') {
     rpc.to = undefined
     rpc.data = undefined
     rpc.value = undefined
   }
 
   const [keyType, keyData] = (() => {
-    const type = account?.keyType || account?.source
+    const type =
+      account && 'keyType' in account ? account.keyType : account?.source
     if (!type) return [undefined, undefined]
     if (type === 'webAuthn')
       // TODO: derive correct bytes size of key data based on webauthn create metadata.
