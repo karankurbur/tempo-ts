@@ -216,9 +216,6 @@ export async function serialize(
     | OneOf<SignatureEnvelope.SignatureEnvelope | viem_Signature>
     | undefined,
 ) {
-  // Convert EIP-1559 transactions to AA transactions.
-  if (transaction.type === 'eip1559') (transaction as any).type = 'aa'
-
   // If the transaction is not a Tempo transaction, route to Viem serializer.
   if (!isTempo(transaction)) {
     if (signature && 'type' in signature && signature.type !== 'secp256k1')
