@@ -63,4 +63,7 @@ export type WriteParameters<
   | 'throwOnReceiptRevert'
 > &
   GetFeeTokenParameter<chain> &
-  UnionPick<TransactionRequestTempo, 'feePayer'>
+  UnionPick<
+    TransactionRequestTempo,
+    'feePayer' | 'nonceKey' | 'validAfter' | 'validBefore'
+  >
