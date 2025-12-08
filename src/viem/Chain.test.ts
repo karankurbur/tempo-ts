@@ -160,7 +160,7 @@ describe('chain.prepareTransactionRequest', () => {
           hash: receipts[2].transactionHash,
         }),
       ])
-      expect(transactions[0].nonceKey).toBe(undefined)
+      expect(transactions[0].nonceKey).toBe(0n)
       expect(transactions[1].nonceKey).toBeGreaterThan(0n)
       expect(transactions[2].nonceKey).toBeGreaterThan(0n)
     })
