@@ -14,7 +14,7 @@ describe('chain.prepareTransactionRequest', () => {
       chain.prepareTransactionRequest({ feePayer: true } as never),
     ])
 
-    expect((requests[0] as any)?.nonceKey).toBe(0n)
+    expect((requests[0] as any)?.nonceKey).toBe(undefined)
     expect((requests[1] as any)?.nonceKey).toBeGreaterThan(0n)
     expect((requests[2] as any)?.nonceKey).toBeGreaterThan(0n)
   })
@@ -25,7 +25,7 @@ describe('chain.prepareTransactionRequest', () => {
       chain.prepareTransactionRequest({ feePayer: true } as never),
     ])
 
-    expect((requests1[0] as any)?.nonceKey).toBe(0n)
+    expect((requests1[0] as any)?.nonceKey).toBe(undefined)
     expect((requests1[1] as any)?.nonceKey).toBeGreaterThan(0n)
 
     // Wait for microtask queue to flush
@@ -37,7 +37,7 @@ describe('chain.prepareTransactionRequest', () => {
     ])
 
     // Counter should have reset
-    expect((requests2[0] as any)?.nonceKey).toBe(0n)
+    expect((requests2[0] as any)?.nonceKey).toBe(undefined)
     expect((requests2[1] as any)?.nonceKey).toBeGreaterThan(0n)
   })
 
@@ -55,13 +55,13 @@ describe('chain.prepareTransactionRequest', () => {
     ])
 
     expect((requests[0] as any)?.nonceKey).toBe(42n)
-    expect((requests[1] as any)?.nonceKey).toBe(0n)
+    expect((requests[1] as any)?.nonceKey).toBe(undefined)
     expect((requests[2] as any)?.nonceKey).toBe(100n)
   })
 
   test('behavior: default nonceKey when feePayer is not true', async () => {
     const request = await chain.prepareTransactionRequest({} as never)
-    expect((request as any)?.nonceKey).toBe(0n)
+    expect((request as any)?.nonceKey).toBe(undefined)
   })
 
   test('behavior: nonce with sequential nonceKey', async () => {
@@ -73,7 +73,7 @@ describe('chain.prepareTransactionRequest', () => {
 
     // Note: 0n is falsy, so first request has nonce undefined
     expect((requests[0] as any)?.nonce).toBe(undefined)
-    expect((requests[0] as any)?.nonceKey).toBe(0n)
+    expect((requests[0] as any)?.nonceKey).toBe(undefined)
 
     // nonceKey >= 1n is truthy, so nonce is 0
     expect((requests[1] as any)?.nonce).toBe(0)
@@ -89,12 +89,12 @@ describe('chain.prepareTransactionRequest', () => {
       nonce: 123,
     } as never)
     expect((request as any)?.nonce).toBe(123)
-    expect((request as any)?.nonceKey).toBe(0n)
+    expect((request as any)?.nonceKey).toBe(undefined)
   })
 
   test('behavior: default nonceKey is 0n (falsy)', async () => {
     const request = await chain.prepareTransactionRequest({} as never)
-    expect((request as any)?.nonceKey).toBe(0n)
+    expect((request as any)?.nonceKey).toBe(undefined)
     expect((request as any)?.nonce).toBe(undefined)
   })
 
@@ -132,7 +132,7 @@ describe('chain.prepareTransactionRequest', () => {
           to: '0x0000000000000000000000000000000000000000',
         }),
       ])
-      expect(request.nonceKey).toBe(0n)
+      expect(request.nonceKey).toBe(undefined)
       expect(request2.nonceKey).toBeGreaterThan(0n)
       expect(request3.nonceKey).toBeGreaterThan(0n)
     })
@@ -160,7 +160,7 @@ describe('chain.prepareTransactionRequest', () => {
           hash: receipts[2].transactionHash,
         }),
       ])
-      expect(transactions[0].nonceKey).toBe(0n)
+      expect(transactions[0].nonceKey).toBe(undefined)
       expect(transactions[1].nonceKey).toBeGreaterThan(0n)
       expect(transactions[2].nonceKey).toBeGreaterThan(0n)
     })
