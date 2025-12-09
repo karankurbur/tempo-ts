@@ -23,9 +23,6 @@ import {
 export { accounts }
 
 export const config = createConfig({
-  batch: {
-    multicall: false,
-  },
   chains: [chain],
   connectors: [
     dangerous_secp256k1({
