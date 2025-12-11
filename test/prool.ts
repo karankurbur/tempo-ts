@@ -1,4 +1,5 @@
 import { Instance, Server } from 'prool'
+import * as TestContainers from 'prool/testcontainers'
 import { createClient, http } from 'viem'
 import { fetchOptions } from './config.js'
 
@@ -27,7 +28,7 @@ export async function setupServer({ port }: { port: number }) {
 
   const server = Server.create({
     instance: tag
-      ? Instance.tempoDocker({
+      ? TestContainers.Instance.tempo({
           ...args,
           image: `ghcr.io/tempoxyz/tempo:${tag}`,
         })

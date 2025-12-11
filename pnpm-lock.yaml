@@ -22,8 +22,8 @@ catalogs:
       specifier: 3.0.0
       version: 3.0.0
     prool:
-      specifier: ~0.1.1
-      version: 0.1.1
+      specifier: ~0.2.0
+      version: 0.2.0
     react:
       specifier: ^19.1.1
       version: 19.2.0
@@ -127,7 +127,7 @@ importers:
         version: 1.56.1
       prool:
         specifier: catalog:default
-        version: 0.1.1(testcontainers@11.10.0)
+        version: 0.2.0(testcontainers@11.10.0)
       react:
         specifier: catalog:default
         version: 19.2.0
@@ -417,7 +417,7 @@ importers:
         version: 2.16.0(@babel/core@7.28.4)(@babel/template@7.27.2)(@types/react@19.2.2)(react@19.2.0)
       prool:
         specifier: catalog:default
-        version: 0.1.1(testcontainers@11.10.0)
+        version: 0.2.0(testcontainers@11.10.0)
       react:
         specifier: catalog:default
         version: 19.2.0
@@ -4041,8 +4041,8 @@ packages:
     resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}
     engines: {node: '>= 0.6.0'}
 
-  prool@0.1.1:
-    resolution: {integrity: sha512-MNsoOlgyDuHzFZkF3I2ltGgA+FEiBBLr4rdM4ZSqIp3yH4xN21pI8V+D4hYpQVSdzIrfR+ziWe/yTlJPSpEFWA==}
+  prool@0.2.0:
+    resolution: {integrity: sha512-nCKuUf673rG1jzXye7px5LPjaO0orIpMZqbeQgTBfrFF4bvVGXyrEK0ZD0OoDYl5R3i+Zgb4bPwwR6MEjZ55VQ==}
     engines: {node: '>=22'}
     peerDependencies:
       '@pimlico/alto': '*'
@@ -9758,7 +9758,7 @@ snapshots:
 
   process@0.11.10: {}
 
-  prool@0.1.1(testcontainers@11.10.0):
+  prool@0.2.0(testcontainers@11.10.0):
     dependencies:
       change-case: 5.4.4
       eventemitter3: 5.0.1
