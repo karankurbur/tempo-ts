@@ -15,9 +15,6 @@
 		"test": "vitest"
 	},
 	"packageManager": "pnpm@10.18.3",
-	"repository": {
-		"url": "https://github.com/tempoxyz/tempo-ts"
-	},
 	"devEngines": {
 		"runtime": {
 			"name": "node",
@@ -107,7 +104,9 @@
 			"optional": true
 		}
 	},
-	"author": "jxom <j@wevm.dev>",
+	"repository": {
+		"url": "https://github.com/tempoxyz/tempo-ts"
+	},
 	"license": "MIT",
 	"files": [
 		"dist",
