@@ -61,7 +61,7 @@ export function localStorage(options: localStorage.Options = {}) {
   const storage = createStorage({
     ...options,
     key,
-    storage: window.localStorage,
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
   })
   return fromStorage(storage)
 }
