@@ -560,7 +560,7 @@ export function webAuthn(options: webAuthn.Parameters) {
 
       const targetChain = defineChain({
         ...chain,
-        async prepareTransactionRequest(args) {
+        async prepareTransactionRequest(args, { phase }) {
           const keyAuthorization = await (async () => {
             {
               const keyAuthorization = (
@@ -581,8 +581,24 @@ export function webAuthn(options: webAuthn.Parameters) {
             )
             return keyAuthorization
           })()
+
+          const [prepareTransactionRequestFn, options] = (() => {
+            if (!chain.prepareTransactionRequest) return [undefined, undefined]
+            if (typeof chain.prepareTransactionRequest === 'function')
+              return [chain.prepareTransactionRequest, undefined]
+            return chain.prepareTransactionRequest
+          })()
+
+          const request = await (async () => {
+            if (!prepareTransactionRequestFn) return {}
+            if (!options || options?.runAt?.includes(phase))
+              return await prepareTransactionRequestFn(args, { phase })
+            return {}
+          })()
+
           return {
             ...args,
+            ...request,
             keyAuthorization,
           }
         },
